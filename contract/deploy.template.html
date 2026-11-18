@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deploy · TalvioGenerate — DOTFIELD</title><meta name="robots" content="noindex">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#050505;--panel:#111110;--line:#2c2c2a;--text:#f2efe6;--muted:#a49e8f;--accent:#f2efe6;--red:#ff3b30;--ok:#7ef0b0;--err:#ff9292}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,sans-serif;padding:24px}main{max-width:780px;margin:auto}h1{margin:0 0 6px;font-size:32px;letter-spacing:.02em}h2{margin:0 0 12px;font-size:20px}p{color:var(--muted)}.sub{margin:0 0 22px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0}.warn{border-color:var(--red)}.order{border-color:var(--accent)}label{display:block;margin:12px 0 6px;color:var(--muted)}input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#0a0a09;color:var(--text);font:inherit}button{border:0;border-radius:8px;padding:12px 15px;background:var(--accent);color:#111;font-weight:800;cursor:pointer;margin:8px 8px 0 0}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#26261f;color:var(--text)}.danger{background:var(--red);color:#fff}.status{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}.ok{color:var(--ok)}.err{color:var(--err)}code{color:var(--accent);overflow-wrap:anywhere}.small{font-size:13px}a{color:var(--accent)}.tokenaddr{font-size:17px;word-break:break-all}ol{margin:8px 0;padding-left:22px}ol li{margin:4px 0}.chk{display:flex;gap:10px;align-items:flex-start;margin:12px 0;color:var(--text)}.chk input{width:auto;margin-top:4px}
+</style></head><body><main>
+<h1>Deploy TalvioGenerate</h1><p class="sub">DOTFIELD Charge Day NFT · BNB Smart Chain (56) · "Talvio Dot Robot" (DOTR) · Mint starts CLOSED — you open Field Nº 1 yourself, last step only</p>
+<div class="card warn"><b>Mainnet warning.</b> Nothing is launched until you deploy and sign with your own wallet on this page. The contract is unaudited. Never share your seed phrase or private key.</div>
+<div class="card order"><h2>Deploy order — do not skip or reorder</h2><ol>
+<li><b>Deploy TalvioGenerate (NFT)</b> — section 2 below. Mint is closed at deploy.</li>
+<li><b>Deploy $DOT</b> — from the token deploy page, with <b>this NFT contract's address as the claim pool</b>, so 600,000,000 DOT (60%) lands directly in the NFT contract and 400,000,000 DOT (40%) goes to your wallet.</li>
+<li><b>Wire: setDotToken(DOT address)</b> — section 4. Check poolOf() shows 600,000,000 DOT.</li>
+<li><b>OPEN MINT — LAST, only when fully ready</b> — section 6. Field Nº 1 starts the day you press it.</li>
+</ol></div>
+<section class="card"><h2>1. Connect owner wallet</h2><button id="connect">Connect wallet</button><div id="wallet" class="status"></div></section>
+<section class="card"><h2>2. Deploy TalvioGenerate (NFT)</h2>
+<p class="small">Deploys the NFT contract with mint <b>closed</b>. baseURI is preset to https://talviogenerate.com/nft/metadata/. Nothing can be resolved until you open the mint in section 6.</p>
+<button id="deployNft" disabled>Deploy TalvioGenerate &amp; sign</button><div id="nftStatus" class="status"></div>
+<div id="nftResult"></div>
+<label for="nftAddr">NFT contract address (auto-filled after deploy; paste it here if already deployed)</label><input id="nftAddr" placeholder="0x… TalvioGenerate address" autocomplete="off">
+</section>
+<section class="card"><h2>3. Deploy $DOT (pool = the NFT contract)</h2>
+<p class="small">Open the token deploy page and deploy DOT there, pasting <b>the NFT contract address from section 2</b> into its "Claim pool address" field. The full DOT supply is minted in that one transaction: 600,000,000 DOT to the NFT contract (the discharge claim pool) and 400,000,000 DOT to your wallet. Then paste the resulting DOT address here.</p>
+<p><a href="../token/deploy.html" target="_blank" rel="noopener">Open the $DOT deploy page (../token/deploy.html) ↗</a></p>
+<label for="dotAddr">DOT token address</label><input id="dotAddr" placeholder="0x… DOT address" autocomplete="off">
+<button id="checkDot" class="secondary">Check DOT</button><div id="dotStatus" class="status"></div>
+</section>
+<section class="card"><h2>4. Wire: setDotToken + pool check</h2>
+<p class="small">Points the NFT contract at the DOT token so discharge can pay claims out of its pool. Afterwards poolOf() must read exactly 600,000,000 DOT.</p>
+<button id="wire" disabled>setDotToken(DOT) &amp; sign</button><button id="checkPool" class="secondary">Read poolOf()</button><div id="wireStatus" class="status"></div>
+</section>
+<section class="card"><h2>5. Status</h2>
+<button id="refresh" class="secondary">Refresh status</button><div id="statusOut" class="status"></div>
+</section>
+<section class="card warn"><h2>6. OPEN MINT — Field Nº 1 starts today</h2>
+<p class="small">This is the point of no return for the launch clock: <b>Field Nº 1 is the day you press this button</b> (days roll over at 12:00 UTC). DPASS sales open together with Field Nº 1; the DPASS lane (pass holders resolving without an Agent ID) activates at <b>Field Nº 4</b>. Make sure sections 2–4 are done and poolOf() shows 600,000,000 DOT first — discharging is how holders claim DOT, and claims point at this pool.</p>
+<label class="chk"><input type="checkbox" id="openConfirm"><span>I understand: pressing Open Mint starts Field Nº 1 today, and this cannot be undone or paused.</span></label>
+<button id="openMint" class="danger" disabled>OPEN MINT &amp; sign</button><div id="openStatus" class="status"></div>
+</section>
+</main><script>
+const ARTIFACT={"abi":__ABI__,"bytecode":"__BYTECODE__"};
+const ERC20_ABI=["function name() view returns (string)","function symbol() view returns (string)","function balanceOf(address) view returns (uint256)","function totalSupply() view returns (uint256)"];
+const CHAIN_ID='0x38';
+let provider,signer;
+const $=id=>document.getElementById(id);
+function show(id,text,type=''){$(id).textContent=text;$(id).className='status '+type}
+function link(a,t='address'){return `https://bscscan.com/${t}/${a}`}
+function fmtDot(x){return Number(ethers.formatUnits(x,18)).toLocaleString('en-US')}
+async function switchChain(){try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:CHAIN_ID}]})}catch(e){if(e.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:CHAIN_ID,chainName:'BNB Smart Chain',nativeCurrency:{name:'BNB',symbol:'BNB',decimals:18},rpcUrls:['https://bsc-dataseed.bnbchain.org'],blockExplorerUrls:['https://bscscan.com']}]});else throw e}}
+async function connect(){if(!window.ethereum)return show('wallet','No wallet found.','err');try{await switchChain();provider=new ethers.BrowserProvider(window.ethereum);await provider.send('eth_requestAccounts',[]);signer=await provider.getSigner();const me=await signer.getAddress();show('wallet','Connected: '+me,'ok');$('deployNft').disabled=false;$('wire').disabled=false;refresh()}catch(e){show('wallet',e.shortMessage||e.message||String(e),'err')}}
+function readProvider(){return provider||new ethers.JsonRpcProvider('https://bsc-dataseed.bnbchain.org')}
+function nftContract(forWrite){const a=$('nftAddr').value.trim();if(!ethers.isAddress(a))return null;return new ethers.Contract(a,ARTIFACT.abi,forWrite?signer:readProvider())}
+async function deployNft(){if(!signer)return show('nftStatus','Connect your wallet first.','err');$('deployNft').disabled=true;try{const f=new ethers.ContractFactory(ARTIFACT.abi,ARTIFACT.bytecode,signer);show('nftStatus','Deploy transaction created. Confirm it in your wallet…');const c=await f.deploy();show('nftStatus','Tx: '+c.deploymentTransaction().hash+'\nWaiting for confirmation…');await c.waitForDeployment();const a=await c.getAddress();$('nftAddr').value=a;localStorage.setItem('talvio_nft_address',a);$('nftResult').innerHTML=`<p class="status ok">Deploy successful. NFT contract address:</p><p class="tokenaddr"><code>${a}</code></p><p class="small">Copy this address into the $DOT deploy page as the claim pool (section 3). <a href="${link(a)}" target="_blank" rel="noopener">View on BscScan</a></p>`;show('nftStatus','Mint is CLOSED. Continue with section 3.','ok');refresh()}catch(e){show('nftStatus',e.shortMessage||e.message||String(e),'err');$('deployNft').disabled=false}}
+async function checkDot(){const d=$('dotAddr').value.trim();const n=$('nftAddr').value.trim();if(!ethers.isAddress(d))return show('dotStatus','DOT address is not a valid address.','err');try{const c=new ethers.Contract(d,ERC20_ABI,readProvider());const [nm,sy,ts]=await Promise.all([c.name(),c.symbol(),c.totalSupply()]);let s=`${nm} (${sy}) · Total supply: ${fmtDot(ts)} DOT`;if(ethers.isAddress(n)){const bal=await c.balanceOf(n);s+=`\nBalance of the NFT contract: ${fmtDot(bal)} DOT`+(bal===600000000n*10n**18n?' ✓ (the 60% claim pool)':' — WARNING: expected exactly 600,000,000 DOT')}show('dotStatus',s,bal===600000000n*10n**18n?'ok':'')}catch(e){show('dotStatus','Could not read a token at that address: '+(e.shortMessage||e.message||String(e)),'err')}}
+async function wire(){const c=nftContract(true);const d=$('dotAddr').value.trim();if(!c)return show('wireStatus','Set a valid NFT contract address in section 2 first.','err');if(!ethers.isAddress(d))return show('wireStatus','DOT address is not a valid address.','err');if(!signer)return show('wireStatus','Connect your wallet first.','err');$('wire').disabled=true;try{show('wireStatus','setDotToken transaction created. Confirm it in your wallet…');const tx=await c.setDotToken(d);await tx.wait();localStorage.setItem('talvio_dot_address',d);const pool=await c.poolOf();show('wireStatus',`Wired. dotToken = ${await c.dotToken()}\npoolOf() = ${fmtDot(pool)} DOT`+(pool===600000000n*10n**18n?' ✓':' — WARNING: expected 600,000,000 DOT'),pool===600000000n*10n**18n?'ok':'err')}catch(e){show('wireStatus',e.shortMessage||e.message||String(e),'err')}finally{$('wire').disabled=false}}
+async function checkPool(){const c=nftContract(false);if(!c)return show('wireStatus','Set a valid NFT contract address in section 2 first.','err');try{const dt=await c.dotToken();const pool=await c.poolOf();show('wireStatus',`dotToken = ${dt}\npoolOf() = ${fmtDot(pool)} DOT`,pool===600000000n*10n**18n?'ok':'')}catch(e){show('wireStatus',e.shortMessage||e.message||String(e),'err')}}
+async function refresh(){const c=nftContract(false);if(!c)return show('statusOut','Set the NFT contract address in section 2 to read status.');try{const [open,first,day,field]=await Promise.all([c.mintOpen(),c.firstDayId(),c.currentDay(),c.fieldNumber()]);let s=`mintOpen: ${open}\nfirstDayId: ${first}\ncurrentDay: ${day}\nField Nº: ${open?field:'— (mint closed)'}`;if(open){const st=await c.dayStats(day);s+=`\nToday: resolved ${st[0]} / 250 · free used ${st[1]} / 150 · unique wallets ${st[2]}`;const tiers=['SPARK','CHARGED','OVERDRIVE'];s+=`\nToday's tier so far: ${tiers[Number(await c.tierOf(day))]}`;s+=`\npassLaneActive: ${await c.passLaneActive()}`}s+=`\ntotalMinted: ${await c.totalMinted()}`;show('statusOut',s,'ok');updateOpenBtn(open)}catch(e){show('statusOut','Could not read status: '+(e.shortMessage||e.message||String(e)),'err')}}
+function updateOpenBtn(open){$('openMint').disabled=!(signer&&$('openConfirm').checked&&open===false)}
+async function openMint(){const c=nftContract(true);if(!c)return show('openStatus','Set a valid NFT contract address in section 2 first.','err');if(!signer)return show('openStatus','Connect your wallet first.','err');$('openMint').disabled=true;try{show('openStatus','openMint transaction created. Confirm it in your wallet…');const tx=await c.openMint();await tx.wait();show('openStatus',`MINT IS OPEN. Field Nº 1 started today (firstDayId ${await c.firstDayId()}). DPASS lane activates at Field Nº 4.`,'ok');refresh()}catch(e){show('openStatus',e.shortMessage||e.message||String(e),'err');updateOpenBtn(false)}}
+const savedNft=localStorage.getItem('talvio_nft_address');if(savedNft)$('nftAddr').value=savedNft;
+const savedDot=localStorage.getItem('talvio_dot_address');if(savedDot)$('dotAddr').value=savedDot;
+$('connect').onclick=connect;$('deployNft').onclick=deployNft;$('checkDot').onclick=checkDot;$('wire').onclick=wire;$('checkPool').onclick=checkPool;$('refresh').onclick=refresh;$('openMint').onclick=openMint;
+$('openConfirm').onchange=()=>refresh();
+if(savedNft)refresh();
+</script></body></html>
