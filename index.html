@@ -263,7 +263,7 @@
   }
   .chamber-foot .pulse-dot{margin-top:5px}
 
-  /* simulator */
+  /* seal animation + live readout */
   .sim{margin-top:26px;border:1px solid var(--line);display:grid;grid-template-columns:340px 1fr}
   .sim-canvas-box{position:relative;background:#000;border-right:1px solid var(--line);min-height:300px}
   #simCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -555,7 +555,7 @@
         <p><b>DOTFIELD is built on Charge Day.</b> Every day is one charge cycle: one <b>free unit per wallet per day</b> for Agent ID holders, a quiet paid ladder beside it, then the day <b>seals at 12:00 UTC</b> — its units freeze into one Mosaic, its Charge Tier is set forever, and from seal +6h every sealed unit can <b>Discharge</b> once. The free daily charge is the hero. Paid is the side door.</p>
         <div class="charge-panel" aria-label="Charge Day live panel">
           <div class="cp-head">
-            <div class="cp-day"><span id="cdDay">DAY Nº —</span><small>CHARGE DAY · SEALS 12:00 UTC</small></div>
+            <div class="cp-day"><span id="cdDay">FIELD Nº 1</span><small id="cdDaySub">NOT OPENED — OPENS ON THE OWNER'S SIGNAL</small></div>
             <div class="countdown"><b id="cdCountdown">--:--:--</b><span>TO NEXT SEAL</span></div>
           </div>
           <div class="cp-row"><span>UNITS TODAY</span><span id="cdUnits">— / 250 CAP</span></div>
@@ -564,8 +564,8 @@
           <div class="cp-bar free" aria-hidden="true"><i id="cdFreeBar"></i></div>
           <div class="cp-row"><span>UNIQUE WALLETS TODAY</span><span id="cdWallets">—</span></div>
           <div class="cp-row"><span>CHARGE TIER NOW</span><span id="cdTier" style="color:var(--gold)">—</span></div>
-          <div class="cp-row"><span>TOTAL RESOLVED</span><span>0 / 10,000 · MINT CLOSED</span></div>
-          <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN · MINT CLOSED — FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL. Day, countdown and seal time are real clock math; unit / wallet counts are a labelled local simulation of the published spec, not on-chain data. Total resolved is 0 — nothing has minted yet.</div>
+          <div class="cp-row"><span>TOTAL RESOLVED</span><span id="cdTotal">0 / 10,000 · MINT CLOSED</span></div>
+          <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN. Every count in this panel — units today, free quota, unique wallets, charge tier, total resolved — is read live from the TalvioGenerate contract and refreshed about every 15 seconds; nothing here is simulated. While mintOpen is false the Field has not opened and the counts read zero — Field Nº 1 opens on the owner's signal.</div>
         </div>
       </div>
       <div class="hero-cta">
@@ -721,21 +721,23 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
       </div>
       <div class="chamber-foot">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <span id="chamberFootText">HONEST STATE: CONTRACT DEPLOYED · MINT CLOSED · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. The contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C and the 600,000,000 DOT claim pool is funded, but mintOpen is still false — no wallet connection is requested and no funds can move from this page until the owner opens Field Nº 1. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
+        <span id="chamberFootText">HONEST STATE: CONTRACT LIVE · MINT CLOSED — READ LIVE FROM BNB CHAIN. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. This page is wired to the contract at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C and the 600,000,000 DOT claim pool is funded, but mintOpen is still false — connect a wallet and every lane reports the chain's real state, yet no funds can move until the owner opens Field Nº 1. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
       </div>
 
-      <!-- SIMULATOR -->
+      <!-- SEAL ANIMATION + LIVE DAY READOUT -->
       <div class="sim reveal">
         <div class="sim-canvas-box">
-          <canvas id="simCanvas" aria-label="Simulation canvas: loose dots converge into a sealed block. The unit artwork itself is sealed and never shown."></canvas>
+          <canvas id="simCanvas" aria-label="Seal animation canvas: loose dots converge into a sealed block. The unit artwork itself is sealed and never shown."></canvas>
         </div>
         <div class="sim-side">
           <h3>Feel a resolve</h3>
-          <p>This is a simulation — no wallet, no chain. Press the button and watch loose field dots do what a mint will do at launch: converge, tighten, and harden into one <b style="color:var(--bone)">sealed</b> unit. The artwork inside stays hidden — the seal only opens at the reveal.</p>
-          <button class="btn btn-signal" type="button" id="simBtn">Run resolve simulation</button>
+          <p>Press the button and watch loose field dots do what a resolve does: converge, tighten, and harden into one <b style="color:var(--bone)">sealed</b> unit. The artwork inside stays hidden — the seal only opens at the reveal. The readout under the button is not part of the picture: it is <b style="color:var(--bone)">today's Field, read live from the contract</b> on BNB Chain.</p>
+          <button class="btn btn-signal" type="button" id="simBtn">Run the seal animation</button>
           <div class="sim-readout" id="simReadout">
-            STATE — <b>SCATTERED FIELD</b><br/>
-            DOTS IN PLAY — <b id="simDots">0</b> · CLASS ROLLED — <b id="simClass">—</b>
+            SEAL ANIMATION — <b id="simState">SCATTERED FIELD</b><br/>
+            UNITS TODAY — <b id="simUnits">—</b> · FREE QUOTA LEFT — <b id="simFreeLeft">—</b><br/>
+            UNIQUE WALLETS — <b id="simWallets">—</b> · TIER NOW — <b id="simTier">—</b><br/>
+            TOTAL RESOLVED — <b id="simTotal">—</b> · <span style="color:var(--bone-faint)">LIVE READ · BNB CHAIN</span>
           </div>
         </div>
       </div>
@@ -796,15 +798,14 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
       <span class="side">250 CELLS. ONE DAY.<br/>FROZEN AT THE SEAL<br/>AS MOSAIC Nº N.</span>
     </div>
     <div class="reveal">
-      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — free units in bone, paid units brighter, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is the simulation engine's seeded picture of a day in progress — not live chain data.</p>
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — resolved units in bone, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is drawn from the contract itself: every filled cell is a unit resolved on-chain today, read live from BNB Chain — a cell burns gold only because <b style="color:var(--bone)">isSurge()</b> says that unit is a SURGE, never by decoration.</p>
       <div class="mosaic-wrap">
-        <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Simulated halftone mosaic grid of 250 cells for today, filling as the simulated day progresses."></canvas>
+        <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Halftone mosaic grid of 250 cells for today, filled live from the contract — one cell per unit resolved on-chain today."></canvas>
         <div class="mosaic-legend">
-          <span><i style="background:#eceade"></i>FREE UNIT</span>
-          <span><i style="background:#fff"></i>PAID UNIT</span>
+          <span><i style="background:#eceade"></i>RESOLVED UNIT</span>
           <span><i style="background:var(--gold)"></i>SURGE UNIT</span>
           <span><i style="background:#23231e"></i>UNRESOLVED CELL</span>
-          <span id="mosaicCount" style="margin-left:auto;color:var(--bone)">— / 250 CELLS FILLED (SIMULATION)</span>
+          <span id="mosaicCount" style="margin-left:auto;color:var(--bone)">— / 250 CELLS FILLED · READING CHAIN…</span>
         </div>
       </div>
     </div>
@@ -841,8 +842,8 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <div class="weight">60,000<small>DOT PER UNIT AT DISCHARGE · CORE LV.3</small></div>
         </article>
       </div>
-      <div class="gauge" aria-label="Charge tier gauge, simulation">
-        <div class="g-top"><span>UNIQUE WALLETS TODAY — <b id="gaugeWallets">—</b> (SIMULATION)</span><span>CURRENT TIER — <b id="gaugeTier" style="color:var(--gold)">—</b></span></div>
+      <div class="gauge" aria-label="Charge tier gauge — live on-chain read">
+        <div class="g-top"><span>UNIQUE WALLETS TODAY — <b id="gaugeWallets">—</b> (LIVE READ)</span><span>CURRENT TIER — <b id="gaugeTier" style="color:var(--gold)">—</b></span></div>
         <div class="gauge-track" aria-hidden="true"><i id="gaugeFill"></i></div>
         <div class="gauge-marks"><span>0 · SPARK</span><span>25 · CHARGED</span><span>100+ · OVERDRIVE</span></div>
       </div>
@@ -998,13 +999,13 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
     <div class="sec-head reveal">
       <span class="sec-no">09</span>
       <h2 id="checker-h">Unit Checker</h2>
-      <span class="side">SEEDED SPECIMEN LOOKUP.<br/>DETERMINISTIC — THE SAME<br/>NUMBER, THE SAME ANSWER.</span>
+      <span class="side">LIVE LOOKUP.<br/>CLASS FROM METADATA —<br/>STATE FROM THE CONTRACT.</span>
     </div>
     <div class="reveal">
       <div class="tool-grid">
         <div class="tool">
           <h3>Check a unit number</h3>
-          <p>Enter any unit from <b style="color:var(--bone)">#1 to #10,000</b>. Its class is read from the unit's own published metadata — classes are seeded across the whole range, not stacked in blocks. Day, Mosaic position, core level and SURGE status below are a deterministic specimen projection from the unit's seed: an illustration of the published spec, not a prediction and not on-chain data — the contract is deployed, but mint is closed and no units exist on-chain yet.</p>
+          <p>Enter any unit from <b style="color:var(--bone)">#1 to #10,000</b>. Its class is read from the unit's own published metadata — classes are seeded across the whole range, not stacked in blocks. Everything else is chain-first: if the unit has been resolved, its field, core level, SURGE status and exact DOT claim are read live from the contract. If it has not been resolved yet, the checker says so plainly — an unminted unit has no on-chain data, and none is invented for it.</p>
           <label for="ucInput">UNIT NUMBER</label>
           <div class="q-form">
             <input id="ucInput" type="number" min="1" max="10000" value="1" aria-label="Unit number" style="flex:1;min-height:50px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px" />
@@ -1137,7 +1138,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
         </details>
         <details>
           <summary>When does resolving open?<span class="plus" aria-hidden="true">+</span></summary>
-          <div class="a">When the owner opens mint. The contracts are already <b>deployed on BNB Chain</b> — NFT <b>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</b>, DOT <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — both Sourcify-verified, and the <b>600,000,000 DOT claim pool is funded</b>. But <b>mintOpen is still false</b> and Field Nº 1 has not started: resolving opens only on the owner's Open Mint signal. Until then this page runs an honestly labelled <b>simulation engine</b> for the day counts — no wallet connects here and no funds can move from this page; on-chain mint wiring from the website is a later step.</div>
+          <div class="a">When the owner opens mint. The contracts are already <b>deployed on BNB Chain</b> — NFT <b>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</b>, DOT <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — both Sourcify-verified, and the <b>600,000,000 DOT claim pool is funded</b>. But <b>mintOpen is still false</b> and Field Nº 1 has not started: resolving opens only on the owner's Open Mint signal. This page is wired to that contract — connect a wallet and the lanes send real transactions, and every count on the page is read live from BNB Chain. Until the owner opens Field Nº 1, the lanes report the closed state and every send still reverts on-chain.</div>
         </details>
         <details>
           <summary>Which lane can pull an Aurum Dot or a SURGE?<span class="plus" aria-hidden="true">+</span></summary>
@@ -1334,6 +1335,39 @@ function dfRevertString(err){
   var m = /execution reverted:?\s*"?([^"\n]+?)"?\s*$/i.exec((err && err.message) || "");
   if (m) return m[1].trim();
   return null;
+}
+function dfTierIdx(w){
+  w = Number(w);
+  return w >= 100 ? 2 : (w >= 25 ? 1 : 0);
+}
+var DF_TIERS = [
+  { name: "SPARK", coreLevel: 1, claimDot: 2500 },
+  { name: "CHARGED", coreLevel: 2, claimDot: 12500 },
+  { name: "OVERDRIVE", coreLevel: 3, claimDot: 60000 }
+];
+/* Display model for every live-stat surface on the page (hero
+   charge panel, tier gauge, mosaic counter, §02 live readout).
+   Inputs are the contract's own numbers — mintOpen, totalMinted,
+   fieldNumber, dayStats — and every string returned here is
+   derived from them. Nothing is seeded, nothing is invented. */
+function dfLiveModel(open, total, field, resolved, freeUsed, wallets){
+  var ti = dfTierIdx(wallets), t = DF_TIERS[ti];
+  return {
+    tierIdx: ti, tierName: t.name, coreLevel: t.coreLevel, claimDot: t.claimDot,
+    dayLabel: open ? "FIELD Nº " + field : "FIELD Nº 1",
+    daySub: open ? "CHARGE DAY · SEALS 12:00 UTC" : "NOT OPENED — OPENS ON THE OWNER'S SIGNAL",
+    unitsText: resolved + " / 250 CAP",
+    unitsPct: resolved / 250 * 100,
+    freeText: freeUsed + " / 150",
+    freePct: freeUsed / 150 * 100,
+    freeLeft: 150 - freeUsed,
+    walletsText: String(wallets),
+    tierText: t.name + " · CORE LV." + t.coreLevel,
+    totalText: total + " / 10,000 · " + (open ? "MINT LIVE" : "MINT CLOSED"),
+    gaugeTierText: t.name + " · " + t.claimDot.toLocaleString("en-US") + " DOT / UNIT",
+    gaugePct: Math.min(100, wallets / 120 * 100),
+    mosaicNo: open ? field : 1
+  };
 }
 /* __PURE_CHAIN_HELPERS_END__ */
 
@@ -1670,9 +1704,14 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 })();
 
 /* ============================================================
-   CHARGE DAY ENGINE — simulation, honestly labelled.
-   Real clock math for Day Nº / countdown / seal; unit & wallet
-   counts are a seeded local simulation of the published spec.
+   CHARGE DAY LIVE DISPLAY — every count rendered by this block
+   is read from the TalvioGenerate contract on BNB Chain. The
+   chain module at the end of this script owns the reads (15s
+   cadence) and calls window.__dfLiveHook after every refresh;
+   this block renders that state into the hero panel, the tier
+   gauge, the Mosaic, the §02 live readout and the unit
+   checker. The countdown is real clock math to the next
+   12:00 UTC seal. No seeded numbers remain anywhere.
    ============================================================ */
 (function(){
   function nextSeal(now){
@@ -1681,82 +1720,145 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
     if (now >= seal) seal += 86400000;
     return seal;
   }
-  function dayNumber(now){
-    var n = Math.floor((now - CONFIG.GENESIS_UTC) / 86400000) + 1;
-    return Math.max(1, n);
-  }
-  var now0 = Date.now();
-  var dayNo = dayNumber(now0);
-  var rnd = seededRand(dayNo * 7919 + 13);
-  var unitsToday = 90 + Math.floor(rnd() * 140);              // 90–229 of 250
-  var walletsToday = Math.min(unitsToday, 30 + Math.floor(rnd() * 110)); // 30–139
-  var freeUsed = Math.min(CONFIG.FREE_DAILY_QUOTA, Math.floor(unitsToday * 0.62));
-  var tier = tierForWallets(walletsToday);
-  window.DOTFIELD_SIM = { dayNo: dayNo, units: unitsToday, wallets: walletsToday, freeUsed: freeUsed, tier: tier };
 
-  /* hero panel */
-  var cdDay = document.getElementById("cdDay");
-  if (cdDay) {
-    cdDay.textContent = "DAY Nº " + dayNo;
-    document.getElementById("cdUnits").textContent = unitsToday + " / " + CONFIG.DAY_CAP + " CAP";
-    document.getElementById("cdUnitsBar").style.width = (unitsToday / CONFIG.DAY_CAP * 100) + "%";
-    document.getElementById("cdFree").textContent = freeUsed + " / " + CONFIG.FREE_DAILY_QUOTA;
-    document.getElementById("cdFreeBar").style.width = (freeUsed / CONFIG.FREE_DAILY_QUOTA * 100) + "%";
-    document.getElementById("cdWallets").textContent = walletsToday;
-    document.getElementById("cdTier").textContent = tier.name + " · CORE LV." + tier.coreLevel;
-    var cdEl = document.getElementById("cdCountdown");
-    function tick(){
+  /* countdown to the next seal — real clock math */
+  var cdEl = document.getElementById("cdCountdown");
+  if (cdEl) {
+    var tickCd = function(){
       var diff = Math.max(0, nextSeal(Date.now()) - Date.now());
       var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
       cdEl.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    };
+    tickCd(); setInterval(tickCd, 1000);
+  }
+
+  /* ---- live chain state, fed by the DOTFIELD chain module ---- */
+  var live = { read: false, open: false, total: 0n, day: 0n, field: 0n, resolved: 0, freeUsed: 0, wallets: 0 };
+  function pullLive(){
+    if (!window.DOTFIELD_LIVE) return false;
+    var st = window.DOTFIELD_LIVE.get();
+    if (!st || !st.read) return false;
+    live.read = true;
+    live.open = !!st.open;
+    live.total = st.total; live.day = st.day; live.field = st.field;
+    if (st.stats) {
+      live.resolved = Number(st.stats.resolved);
+      live.freeUsed = Number(st.stats.freeUsed);
+      live.wallets = Number(st.stats.uniqueWallets);
     }
-    tick(); setInterval(tick, 1000);
+    return true;
+  }
+  function model(){
+    return dfLiveModel(live.open, Number(live.total), Number(live.field), live.resolved, live.freeUsed, live.wallets);
   }
 
-  /* tier gauge + active card */
-  var gw = document.getElementById("gaugeWallets");
-  if (gw) {
-    gw.textContent = walletsToday;
-    document.getElementById("gaugeTier").textContent = tier.name + " · " + tier.claimDot.toLocaleString("en-US") + " DOT / UNIT";
-    document.getElementById("gaugeFill").style.width = Math.min(100, walletsToday / 120 * 100) + "%";
-    var idx = CONFIG.TIERS.indexOf(tier);
-    document.querySelectorAll(".tier-card").forEach(function(card){
-      if (parseInt(card.getAttribute("data-tier"), 10) === idx) card.classList.add("active");
-    });
+  /* hero panel + tier gauge + §02 live readout — one model */
+  function renderLive(){
+    if (!pullLive()) return;
+    var m = model();
+    var cdDay = document.getElementById("cdDay");
+    if (cdDay) {
+      cdDay.textContent = m.dayLabel;
+      var sub = document.getElementById("cdDaySub");
+      if (sub) sub.textContent = m.daySub;
+      document.getElementById("cdUnits").textContent = m.unitsText;
+      document.getElementById("cdUnitsBar").style.width = m.unitsPct + "%";
+      document.getElementById("cdFree").textContent = m.freeText;
+      document.getElementById("cdFreeBar").style.width = m.freePct + "%";
+      document.getElementById("cdWallets").textContent = m.walletsText;
+      document.getElementById("cdTier").textContent = m.tierText;
+      document.getElementById("cdTotal").textContent = m.totalText;
+    }
+    var gw = document.getElementById("gaugeWallets");
+    if (gw) {
+      gw.textContent = m.walletsText;
+      document.getElementById("gaugeTier").textContent = m.gaugeTierText;
+      document.getElementById("gaugeFill").style.width = m.gaugePct + "%";
+      document.querySelectorAll(".tier-card").forEach(function(card){
+        if (parseInt(card.getAttribute("data-tier"), 10) === m.tierIdx) card.classList.add("active");
+        else card.classList.remove("active");
+      });
+    }
+    var su = document.getElementById("simUnits");
+    if (su) {
+      su.textContent = live.resolved + " / 250";
+      document.getElementById("simFreeLeft").textContent = m.freeLeft + " / 150";
+      document.getElementById("simWallets").textContent = m.walletsText;
+      document.getElementById("simTier").textContent = m.tierText;
+      document.getElementById("simTotal").textContent = live.total.toString() + " / 10,000";
+    }
+    drawMosaic();
+    fetchSurges();
   }
+  window.__dfLiveHook = renderLive;
+  setInterval(renderLive, 15000);
 
-  /* mosaic of the day — 25 × 10 halftone cells */
-  var mc = document.getElementById("mosaicCanvas");
-  if (mc) {
+  /* mosaic of the day — 25 × 10 halftone cells. Filled cells are
+     today's resolved units, read live: token IDs are sequential,
+     so today's units are exactly the last dayStats.resolved IDs
+     of totalMinted. SURGE cells come from real isSurge() reads
+     over that exact ID range — gold is painted only from chain
+     data. (The contract does not store free-vs-paid per token,
+     so resolved cells share one bone tone; the free/paid split
+     is reported as real counts in the counter line.) */
+  var surgeCache = { key: "", map: {} };
+  function drawMosaic(){
+    var mc = document.getElementById("mosaicCanvas");
+    if (!mc) return;
     var c = mc.getContext("2d"), W = mc.width, H = mc.height;
     c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
     var cols = 25, rows = 10, cw = W / cols, ch = H / rows;
-    var mr = seededRand(dayNo * 104729 + 7);
+    var firstId = live.total - BigInt(live.resolved) + 1n;
     var surgeCount = 0;
     for (var i = 0; i < cols * rows; i++) {
       var x = (i % cols) * cw + cw / 2, y = Math.floor(i / cols) * ch + ch / 2;
-      var hash = Math.floor(mr() * 100000);
-      var rBase = 3 + (hash % 100) / 100 * 9; // halftone radius variation
-      var filled = i < unitsToday;
+      var hsh = (Math.imul(i + 1, 2654435761) >>> 0) % 100;
+      var rBase = 3 + hsh / 100 * 9; // halftone radius variation — texture only, never data
+      var filled = live.read && i < live.resolved;
+      var isS = false;
+      if (filled) {
+        isS = !!surgeCache.map[(firstId + BigInt(i)).toString()];
+        if (isS) surgeCount++;
+      }
       if (!filled) {
         c.globalAlpha = 0.35; c.fillStyle = "#2a2a24";
         c.beginPath(); c.arc(x, y, Math.max(1.6, rBase * 0.35), 0, Math.PI * 2); c.fill();
-      } else if (hash % 1000 >= 970) {
-        surgeCount++;
+      } else if (isS) {
         c.globalAlpha = 1; c.fillStyle = "#ffce00";
         c.beginPath(); c.arc(x, y, rBase + 2, 0, Math.PI * 2); c.fill();
-      } else if (i < freeUsed) {
-        c.globalAlpha = 0.75; c.fillStyle = "#eceade";
-        c.beginPath(); c.arc(x, y, rBase, 0, Math.PI * 2); c.fill();
       } else {
-        c.globalAlpha = 1; c.fillStyle = "#ffffff";
+        c.globalAlpha = 0.85; c.fillStyle = "#eceade";
         c.beginPath(); c.arc(x, y, rBase, 0, Math.PI * 2); c.fill();
       }
     }
     c.globalAlpha = 1;
-    document.getElementById("mosaicCount").textContent =
-      unitsToday + " / 250 CELLS FILLED · " + surgeCount + " SURGE (SIMULATION · MOSAIC Nº " + dayNo + " IN PROGRESS)";
+    var mcEl = document.getElementById("mosaicCount");
+    if (mcEl) {
+      if (!live.read) mcEl.textContent = "— / 250 CELLS FILLED · READING BNB CHAIN…";
+      else mcEl.textContent = live.resolved + " / 250 CELLS FILLED · " + surgeCount + " SURGE · " +
+        live.freeUsed + " FREE / " + (live.resolved - live.freeUsed) + " PAID · MOSAIC Nº " + model().mosaicNo +
+        (live.open ? " IN PROGRESS" : " — FIELD NOT OPENED");
+    }
   }
+  function fetchSurges(){
+    if (!live.read || live.resolved <= 0 || !window.DOTFIELD_LIVE) return;
+    var key = live.total.toString() + ":" + live.resolved;
+    if (key === surgeCache.key) return;
+    surgeCache.key = key;
+    var firstId = live.total - BigInt(live.resolved) + 1n;
+    var calls = [];
+    for (var i = 0; i < live.resolved; i++) {
+      var id = firstId + BigInt(i);
+      calls.push({ key: "s" + id.toString(), data: dfEncodeCall("isSurge(uint256)", ["uint256"], [id]), tid: id.toString() });
+    }
+    window.DOTFIELD_LIVE.rpcBatch(calls, []).then(function(m){
+      var map = {};
+      calls.forEach(function(cl){ map[cl.tid] = m[cl.key] !== undefined ? dfDecBool(m[cl.key], 0) : false; });
+      surgeCache.map = map;
+      drawMosaic();
+    }).catch(function(){});
+  }
+  drawMosaic();
 
   /* anti-bot arithmetic question — driven live by the DOTFIELD chain
      module at the end of this script: the question comes from
@@ -1792,40 +1894,17 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
     dcRender();
   }
 
-  /* unit checker — class read from the unit's own published
-     metadata (the collection's classes are seeded across the
-     full range, NOT stacked in ID blocks); day / tier / SURGE
-     are a deterministic specimen projection, labelled as such */
+  /* unit checker — chain-first. Class comes from the unit's own
+     published metadata (classes are seeded across the full
+     range, NOT stacked in ID blocks); everything else comes
+     from the contract. If ownerOf() answers, the unit exists
+     and its field, core level, SURGE status and exact DOT claim
+     are read live. If ownerOf() reverts, the unit is not minted
+     yet and the checker says exactly that — no projections. */
   var ucOut = document.getElementById("ucOut");
   if (ucOut) {
-    function ucRender(id, classLabel){
-      var seed = (Math.imul(id, 2654435761) >>> 0);
-      var surge = seed % 1000 >= 970;
-      var r = seededRand(seed);
-      var mDay = 1 + Math.floor(r() * 50);
-      var mPos = (id - 1) % 250 + 1;
-      var wThatDay = 8 + Math.floor(r() * 150);
-      var t = tierForWallets(wThatDay);
-      var claim = surge ? CONFIG.SURGE_CLAIM_DOT : t.claimDot;
-      ucOut.classList.add("show");
-      ucOut.innerHTML =
-        "UNIT — <b>#" + id.toLocaleString("en-US") + "</b> · CLASS — <b>" + classLabel + "</b><br/>" +
-        "PROJECTED SEAL — DAY / MOSAIC <b>Nº " + mDay + "</b> · CELL <b>" + mPos + " / 250</b><br/>" +
-        "THAT DAY (PROJECTION) — <b>" + wThatDay + "</b> UNIQUE WALLETS → <b>" + t.name + "</b> · CORE <b>LV." + t.coreLevel + "</b><br/>" +
-        (surge ? "SURGE (PROJECTION) — <b class='gold'>YES · GOLD CORE</b><br/>" : "SURGE (PROJECTION) — NO<br/>") +
-        "PROJECTED DISCHARGE CLAIM — <b class='gold'>" + claim.toLocaleString("en-US") + " DOT</b> · FEE 0.0002 BNB · NEVER EXPIRES<br/>" +
-        "<span style='color:var(--bone-faint)'>CLASS READ FROM THE UNIT'S PUBLISHED METADATA · DAY / TIER / SURGE ARE A SEEDED SPECIMEN PROJECTION — NOT ON-CHAIN DATA. CONTRACT DEPLOYED · MINT CLOSED.</span>";
-    }
-    function check(){
-      var id = parseInt(document.getElementById("ucInput").value, 10);
-      if (!id || id < 1 || id > 10000) {
-        ucOut.classList.add("show");
-        ucOut.innerHTML = "ENTER A UNIT NUMBER BETWEEN <b>1</b> AND <b>10,000</b>.";
-        return;
-      }
-      ucOut.classList.add("show");
-      ucOut.innerHTML = "READING UNIT <b>#" + id.toLocaleString("en-US") + "</b> FROM ITS PUBLISHED METADATA…";
-      fetch("nft/metadata/" + id + ".json")
+    function ucClass(id){
+      return fetch("nft/metadata/" + id + ".json")
         .then(function(res){ if (!res.ok) throw new Error("metadata"); return res.json(); })
         .then(function(meta){
           var cls = "", specimen = "";
@@ -1835,11 +1914,88 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
           });
           var label = cls ? cls.toUpperCase() : "—";
           if (specimen) label += " · " + specimen.toUpperCase() + " (SPECIMEN)";
-          ucRender(id, label);
+          return label;
         })
-        .catch(function(){
-          ucRender(id, "IN ITS PUBLISHED METADATA — talviogenerate.com/nft/metadata/" + id + ".json");
-        });
+        .catch(function(){ return "IN ITS PUBLISHED METADATA — talviogenerate.com/nft/metadata/" + id + ".json"; });
+    }
+    function ucChain(id){
+      function go(){
+        var bid = BigInt(id);
+        var calls = [
+          { key: "owner",      data: dfEncodeCall("ownerOf(uint256)", ["uint256"], [bid]) },
+          { key: "day",        data: dfEncodeCall("unitDay(uint256)", ["uint256"], [bid]) },
+          { key: "core",       data: dfEncodeCall("coreLevel(uint256)", ["uint256"], [bid]) },
+          { key: "surge",      data: dfEncodeCall("isSurge(uint256)", ["uint256"], [bid]) },
+          { key: "able",       data: dfEncodeCall("dischargeable(uint256)", ["uint256"], [bid]) },
+          { key: "reward",     data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [bid]) },
+          { key: "discharged", data: dfEncodeCall("dischargedOf(uint256)", ["uint256"], [bid]) },
+          { key: "firstDay",   data: dfEncodeCall("firstDayId()", [], []) }
+        ];
+        return window.DOTFIELD_LIVE.rpcBatch(calls, []).then(function(m){
+          if (m.owner === undefined) return { minted: false };
+          var day = m.day ? dfDecUint(m.day, 0) : 0n;
+          var firstDay = m.firstDay ? dfDecUint(m.firstDay, 0) : 0n;
+          var core = m.core ? Number(dfDecUint(m.core, 0)) : 0;
+          var openTs = Number((day + 1n) * 86400n + 43200n + 21600n);
+          return {
+            minted: true,
+            owner: dfDecAddr(m.owner, 0),
+            fieldNo: firstDay > 0n ? (day - firstDay + 1n) : 0n,
+            core: core,
+            tierName: DF_TIERS[Math.min(2, Math.max(0, core - 1))].name,
+            surge: m.surge ? dfDecBool(m.surge, 0) : false,
+            able: m.able ? dfDecBool(m.able, 0) : false,
+            discharged: m.discharged ? dfDecBool(m.discharged, 0) : false,
+            reward: m.reward ? dfDecUint(m.reward, 0) : 0n,
+            openUtc: new Date(openTs * 1000).toUTCString().toUpperCase()
+          };
+        }).catch(function(){ return null; });
+      }
+      if (window.DOTFIELD_LIVE) return go();
+      return new Promise(function(res){
+        var n = 0;
+        var iv = setInterval(function(){
+          n++;
+          if (window.DOTFIELD_LIVE) { clearInterval(iv); res(go()); }
+          else if (n > 24) { clearInterval(iv); res(null); }
+        }, 500);
+      });
+    }
+    function ucRender(id, classLabel, ch){
+      ucOut.classList.add("show");
+      var head = "UNIT — <b>#" + id.toLocaleString("en-US") + "</b> · CLASS — <b>" + classLabel + "</b><br/>";
+      if (ch === null) {
+        ucOut.innerHTML = head +
+          "CHAIN READ UNAVAILABLE — THE PAGE COULD NOT REACH BNB CHAIN JUST NOW. THE CLASS ABOVE IS FROM THE UNIT'S PUBLISHED METADATA; CHECK AGAIN IN A MOMENT FOR ITS ON-CHAIN STATE.";
+        return;
+      }
+      if (!ch.minted) {
+        var st = window.DOTFIELD_LIVE ? window.DOTFIELD_LIVE.get() : null;
+        var tot = st && st.read ? st.total.toString() : "0";
+        ucOut.innerHTML = head +
+          "STATUS — <b>NOT MINTED YET</b> · THIS UNIT HAS NO ON-CHAIN DATA<br/>" +
+          "TOTAL RESOLVED SO FAR — <b>" + tot + " / 10,000</b> · WHEN THIS UNIT IS RESOLVED, ITS FIELD, CORE LEVEL, SURGE STATUS AND EXACT DOT CLAIM WILL BE READ HERE FROM THE CONTRACT — NOTHING ABOUT IT IS PROJECTED OR INVENTED.";
+        return;
+      }
+      ucOut.innerHTML = head +
+        "STATUS — <b>MINTED · READ LIVE FROM THE CONTRACT</b> · OWNER <b>" + ch.owner.slice(0, 6) + "…" + ch.owner.slice(-4) + "</b><br/>" +
+        "SEALED — <b>FIELD Nº " + ch.fieldNo.toString() + "</b> · CORE <b>LV." + ch.core + "</b> · DAY TIER <b>" + ch.tierName + "</b><br/>" +
+        (ch.surge ? "SURGE — <b class='gold'>YES · GOLD CORE</b><br/>" : "SURGE — NO<br/>") +
+        "DISCHARGE CLAIM — <b class='gold'>" + dfFmtDot(ch.reward) + " DOT</b> · FEE 0.0002 BNB · " +
+        (ch.discharged ? "STATUS — <b>ALREADY DISCHARGED</b> · EACH UNIT CLAIMS EXACTLY ONCE"
+          : ch.able ? "STATUS — <b>DISCHARGEABLE NOW</b> · NEVER EXPIRES"
+          : "STATUS — <b>SEALED · OPENS " + ch.openUtc + "</b> · NEVER EXPIRES");
+    }
+    function check(){
+      var id = parseInt(document.getElementById("ucInput").value, 10);
+      if (!id || id < 1 || id > 10000) {
+        ucOut.classList.add("show");
+        ucOut.innerHTML = "ENTER A UNIT NUMBER BETWEEN <b>1</b> AND <b>10,000</b>.";
+        return;
+      }
+      ucOut.classList.add("show");
+      ucOut.innerHTML = "READING UNIT <b>#" + id.toLocaleString("en-US") + "</b> — METADATA + CONTRACT…";
+      Promise.all([ucClass(id), ucChain(id)]).then(function(r){ ucRender(id, r[0], r[1]); });
     }
     document.getElementById("ucBtn").addEventListener("click", check);
     document.getElementById("ucInput").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); check(); } });
@@ -1930,7 +2086,10 @@ wireCopy("copyPrompt", "agentPrompt", false);
 wireCopy("copyJson", "mintJson", false);
 
 /* ============================================================
-   RESOLVE SIMULATOR — scattered dots converge into a unit.
+   SEAL ANIMATION — scattered dots converge into a sealed unit.
+   Purely visual: it rolls no class and reports no outcome. The
+   readout beside it is the live day state from the contract,
+   rendered by the CHARGE DAY LIVE DISPLAY block above.
    ============================================================ */
 (function(){
   var cv = document.getElementById("simCanvas");
@@ -1938,12 +2097,6 @@ wireCopy("copyJson", "mintJson", false);
   var box = cv.parentElement;
   var W = 0, H = 0, dots = [], mode = "scatter", raf = null, startT = 0;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
-  var classes = [
-    { name: "PRIME", w: 30 }, { name: "PIXEL DOT", w: 28 },
-    { name: "STEALTH DOT", w: 27 }, { name: "AURUM DOT", w: 15 }
-  ];
-  var rolled = null;
-
   function targets(){
     // SEALED block — dots harden into a closed vault slab with a
     // keyhole, never into the unit itself. The artwork is not
@@ -1976,14 +2129,12 @@ wireCopy("copyJson", "mintJson", false);
         ph: Math.random() * Math.PI * 2
       };
     });
-    document.getElementById("simDots").textContent = dots.length;
     draw(0);
   }
 
   function draw(ts){
     c.clearRect(0, 0, W, H);
     var t = ts * 0.001;
-    var gold = rolled && rolled.name === "AURUM DOT";
     for (var i = 0; i < dots.length; i++) {
       var d = dots[i];
       var tx, ty;
@@ -1997,7 +2148,7 @@ wireCopy("copyJson", "mintJson", false);
       d.x += (tx - d.x) * 0.055;
       d.y += (ty - d.y) * 0.055;
       c.globalAlpha = mode === "formed" ? 0.95 : 0.5;
-      c.fillStyle = gold && mode === "formed" ? "#ffce00" : "#eceade";
+      c.fillStyle = "#eceade";
       c.beginPath(); c.arc(d.x, d.y, 1.9, 0, Math.PI * 2); c.fill();
     }
     c.globalAlpha = 1;
@@ -2009,17 +2160,16 @@ wireCopy("copyJson", "mintJson", false);
   }
 
   document.getElementById("simBtn").addEventListener("click", function(){
-    // weighted class roll, same distribution as the collection
-    var roll = Math.random() * 100, acc = 0; rolled = classes[0];
-    for (var i = 0; i < classes.length; i++) { acc += classes[i].w; if (roll < acc) { rolled = classes[i]; break; } }
-    document.getElementById("simClass").textContent = rolled.name;
-    document.querySelector("#simReadout b").textContent = "RESOLVING…";
+    // seal animation only — no class is rolled and no unit is
+    // claimed; the readout under the button is live chain data.
+    var st = document.getElementById("simState");
+    if (st) st.textContent = "FORMING THE SEAL…";
     mode = "forming"; startT = performance.now();
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(draw);
     setTimeout(function(){
       mode = "formed";
-      document.querySelector("#simReadout b").textContent = "UNIT RESOLVED — ARTWORK SEALED (SIMULATION)";
+      if (st) st.textContent = "SEALED — ARTWORK STAYS HIDDEN";
     }, reducedMotion ? 60 : 1400);
     if (reducedMotion) { mode = "formed"; draw(0); }
   });
@@ -2354,6 +2504,7 @@ wireCopy("copyJson", "mintJson", false);
     if (S.account && S.walletCount !== null && window.DOTFIELD_LANEB){
       if (window.DOTFIELD_LANEB.getBase() !== Number(S.walletCount)) window.DOTFIELD_LANEB.setBase(Number(S.walletCount), true);
     }
+    if (window.__dfLiveHook){ try { window.__dfLiveHook(); } catch (e) {} }
   }
   window.__lanebChanged = function(){ renderLaneB(); };
 
@@ -2491,6 +2642,16 @@ wireCopy("copyJson", "mintJson", false);
       return "■ DISCHARGED — <b>" + dfFmtDot(reward) + " DOT</b> claimed to your wallet for unit #" + id.toString() + " · tx " + txLink(hash) + ".";
     });
   });
+
+  /* Live-state bridge for the display surfaces (hero panel, tier
+     gauge, mosaic, §02 readout, unit checker): a read-only view of
+     the chain state plus the same batched reader the lanes use.
+     The display block registers window.__dfLiveHook, which
+     renderAll() calls after every refresh. */
+  window.DOTFIELD_LIVE = {
+    get: function(){ return { read: S.read, open: S.open, total: S.total, day: S.day, field: S.field, stats: S.stats }; },
+    rpcBatch: rpcBatch
+  };
 
   /* ---------------- wire up ---------------- */
   if ($("walletConnectBtn")) $("walletConnectBtn").addEventListener("click", connect);
