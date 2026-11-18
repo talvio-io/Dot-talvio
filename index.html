@@ -459,6 +459,66 @@
   .seg button:last-child{border-right:0}.seg button.on{background:var(--gold);color:#111;font-weight:700}
   .unit-result{display:none}.unit-result.show{display:block}
 
+  /* ---------- field ledger band ---------- */
+  .ledger{border-bottom:1px solid var(--line);background:var(--ink-2)}
+  .ledger-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 0 4px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--bone-dim)}
+  .ledger-head .lg-dot{color:var(--signal)}
+  .ledger-head #lgStatus{color:var(--bone-faint);letter-spacing:.12em;text-align:right}
+  .ledger-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:14px 0 22px}
+  .lg-cell{padding:10px 18px 6px;border-left:1px solid var(--line-soft)}
+  .lg-cell:first-child{border-left:0;padding-left:0}
+  .lg-lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--bone-faint);line-height:1.7;min-height:36px}
+  .lg-num{font-family:var(--mono);font-size:clamp(24px,3.2vw,38px);font-weight:700;color:var(--bone);line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .lg-num.red{color:var(--signal)}
+  .lg-num small{font-size:.52em;color:var(--bone-dim);font-weight:400}
+  .lg-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--bone-dim);margin-top:6px;line-height:1.7}
+  @media (max-width:1020px){.ledger-grid{grid-template-columns:repeat(2,1fr)}.lg-cell{border-left:0;padding-left:0}.lg-lab{min-height:0}}
+
+  /* ---------- mosaic explorer plate ---------- */
+  .mz-stage{position:relative}
+  .mz-stage #mosaicCanvas{cursor:pointer}
+  #mosaicOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .mz-plate{border-top:1px solid var(--line);padding:16px 18px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+  .mz-swatch{flex:none;border:1px solid var(--line-soft);background:#000}
+  .mz-info{flex:1;min-width:280px;font-family:var(--mono);font-size:12px;line-height:2;letter-spacing:.04em;color:var(--bone-dim)}
+  .mz-info b{color:var(--bone)} .mz-info .gold{color:var(--gold)} .mz-info .red{color:#ff7a6e}
+  .mz-info a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold)}
+  .mz-info a:hover{color:var(--bone);border-color:var(--bone)}
+
+  /* ---------- listing countdown ---------- */
+  .cd-wrap{display:flex;gap:clamp(22px,4vw,54px);flex-wrap:wrap;align-items:center;margin-top:26px;border:1px solid var(--line);padding:clamp(22px,3.4vw,40px)}
+  .cd-ringbox{flex:none;margin:0 auto}
+  #cdRing{display:block;background:#000}
+  .cd-main{flex:1;min-width:300px}
+  .cd-label{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--bone-faint)}
+  .cd-big{font-size:clamp(46px,7.4vw,104px);font-weight:900;text-transform:uppercase;line-height:1.02;letter-spacing:-.01em;margin:12px 0 6px;font-variant-numeric:tabular-nums}
+  .cd-big .cd-d{color:var(--bone)} .cd-big .cd-t{color:var(--gold)}
+  .cd-units{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint);margin-bottom:18px}
+  .cd-fact{font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:var(--bone);line-height:1.9;border-top:1px solid var(--line-soft);padding-top:16px}
+  .cd-note{color:var(--bone-dim);line-height:1.7;font-size:14.5px;margin-top:10px;max-width:640px}
+  .warn{border:1px solid var(--signal);color:#ffb3ad;background:rgba(255,45,30,.07);padding:16px 18px;margin-top:22px;font-size:14.5px;line-height:1.7}
+  .warn b{color:#ffd9d5}
+  .contract-block{border:1px solid var(--line);margin-top:22px;padding:18px;font-family:var(--mono);font-size:12px;line-height:2;letter-spacing:.04em;color:var(--bone-dim)}
+  .contract-block .cb-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:8px 0}
+  .contract-block .cb-row + .cb-row{border-top:1px solid var(--line-soft)}
+  .contract-block .cb-addr{color:var(--bone);word-break:break-all}
+  .contract-block .cb-btn{display:inline-block;border:1px solid var(--line);color:var(--bone);text-decoration:none;padding:8px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;min-height:40px;line-height:22px;background:transparent;cursor:pointer}
+  .contract-block .cb-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .contract-block .copy-btn{margin-left:auto}
+
+  /* ---------- footer directory ---------- */
+  .foot-brand{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--bone-dim);line-height:2;margin-top:8px}
+  .foot-brand b{color:var(--bone);letter-spacing:.14em}
+  .foot-dir{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);margin-top:26px}
+  .foot-col{padding:22px 24px}
+  .foot-col + .foot-col{border-left:1px solid var(--line)}
+  .foot-col-h{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--bone);margin-bottom:14px}
+  .foot-col-h .fd-dot{color:var(--signal)}
+  .foot-col a{display:block;color:var(--bone-dim);text-decoration:none;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;padding:7px 0;min-height:32px}
+  .foot-col a:hover{color:var(--gold)}
+  .foot-note{color:var(--bone-faint);font-size:13.5px;line-height:1.75;max-width:760px;margin:24px 0 6px}
+  @media (max-width:720px){.foot-dir{grid-template-columns:1fr}.foot-col + .foot-col{border-left:0;border-top:1px solid var(--line)}}
+
   /* ---------- dot pass ---------- */
   .pass-grid{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);margin:26px 0 84px}
   .pass-info{padding:clamp(22px,3vw,38px)}
@@ -510,6 +570,7 @@
       <a href="#mosaic">Mosaic</a>
       <a href="#tiers">Tier</a>
       <a href="#discharge">Discharge</a>
+      <a href="#listing">Listing</a>
       <a href="#checker">Unit Checker</a>
       <a href="#machine">Agent Surface</a>
       <a href="#faq">FAQ</a>
@@ -524,6 +585,7 @@
     <a href="#tiers"><span class="n">05</span>Charge Tier</a>
     <a href="#classes"><span class="n">06</span>Four Densities — Classes</a>
     <a href="#discharge"><span class="n">08</span>Discharge — Claim DOT</a>
+    <a href="#listing"><span class="n">08·5</span>Listing — $DOT on Uniswap</a>
     <a href="#checker"><span class="n">09</span>Unit Checker</a>
     <a href="#machine"><span class="n">10</span>Agent Surface</a>
     <a href="#faq"><span class="n">11</span>FAQ — Field Notes</a>
@@ -589,6 +651,20 @@
     <span>OVERDRIVE DAY — <b>60,000 DOT / UNIT</b></span><span class="sep">·</span>
     <span>ARTWORK — <b>SEALED · NO UNIT IMAGE SHOWN BEFORE REVEAL</b></span><span class="sep">·</span>
     <span>SPECIMEN #0001 — <b>GENESIS DOT</b></span><span class="sep">·</span>
+  </div>
+</div>
+
+<!-- ================= FIELD LEDGER ================= -->
+<div class="ledger" role="region" aria-label="Field ledger — live on-chain totals read from the TalvioGenerate contract">
+  <div class="wrap">
+    <div class="ledger-head"><span><span class="lg-dot">●</span> FIELD LEDGER — EVERY FIGURE READ LIVE FROM BNB CHAIN</span><span id="lgStatus">READING BNB CHAIN…</span></div>
+    <div class="ledger-grid">
+      <div class="lg-cell"><div class="lg-lab">TOTAL RESOLVED</div><div class="lg-num" id="lgTotal">—</div><div class="lg-sub">UNITS · OF 10,000</div></div>
+      <div class="lg-cell"><div class="lg-lab">SEALED</div><div class="lg-num" id="lgSealed">—</div><div class="lg-sub">UNITS FROM FIELDS ALREADY SEALED</div></div>
+      <div class="lg-cell"><div class="lg-lab">DISCHARGED</div><div class="lg-num" id="lgDischarged">—</div><div class="lg-sub">CLAIMS ALREADY PAID OUT</div></div>
+      <div class="lg-cell"><div class="lg-lab">SEALED — NOT YET DISCHARGED</div><div class="lg-num red" id="lgUnclaimed">—</div><div class="lg-sub" id="lgUnclaimedDot">— DOT WAITING TO BE CLAIMED</div></div>
+      <div class="lg-cell"><div class="lg-lab">CLAIM POOL REMAINING</div><div class="lg-num" id="lgPool">—</div><div class="lg-sub" id="lgPoolPct">— OF 600,000,000 DOT</div></div>
+    </div>
   </div>
 </div>
 
@@ -798,14 +874,21 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
       <span class="side">250 CELLS. ONE DAY.<br/>FROZEN AT THE SEAL<br/>AS MOSAIC Nº N.</span>
     </div>
     <div class="reveal">
-      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — resolved units in bone, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is drawn from the contract itself: every filled cell is a unit resolved on-chain today, read live from BNB Chain — a cell burns gold only because <b style="color:var(--bone)">isSurge()</b> says that unit is a SURGE, never by decoration.</p>
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — resolved units in bone, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is drawn from the contract itself: every filled cell is a unit resolved on-chain today, read live from BNB Chain — a cell burns gold only because <b style="color:var(--bone)">isSurge()</b> says that unit is a SURGE, never by decoration. <b style="color:var(--bone)">Tap or hover any filled cell</b> and the plate under the grid reads that unit's own data — class, field, core level, discharge state — from the contract and its published metadata. The artwork itself stays sealed.</p>
       <div class="mosaic-wrap">
-        <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Halftone mosaic grid of 250 cells for today, filled live from the contract — one cell per unit resolved on-chain today."></canvas>
+        <div class="mz-stage">
+          <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Halftone mosaic grid of 250 cells for today, filled live from the contract — one cell per unit resolved on-chain today. Tap or hover a filled cell to inspect that unit."></canvas>
+          <canvas id="mosaicOverlay" width="1000" height="400" aria-hidden="true"></canvas>
+        </div>
         <div class="mosaic-legend">
           <span><i style="background:#eceade"></i>RESOLVED UNIT</span>
           <span><i style="background:var(--gold)"></i>SURGE UNIT</span>
           <span><i style="background:#23231e"></i>UNRESOLVED CELL</span>
           <span id="mosaicCount" style="margin-left:auto;color:var(--bone)">— / 250 CELLS FILLED · READING CHAIN…</span>
+        </div>
+        <div class="mz-plate" id="mzPlate">
+          <canvas class="mz-swatch" id="mzSwatch" width="264" height="168" aria-hidden="true"></canvas>
+          <div class="mz-info" id="mzInfo" aria-live="polite">UNIT PLATE — READING BNB CHAIN…</div>
         </div>
       </div>
     </div>
@@ -993,6 +1076,35 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
   </div>
 </section>
 
+<!-- ================= 08.5 LISTING ================= -->
+<section id="listing" aria-labelledby="listing-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">08·5</span>
+      <h2 id="listing-h">The Listing</h2>
+      <span class="side">$DOT LEAVES THE FIELD.<br/>ONE POOL. ONE DATE.<br/>ANNOUNCED BY THE PROJECT.</span>
+    </div>
+    <div class="reveal">
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Until now $DOT exists in exactly two places: the claim pool inside the TalvioGenerate contract, and the wallets that have discharged for it. On the date below it also becomes tradeable — the project opens one liquidity pool on Uniswap (BNB Chain) and announces the pair here first. The ring of dots is the road from the announcement to that morning, filled by real time — nothing else moves it.</p>
+      <div class="cd-wrap">
+        <div class="cd-ringbox"><canvas id="cdRing" width="300" height="300" role="img" aria-label="A ring of dots that fills as the listing date approaches."></canvas></div>
+        <div class="cd-main">
+          <div class="cd-label" id="cdLabel">COUNTDOWN TO THE LISTING</div>
+          <div class="cd-big"><span class="cd-d" id="cdDays">—</span><span class="cd-t" id="cdTime"> — —</span></div>
+          <div class="cd-units">DAYS&nbsp;&nbsp;·&nbsp;&nbsp;HRS : MIN : SEC — ALL TIMES UTC</div>
+          <div class="cd-fact">$DOT POOL LISTS 3 DECEMBER 2026 · 00:00 UTC · UNISWAP (BNB CHAIN)</div>
+          <p class="cd-note" id="cdNote">Announced by the project on 18 November 2026. Seed size is still to be decided; this page updates first when the pair exists.</p>
+        </div>
+      </div>
+      <div class="warn"><b>■ NO OFFICIAL POOL YET.</b> No official $DOT liquidity pool exists yet. When a pool opens, its venue and pair address will be announced on this page first. Until then, any pool or token using the DOTFIELD / $DOT name should be treated as unofficial.</div>
+      <div class="contract-block" aria-label="Official contract addresses">
+        <div class="cb-row"><span>$DOT CONTRACT —</span><span class="cb-addr" id="dotAddrText">0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</span><button class="copy-btn" id="copyDotAddr" type="button">COPY</button><a class="cb-btn" href="https://bscscan.com/token/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">VERIFY ON BSCSCAN ↗</a></div>
+        <div class="cb-row"><span>TALVIOGENERATE NFT —</span><span class="cb-addr" id="nftAddrText">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span><button class="copy-btn" id="copyNftAddr" type="button">COPY</button><a class="cb-btn" href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">VERIFY ON BSCSCAN ↗</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 09 UNIT CHECKER ================= -->
 <section id="checker" aria-labelledby="checker-h">
   <div class="wrap">
@@ -1153,14 +1265,29 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
 <footer>
   <div class="wrap">
     <p class="foot-mega">Dot<span style="color:var(--signal)">·</span><span class="hollow">Field</span></p>
-    <div class="foot-grid">
-      <div><b>TALVIO GENERATE — DOTFIELD</b><br/>10,000 BLACK DOT ROBOTS · BNB CHAIN<br/>TALVIOGENERATE.COM</div>
-      <div>FREE — 1 / WALLET / DAY · AGENT ID<br/>PAID LADDER — 0.00026 → 0.001 BNB · MAX 10 / DAY<br/>DAY CAP 250 · SEAL 12:00 UTC</div>
-      <div>DISCHARGE — PAYS $DOT · FEE 0.0002 BNB<br/>$DOT — 1,000,000,000 SUPPLY · 60% CLAIM POOL<br/>$DOT CONTRACT —<br/>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a<br/>CLAIM POOL — 600,000,000 DOT · FUNDED<br/>ANNOUNCED — $DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DEC 2026</div>
-      <div>STATUS — CONTRACT LIVE · <span style="color:#ff7a6e">MINT CLOSED</span><br/>NFT CONTRACT —<br/>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C<br/>FIELD Nº 1 — OPENS ON THE OWNER'S SIGNAL</div>
-      <div><b>OFFICIAL X</b><br/><a href="https://x.com/DotFieldBnb" target="_blank" rel="noopener noreferrer">X — @DotFieldBnb ↗</a></div>
-      <div>ONE DOT.<br/>TEN THOUSAND MACHINES.</div>
+    <div class="foot-brand"><b>TALVIO GENERATE — DOTFIELD</b><br/>One dot. Ten thousand machines. 10,000 Black Dot Robots on BNB Chain.</div>
+    <div class="foot-dir">
+      <div class="foot-col">
+        <div class="foot-col-h"><span class="fd-dot">●</span> PROJECT</div>
+        <a href="#top">Home</a>
+        <a href="#chamber">Resolution Chamber</a>
+        <a href="#pass">Dot Pass</a>
+        <a href="#discharge">Discharge · $DOT</a>
+        <a href="#listing">Listing</a>
+        <a href="#checker">Unit Checker</a>
+        <a href="#machine">Agent Surface</a>
+        <a href="/llms.txt">Docs · llms.txt</a>
+        <a href="https://x.com/DotFieldBnb" target="_blank" rel="noopener noreferrer">X · @DotFieldBnb</a>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-h"><span class="fd-dot">●</span> CONTRACTS</div>
+        <a href="https://bscscan.com/token/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">$DOT Token · BscScan ↗</a>
+        <a href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">TalvioGenerate NFT · BscScan ↗</a>
+        <a href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">DPASS (inside the NFT contract) · BscScan ↗</a>
+        <a href="https://bscscan.com/address/0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" target="_blank" rel="noopener">Agent ID Registry · BscScan ↗</a>
+      </div>
     </div>
+    <p class="foot-note">DOTFIELD runs on BNB Chain (BSC). Resolving happens on this page with your own wallet, through your own agent, or from Field Nº 4 with a DPASS in your own wallet. Nothing on this site is financial advice.</p>
   </div>
 </footer>
 
@@ -1368,6 +1495,72 @@ function dfLiveModel(open, total, field, resolved, freeUsed, wallets){
     gaugePct: Math.min(100, wallets / 120 * 100),
     mosaicNo: open ? field : 1
   };
+}
+/* ---- Field Ledger + Listing: constants and pure models ----
+   DF_DEPLOY_BLOCK: the TalvioGenerate deployment block on BSC,
+   determined 2026-11-18 by chunked eth_getLogs: the contract's
+   first log — its constructor's OwnershipTransferred — sits in
+   block 134303646 (2026-11-18 11:30:14 UTC), ~9 minutes before
+   the pool-funding transaction
+   0xffb4b7add9ad896ddd6a0857c3dc592b3f01e683c4e5be2eea71f519154c0fa0
+   (block 134304904, 11:39:41 UTC), and it is the only contract log
+   in the surrounding 2,500-block window. The ledger's DISCHARGED
+   figure does NOT depend on logs: discharge is only possible
+   after a unit's day seals (+6h), so every discharged unit is a
+   sealed unit, and counting dischargedOf() over the sealed ID
+   range is exact — the same number the Discharged events carry
+   (equivalence asserted in the local-chain test harness). */
+var DF_POOL_WEI = 600000000n * 1000000000000000000n; // funded claim pool: 600,000,000 DOT
+var DF_DEPLOY_BLOCK = 134303646;
+var DF_DISCHARGED_TOPIC = "0x2ec7fec44c589c30f835cedfece542956fa709398b9ef5cd4bba57bedf16ad19"; // Discharged(uint256,address,uint256)
+/* Ledger model. Inputs are the contract's own numbers plus the
+   exact per-token scan results; every figure is derived, none is
+   estimated. unclaimedDotWei is the exact sum of dischargeReward
+   over sealed units whose dischargedOf() is still false. */
+function dfLedgerModel(total, todayResolved, dischargedCount, unclaimedDotWei, poolWei){
+  total = Number(total); todayResolved = Number(todayResolved); dischargedCount = Number(dischargedCount);
+  var sealed = Math.max(0, total - todayResolved);
+  var unclaimedUnits = Math.max(0, sealed - dischargedCount);
+  var poolPct = poolWei === null || poolWei === undefined ? null : Number(poolWei * 10000n / DF_POOL_WEI) / 100;
+  return {
+    total: total, sealed: sealed, discharged: dischargedCount,
+    unclaimedUnits: unclaimedUnits,
+    unclaimedDot: dfFmtDot(unclaimedDotWei),
+    poolDot: poolWei === null || poolWei === undefined ? null : dfFmtDot(poolWei),
+    poolPctText: poolPct === null ? null : poolPct.toFixed(2) + "% OF 600,000,000 DOT"
+  };
+}
+/* Unit plate model — the same per-token read set the §08 tool and
+   the §09 checker use, shaped for the Mosaic explorer plate. */
+function dfPlateModel(owner, day, firstDay, core, surge, discharged, able, reward){
+  day = BigInt(day); firstDay = BigInt(firstDay); core = Number(core);
+  var openTs = Number((day + 1n) * 86400n + 43200n + 21600n); // day seal (12:00 UTC) + 6h
+  return {
+    owner: owner,
+    fieldNo: firstDay > 0n ? (day - firstDay + 1n).toString() : "—",
+    core: core,
+    tierName: core >= 1 && core <= 3 ? DF_TIERS[core - 1].name : "—",
+    surge: !!surge,
+    status: discharged ? "discharged" : (able ? "able" : "sealed"),
+    rewardDot: dfFmtDot(reward),
+    openUtc: new Date(openTs * 1000).toUTCString().toUpperCase()
+  };
+}
+/* $DOT listing countdown. Window: the project's announcement
+   (18 Nov 2026, 00:00 UTC) to the listing instant
+   (3 Dec 2026, 00:00 UTC). The filled fraction is computed from
+   real time on every tick — never hardcoded. */
+var DF_LISTING_START = Date.UTC(2026, 10, 18);
+var DF_LISTING_TS = Date.UTC(2026, 11, 3);
+function dfCountdownModel(now){
+  now = Number(now);
+  var frac = (now - DF_LISTING_START) / (DF_LISTING_TS - DF_LISTING_START);
+  if (frac < 0) frac = 0; if (frac > 1) frac = 1;
+  var passed = now >= DF_LISTING_TS;
+  var rem = Math.max(0, Math.floor((DF_LISTING_TS - now) / 1000));
+  var days = Math.floor(rem / 86400), hh = Math.floor(rem % 86400 / 3600), mm = Math.floor(rem % 3600 / 60), ss = rem % 60;
+  function p2(n){ return (n < 10 ? "0" : "") + n; }
+  return { passed: passed, frac: frac, days: days, timeText: p2(hh) + ":" + p2(mm) + ":" + p2(ss), pct: Math.floor(frac * 100) };
 }
 /* __PURE_CHAIN_HELPERS_END__ */
 
@@ -2673,6 +2866,301 @@ wireCopy("copyJson", "mintJson", false);
   renderAll();
   readState();
   setInterval(readState, 15000);
+})();
+
+/* ============================================================
+   FIELD LEDGER · MOSAIC EXPLORER · LISTING COUNTDOWN
+   (2026-11-18). Read-only surfaces fed by the DOTFIELD chain
+   module above (window.DOTFIELD_LIVE) and the pure models in
+   the helpers block. No sends live in this block.
+   LEDGER exactness: SEALED = totalMinted − today's resolved.
+   DISCHARGED and the DOT-waiting sum are counted token by token
+   over the sealed ID range (dischargedOf + dischargeReward in
+   batches of 125 IDs) — exact, never sampled: discharge is only
+   possible after a unit's day seals (+6h), so every discharged
+   unit sits inside the sealed range by construction.
+   ============================================================ */
+(function(){
+  "use strict";
+  function $(id){ return document.getElementById(id); }
+  function liveGet(){ return window.DOTFIELD_LIVE ? window.DOTFIELD_LIVE.get() : null; }
+  function shortAddr(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }
+
+  /* ---------------- FIELD LEDGER ---------------- */
+  var lg = { sig: "", scanning: false, done: false, discharged: 0, unclaimedDot: 0n, counted: 0, pool: null };
+  function lgStatusText(){
+    return lg.done ? "LEDGER — READ LIVE · REFRESHES WITH THE CHAIN" : "LEDGER — COUNTING SEALED UNITS FROM THE CONTRACT…";
+  }
+  function lgRender(statusText){
+    var st = liveGet(), el;
+    if (!st || !st.read){
+      if ((el = $("lgStatus"))) el.textContent = "READING BNB CHAIN…";
+      return;
+    }
+    var today = st.stats ? Number(st.stats.resolved) : 0;
+    var m = dfLedgerModel(Number(st.total), today, lg.discharged, lg.unclaimedDot, lg.pool);
+    if ((el = $("lgTotal"))) el.textContent = m.total.toLocaleString("en-US");
+    if ((el = $("lgSealed"))) el.textContent = m.sealed.toLocaleString("en-US");
+    if ((el = $("lgDischarged"))) el.textContent = lg.done ? m.discharged.toLocaleString("en-US") : "…";
+    if ((el = $("lgUnclaimed"))) el.textContent = lg.done ? m.unclaimedUnits.toLocaleString("en-US") : "…";
+    if ((el = $("lgUnclaimedDot"))) el.textContent = lg.done ? (m.unclaimedDot + " DOT WAITING TO BE CLAIMED") : "COUNTING SEALED UNITS FROM THE CONTRACT…";
+    if ((el = $("lgPool"))) el.innerHTML = m.poolDot === null ? "—" : m.poolDot + " <small>DOT</small>";
+    if ((el = $("lgPoolPct"))) el.textContent = m.poolPctText === null ? "OF 600,000,000 DOT" : m.poolPctText;
+    if ((el = $("lgStatus"))) el.textContent = statusText || lgStatusText();
+  }
+  function lgScan(){
+    var st = liveGet();
+    if (!st || !st.read || !window.DOTFIELD_LIVE) return;
+    window.DOTFIELD_LIVE.rpcBatch([{ key: "pool", data: dfEncodeCall("poolOf()", [], []) }], []).then(function(m){
+      if (m.pool !== undefined){ lg.pool = dfDecUint(m.pool, 0); lgRender(); }
+    }).catch(function(){});
+    var today = st.stats ? Number(st.stats.resolved) : 0;
+    var total = Number(st.total);
+    var sealed = Math.max(0, total - today);
+    var sig = total + ":" + today;
+    if (sig === lg.sig && (lg.done || lg.scanning)) return;
+    lg.sig = sig; lg.scanning = true; lg.done = false; lg.discharged = 0; lg.unclaimedDot = 0n; lg.counted = 0;
+    lgRender();
+    if (sealed === 0){ lg.scanning = false; lg.done = true; lgRender(); return; }
+    var nextId = 1, CHUNK = 125;
+    function fail(){
+      if (lg.sig !== sig) return;
+      lg.scanning = false; lg.sig = ""; // retry on the next refresh
+      lgRender("LEDGER — CHAIN READ INTERRUPTED · COUNTING RETRIES ON THE NEXT REFRESH");
+    }
+    function step(){
+      if (lg.sig !== sig) return; // superseded by newer chain state
+      if (nextId > sealed){ lg.scanning = false; lg.done = true; lgRender(); return; }
+      var end = Math.min(sealed, nextId + CHUNK - 1), from = nextId, calls = [];
+      for (var id = from; id <= end; id++){
+        calls.push({ key: "d" + id, data: dfEncodeCall("dischargedOf(uint256)", ["uint256"], [BigInt(id)]) });
+        calls.push({ key: "r" + id, data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [BigInt(id)]) });
+      }
+      window.DOTFIELD_LIVE.rpcBatch(calls, []).then(function(m){
+        if (lg.sig !== sig) return;
+        for (var id = from; id <= end; id++){
+          if (m["d" + id] === undefined || m["r" + id] === undefined){ fail(); return; }
+          if (dfDecBool(m["d" + id], 0)) lg.discharged++;
+          else lg.unclaimedDot += dfDecUint(m["r" + id], 0);
+        }
+        lg.counted = end; nextId = end + 1;
+        lgRender("LEDGER — COUNTED " + lg.counted + " / " + sealed + " SEALED UNITS…");
+        step();
+      }).catch(fail);
+    }
+    step();
+  }
+
+  /* ---------------- MOSAIC EXPLORER ---------------- */
+  var COLS = 25, ROWS = 10;
+  var mzCanvas = $("mosaicCanvas"), mzOverlay = $("mosaicOverlay"), mzInfo = $("mzInfo"), mzSwatch = $("mzSwatch");
+  var mz = { idx: null, tokenId: null, surge: false, defKey: "" };
+  function mzState(){
+    var st = liveGet();
+    if (!st || !st.read) return null;
+    var resolved = st.stats ? Number(st.stats.resolved) : 0;
+    return { st: st, resolved: resolved, total: st.total, firstId: st.total - BigInt(resolved) + 1n };
+  }
+  function drawSwatch(cls){
+    if (!mzSwatch) return;
+    var c = mzSwatch.getContext("2d"), W = mzSwatch.width, H = mzSwatch.height;
+    c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
+    var P = {
+      "Prime":       { gap: 24, r: 3.2, col: "#eceade", a: 0.90 },
+      "Pixel Dot":   { gap: 15, r: 3.6, col: "#eceade", a: 0.95 },
+      "Stealth Dot": { gap: 11, r: 3.0, col: "#eceade", a: 0.32 },
+      "Aurum Dot":   { gap: 9,  r: 3.4, col: "#ffce00", a: 1.00 }
+    }[cls] || { gap: 26, r: 2.4, col: "#3a3a32", a: 0.55 };
+    c.fillStyle = P.col;
+    var row = 0;
+    for (var y = P.gap / 2; y < H; y += P.gap, row++){
+      var colI = 0;
+      for (var x = P.gap / 2; x < W; x += P.gap, colI++){
+        var hsh = (Math.imul(row * 31 + colI + 1, 2654435761) >>> 0) % 100;
+        c.globalAlpha = P.a * (0.55 + hsh / 100 * 0.45);
+        c.beginPath(); c.arc(x, y, P.r, 0, Math.PI * 2); c.fill();
+      }
+    }
+    c.globalAlpha = 1;
+  }
+  function drawRing(){
+    if (!mzOverlay) return;
+    var c = mzOverlay.getContext("2d");
+    c.clearRect(0, 0, mzOverlay.width, mzOverlay.height);
+    if (mz.idx === null) return;
+    var cw = mzOverlay.width / COLS, ch = mzOverlay.height / ROWS;
+    var x = (mz.idx % COLS) * cw, y = Math.floor(mz.idx / COLS) * ch;
+    c.lineWidth = 3; c.strokeStyle = mz.surge ? "#ffce00" : "#eceade";
+    c.strokeRect(x + 2, y + 2, cw - 4, ch - 4);
+    c.lineWidth = 1; c.strokeStyle = "#000";
+    c.strokeRect(x + 5.5, y + 5.5, cw - 11, ch - 11);
+  }
+  function mzClass(id){
+    return fetch("nft/metadata/" + id + ".json")
+      .then(function(res){ if (!res.ok) throw new Error("metadata"); return res.json(); })
+      .then(function(meta){
+        var cls = "";
+        (meta.attributes || []).forEach(function(a){ if (a.trait_type === "Class") cls = a.value; });
+        return cls;
+      })
+      .catch(function(){ return ""; });
+  }
+  function mzDefault(){
+    var s = mzState();
+    if (!s || !mzInfo) return;
+    var key = (s.st.open ? "open" : "closed") + ":" + s.total.toString() + ":" + s.resolved;
+    if (key === mz.defKey) return;
+    mz.defKey = key;
+    drawSwatch("");
+    if (!s.st.open && s.total === 0n){
+      mzInfo.innerHTML = "UNIT PLATE — <b>NO UNITS EXIST YET</b><br/>FIELD Nº 1 HAS NOT OPENED — TOTAL RESOLVED IS <b>0</b>, SO ALL 250 CELLS ABOVE ARE EMPTY SLOTS. WHEN THE FIELD OPENS AND UNITS RESOLVE, TAP ANY FILLED CELL TO READ THAT UNIT'S CLASS, FIELD, CORE LEVEL AND DISCHARGE STATE. THE ARTWORK STAYS SEALED — ONLY ITS DATA IS PUBLIC.";
+    } else {
+      mzInfo.innerHTML = "UNIT PLATE — <b>" + s.resolved + " / 250</b> CELLS HOLD A UNIT TODAY<br/>TAP OR HOVER A FILLED CELL TO READ THAT UNIT — CLASS, FIELD, CORE LEVEL, SURGE AND DISCHARGE STATE, ALL FROM THE CONTRACT AND ITS PUBLISHED METADATA. EMPTY CELLS ARE SLOTS NO UNIT HAS TAKEN YET.";
+    }
+  }
+  function mzSlot(idx, s){
+    if (!mzInfo) return;
+    drawSwatch("");
+    mzInfo.innerHTML = "CELL — <b>" + (idx + 1) + " / 250</b> · STATUS — <b>NOT RESOLVED YET</b><br/>" +
+      "TODAY — <b>" + s.resolved + " / 250</b> UNITS RESOLVED" + (s.st.open ? " · FIELD Nº " + s.st.field.toString() + " IN PROGRESS" : " · FIELD Nº 1 NOT OPENED") + "<br/>" +
+      "WHEN A UNIT RESOLVES INTO THIS CELL, ITS PLATE — CLASS, CORE LEVEL, SURGE, EXACT DOT CLAIM — IS READ HERE FROM THE CONTRACT. NOTHING IS PREVIEWED OR INVENTED.";
+  }
+  function mzLoad(tokenId){
+    var key = tokenId.toString();
+    mzInfo.innerHTML = "UNIT <b>#" + key + "</b> — READING THE CONTRACT…";
+    var bid = tokenId;
+    var calls = [
+      { key: "owner",      data: dfEncodeCall("ownerOf(uint256)", ["uint256"], [bid]) },
+      { key: "day",        data: dfEncodeCall("unitDay(uint256)", ["uint256"], [bid]) },
+      { key: "core",       data: dfEncodeCall("coreLevel(uint256)", ["uint256"], [bid]) },
+      { key: "surge",      data: dfEncodeCall("isSurge(uint256)", ["uint256"], [bid]) },
+      { key: "able",       data: dfEncodeCall("dischargeable(uint256)", ["uint256"], [bid]) },
+      { key: "reward",     data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [bid]) },
+      { key: "discharged", data: dfEncodeCall("dischargedOf(uint256)", ["uint256"], [bid]) },
+      { key: "firstDay",   data: dfEncodeCall("firstDayId()", [], []) }
+    ];
+    Promise.all([mzClass(Number(tokenId)), window.DOTFIELD_LIVE.rpcBatch(calls, [])]).then(function(r){
+      if (!mz.tokenId || mz.tokenId.toString() !== key) return; // selection moved on
+      var cls = r[0], m = r[1];
+      if (m.owner === undefined){
+        mzInfo.innerHTML = "UNIT <b>#" + key + "</b> — <b>NOT MINTED</b> · IT HAS NO ON-CHAIN DATA.";
+        return;
+      }
+      var pm = dfPlateModel(
+        dfDecAddr(m.owner, 0),
+        m.day ? dfDecUint(m.day, 0) : 0n,
+        m.firstDay ? dfDecUint(m.firstDay, 0) : 0n,
+        m.core ? Number(dfDecUint(m.core, 0)) : 0,
+        m.surge ? dfDecBool(m.surge, 0) : false,
+        m.discharged ? dfDecBool(m.discharged, 0) : false,
+        m.able ? dfDecBool(m.able, 0) : false,
+        m.reward ? dfDecUint(m.reward, 0) : 0n
+      );
+      mz.surge = pm.surge; drawRing(); drawSwatch(cls);
+      mzInfo.innerHTML =
+        "UNIT — <b>#" + key + "</b> · CLASS — <b>" + (cls ? cls.toUpperCase() : "IN ITS PUBLISHED METADATA") + "</b>" + (pm.surge ? " · <b class='gold'>SURGE — GOLD CORE</b>" : "") + "<br/>" +
+        "FIELD — <b>Nº " + pm.fieldNo + "</b> · CORE — <b>LV." + pm.core + " · " + pm.tierName + " DAY</b> · SURGE — <b>" + (pm.surge ? "YES" : "NO") + "</b><br/>" +
+        "OWNER — <b>" + shortAddr(pm.owner) + "</b> · DISCHARGE CLAIM — <b class='gold'>" + pm.rewardDot + " DOT</b><br/>" +
+        "STATUS — " + (pm.status === "discharged" ? "<b>ALREADY DISCHARGED</b> · EACH UNIT CLAIMS EXACTLY ONCE"
+          : pm.status === "able" ? "<b>DISCHARGEABLE NOW</b> · NEVER EXPIRES"
+          : "<b>SEALED</b> · DISCHARGE OPENS <b>" + pm.openUtc + "</b> · NEVER EXPIRES") + "<br/>" +
+        "<a href=\"#checker\" data-mz-checker=\"" + key + "\">OPEN IN UNIT CHECKER →</a>";
+      var link = mzInfo.querySelector("[data-mz-checker]");
+      if (link) link.addEventListener("click", function(){
+        var inp = $("ucInput"), btn = $("ucBtn");
+        if (inp && btn){ inp.value = link.getAttribute("data-mz-checker"); btn.click(); }
+      });
+    }).catch(function(){
+      if (mz.tokenId && mz.tokenId.toString() === key)
+        mzInfo.innerHTML = "UNIT <b>#" + key + "</b> — CHAIN READ INTERRUPTED. TAP THE CELL AGAIN IN A MOMENT.";
+    });
+  }
+  function mzSelect(idx){
+    var s = mzState();
+    mz.idx = idx;
+    if (!s){ drawRing(); return; }
+    if (idx < s.resolved){
+      var tid = s.firstId + BigInt(idx);
+      if (!mz.tokenId || mz.tokenId !== tid){ mz.tokenId = tid; mz.surge = false; drawRing(); mzLoad(tid); }
+      else drawRing();
+    } else {
+      mz.tokenId = null; mz.surge = false; drawRing();
+      mzSlot(idx, s);
+    }
+  }
+  function mzCellFromEvent(e){
+    var rect = mzCanvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    var x = (e.clientX - rect.left) * (mzCanvas.width / rect.width);
+    var y = (e.clientY - rect.top) * (mzCanvas.height / rect.height);
+    var col = Math.floor(x / (mzCanvas.width / COLS)), row = Math.floor(y / (mzCanvas.height / ROWS));
+    if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return null;
+    return row * COLS + col;
+  }
+  if (mzCanvas){
+    mzCanvas.addEventListener("click", function(e){ var i = mzCellFromEvent(e); if (i !== null) mzSelect(i); });
+    if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches){
+      mzCanvas.addEventListener("pointermove", function(e){ var i = mzCellFromEvent(e); if (i !== null && i !== mz.idx) mzSelect(i); });
+    }
+  }
+  function mzRefresh(){
+    if (mz.idx === null){ mzDefault(); return; }
+    mzSelect(mz.idx);
+  }
+
+  /* ---------------- LISTING COUNTDOWN ---------------- */
+  var cdRing = $("cdRing");
+  function drawCdRing(frac){
+    if (!cdRing) return;
+    var c = cdRing.getContext("2d"), W = cdRing.width, H = cdRing.height;
+    c.clearRect(0, 0, W, H);
+    var cx = W / 2, cy = H / 2, R = 126, N = 150;
+    var filled = Math.round(frac * N);
+    for (var i = 0; i < N; i++){
+      var a = -Math.PI / 2 + i / N * Math.PI * 2;
+      var x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
+      if (i < filled && i === filled - 1 && filled < N){ c.fillStyle = "#ffce00"; c.globalAlpha = 1; c.beginPath(); c.arc(x, y, 5, 0, Math.PI * 2); c.fill(); }
+      else if (i < filled){ c.fillStyle = "#eceade"; c.globalAlpha = 0.95; c.beginPath(); c.arc(x, y, 3, 0, Math.PI * 2); c.fill(); }
+      else { c.fillStyle = "#2a2a24"; c.globalAlpha = 0.65; c.beginPath(); c.arc(x, y, 3, 0, Math.PI * 2); c.fill(); }
+    }
+    c.globalAlpha = 1; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillStyle = "#eceade"; c.font = "700 32px 'IBM Plex Mono', monospace";
+    c.fillText(Math.floor(frac * 100) + "%", cx, cy - 13);
+    c.fillStyle = "#6d6b61"; c.font = "11px 'IBM Plex Mono', monospace";
+    c.fillText("OF THE ROAD", cx, cy + 20);
+  }
+  function cdTick(){
+    var m = dfCountdownModel(Date.now());
+    if (m.passed){
+      if ($("cdLabel")) $("cdLabel").textContent = "LISTING DAY — 3 DECEMBER 2026 · UNISWAP (BNB CHAIN)";
+      if ($("cdDays")) $("cdDays").textContent = "LISTING";
+      if ($("cdTime")) $("cdTime").textContent = " DAY";
+      if ($("cdNote")) $("cdNote").textContent = "LISTING DAY — the pair address will appear on this page when the owner creates the pool. Verify the contract above before any trade.";
+    } else {
+      if ($("cdDays")) $("cdDays").textContent = m.days;
+      if ($("cdTime")) $("cdTime").textContent = " · " + m.timeText;
+    }
+    drawCdRing(m.frac);
+  }
+  if ($("cdDays")){ cdTick(); setInterval(cdTick, 1000); }
+  if (typeof wireCopy === "function"){
+    wireCopy("copyDotAddr", "dotAddrText", true);
+    wireCopy("copyNftAddr", "nftAddrText", true);
+  }
+
+  /* ---------------- refresh wiring ---------------- */
+  function refresh(){ lgScan(); mzRefresh(); }
+  var prevHook = window.__dfLiveHook;
+  window.__dfLiveHook = function(){ if (prevHook){ try { prevHook(); } catch (e) {} } refresh(); };
+  var bootTries = 0;
+  var boot = setInterval(function(){
+    bootTries++; refresh();
+    var st = liveGet();
+    if ((st && st.read) || bootTries > 20) clearInterval(boot);
+  }, 1000);
+  setInterval(refresh, 15000);
+  drawSwatch("");
+  refresh();
 })();
 </script>
 </body>
