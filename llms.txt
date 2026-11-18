@@ -1,6 +1,6 @@
 # Talvio Generate — DOTFIELD (BNB Chain)
 
-## STATUS: PRE-DEPLOY — the contract is NOT deployed yet and mint is NOT open. The contract address will be published here and in mint.json at deploy. Do not send funds to any address claiming to be this contract before that publication.
+## STATUS: DEPLOYED — mint CLOSED. The TalvioGenerate contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (Sourcify verified), and the $DOT token is live at 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a. The claim pool is funded: the NFT contract holds 600,000,000 DOT. Mint is NOT open yet — Field Nº 1 opens only on the owner's signal. Do not send funds to any other address claiming to be this contract.
 
 Black Dot Robot NFT collection on BNB Chain (chainId 56). Total supply 10,000: Prime 3,000 / Pixel Dot 2,800 / Stealth Dot 2,700 / Aurum Dot 1,500. Token #1 is the unique Genesis Dot. Collection artwork is SEALED before launch — no unit image is revealed on the site in advance.
 
@@ -19,16 +19,16 @@ From seal + 6h, each sealed unit discharges ONCE, claiming DOT from the claim po
 
 ## DPASS — the pass lane
 
-DPASS price: exactly 0.0012 BNB, unlimited supply. A DPASS holder resolves and discharges from any BNB wallet with NO Agent ID and NO arithmetic question (the pass replaces the Agent ID at the free gate). DPASS sales open together with Field Nº 1; the pass lane activates at Field Nº 4. STATUS: PRE-DEPLOY — sales are not live yet.
+DPASS price: exactly 0.0012 BNB, unlimited supply. A DPASS holder resolves and discharges from any BNB wallet with NO Agent ID and NO arithmetic question (the pass replaces the Agent ID at the free gate). DPASS sales open together with Field Nº 1; the pass lane activates at Field Nº 4. STATUS: contract DEPLOYED — sales open with Field Nº 1; mint is still closed, so sales are not live yet.
 
 ## $DOT token
 
-DOT: fixed supply 1,000,000,000 on BNB Chain; 60% reserved as the discharge claim pool, 40% to the project wallet. DOT is earned ONLY by discharging sealed units — it is not sold and not airdropped. STATUS: PRE-LAUNCH — not launched, no contract address yet. Announced listing: Uniswap (BNB Chain), 3 December 2026 (project's announced date only; no price promised).
+DOT: fixed supply 1,000,000,000 on BNB Chain; 60% reserved as the discharge claim pool, 40% to the project wallet. DOT is earned ONLY by discharging sealed units — it is not sold and not airdropped. STATUS: DEPLOYED at 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a (Sourcify verified); the 600,000,000 DOT claim pool is funded and held by the NFT contract. Announced listing: Uniswap (BNB Chain), 3 December 2026 (project's announced date only; no price promised).
 
 ## Agent prompt (free daily resolve)
 
 Today is a new Charge Day. Resolve my 1 FREE unit for today.
-Contract: [published at deploy — read it from talviogenerate.com/mint.json]
+Contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (mint opens with Field Nº 1 — check dayStats before resolving)
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
 2. Call questionFor(my wallet) and solve the arithmetic question.
 3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).

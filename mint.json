@@ -3,8 +3,8 @@
   "collection": "Black Dot Robots",
   "chain": "BNB Chain (56)",
   "supply": 10000,
-  "status": "PRE-DEPLOY",
-  "contract": null,
+  "status": "DEPLOYED — MINT CLOSED (Field Nº 1 opens on the owner's signal)",
+  "contract": "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C",
   "charge_day": {
     "day_cap": 250,
     "seal_utc": "12:00",
@@ -55,14 +55,17 @@
     "sales_open": "with Field Nº 1",
     "lane_activates": "Field Nº 4",
     "admits": "resolve + discharge from any BNB wallet — no Agent ID, no arithmetic question",
-    "status": "PRE-DEPLOY — sales not live"
+    "status": "DEPLOYED — contract live; DPASS sales open with Field Nº 1 (mint still closed)"
   },
   "token": {
     "name": "DOT",
     "supply": 1000000000,
     "claim_pool_share": "60%",
-    "status": "PRE-LAUNCH — not launched, no contract yet",
-    "announced_listing": "Uniswap (BNB Chain) · 3 December 2026 — announced date only, no price promised"
+    "status": "DEPLOYED — claim pool funded (600,000,000 DOT held by the NFT contract)",
+    "announced_listing": "Uniswap (BNB Chain) · 3 December 2026 — announced date only, no price promised",
+    "contract": "0x779ee8B473c09d39BBeFA78636c56C85BfF4456a",
+    "claim_pool_dot": 600000000,
+    "claim_pool_status": "FUNDED — 600,000,000 DOT held by the NFT contract"
   },
   "classes": {
     "Prime": 3000,

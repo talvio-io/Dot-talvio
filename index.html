@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
-<meta name="description" content="DOTFIELD Charge Day — 10,000 Black Dot Robots on BNB Chain. One free unit daily per wallet with Agent ID, a quiet paid ladder, a daily Mosaic, Charge Tiers and Discharge. Pre-deploy specification." />
+<meta name="description" content="DOTFIELD Charge Day — 10,000 Black Dot Robots on BNB Chain. One free unit daily per wallet with Agent ID, a quiet paid ladder, a daily Mosaic, Charge Tiers and Discharge. Contracts deployed on BNB Chain, claim pool funded — mint closed, Field Nº 1 not yet opened." />
 <meta property="og:title" content="Talvio Generate — DOTFIELD" />
 <meta property="og:description" content="One dot. Ten thousand machines. A daily Charge Day cycle: resolve, seal the Mosaic at 12:00 UTC, then Discharge." />
 <meta property="og:type" content="website" />
@@ -491,7 +491,7 @@
       <a href="#faq">FAQ</a>
     </nav>
     <button class="menu-btn" type="button" id="menuBtn" aria-expanded="false" aria-controls="mobileNav">MENU<span class="plus" aria-hidden="true">+</span></button>
-    <div class="status-pill" role="status"><span class="pulse-dot" aria-hidden="true"></span><span class="hide-m">FIELD </span>STANDBY · PRE-DEPLOY</div>
+    <div class="status-pill" role="status"><span class="pulse-dot" aria-hidden="true"></span><span class="hide-m">CONTRACT LIVE · </span>MINT CLOSED</div>
   </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Sections">
     <a href="#chamber"><span class="n">02</span>Charge — Resolution Chamber</a>
@@ -540,8 +540,8 @@
           <div class="cp-bar free" aria-hidden="true"><i id="cdFreeBar"></i></div>
           <div class="cp-row"><span>UNIQUE WALLETS TODAY</span><span id="cdWallets">—</span></div>
           <div class="cp-row"><span>CHARGE TIER NOW</span><span id="cdTier" style="color:var(--gold)">—</span></div>
-          <div class="cp-row"><span>TOTAL RESOLVED</span><span>0 / 10,000 · PRE-DEPLOY</span></div>
-          <div class="cp-sim">SIMULATION ENGINE — contract not deployed yet. Day, countdown and seal time are real clock math; unit / wallet counts are a labelled local simulation of the published spec, not on-chain data.</div>
+          <div class="cp-row"><span>TOTAL RESOLVED</span><span>0 / 10,000 · MINT CLOSED</span></div>
+          <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN · MINT CLOSED — FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL. Day, countdown and seal time are real clock math; unit / wallet counts are a labelled local simulation of the published spec, not on-chain data. Total resolved is 0 — nothing has minted yet.</div>
         </div>
       </div>
       <div class="hero-cta">
@@ -555,6 +555,7 @@
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tickerTrack">
     <span><b>10,000</b> BLACK DOT ROBOTS</span><span class="sep">·</span>
+    <span>CONTRACT — <b>LIVE ON BNB CHAIN · MINT CLOSED — FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL</b></span><span class="sep">·</span>
     <span>FREE — <b>1 / WALLET / DAY</b></span><span class="sep">·</span>
     <span>DAY CAP — <b>250 UNITS</b></span><span class="sep">·</span>
     <span>SEAL — <b>12:00 UTC DAILY</b></span><span class="sep">·</span>
@@ -585,9 +586,10 @@
         <div><span>FREE</span><span>1 / WALLET / DAY · QUOTA 150</span></div>
         <div><span>SEAL</span><span>12:00 UTC DAILY</span></div>
         <div><span>SECOND ACT</span><span>DISCHARGE · SEAL +6H · PAYS DOT</span></div>
-        <div><span>TOKEN</span><span>DOT · 1,000,000,000 · PRE-LAUNCH</span></div>
+        <div><span>TOKEN</span><span>DOT · 1,000,000,000 · DEPLOYED</span></div>
         <div><span>NETWORK</span><span>BNB CHAIN</span></div>
-        <div><span>CONTRACT</span><span>NOT DEPLOYED — YET</span></div>
+        <div><span>CONTRACT</span><span>LIVE — 0xFfC5…dB2C · MINT CLOSED</span></div>
+        <div><span>CLAIM POOL</span><span>600,000,000 DOT — FUNDED</span></div>
       </div>
     </div>
   </div>
@@ -636,7 +638,7 @@
             </div>
             <pre id="agentPrompt"><span class="c">// DOTFIELD CHARGE DAY · talviogenerate.com · BNB Chain</span>
 Today is a new Charge Day. Resolve my 1 FREE unit for today.
-Contract: <span class="r">[published at deploy — read it from talviogenerate.com/mint.json]</span>
+Contract: <span class="r">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span> (deployed — mint closed until Field Nº 1 opens)
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
 2. Call questionFor(my wallet) and solve the arithmetic question.
 3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
@@ -651,7 +653,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           </div>
           <button class="btn btn-ghost" type="button" id="agentStandbyBtn" style="width:100%" disabled>Free resolve — answer the question first</button>
           <div class="standby" id="agentStandbyMsg" role="status">
-            ■ FREE LANE IN STANDBY — question answered correctly, but the DOTFIELD contract is not deployed yet, so mintFree(answer) cannot be sent and nothing here pretends otherwise. The moment the owner deploys, this button calls the contract directly — same question, same answer, 0 BNB.
+            ■ FREE LANE IN STANDBY — question answered correctly. The DOTFIELD contract is deployed on BNB Chain, but mint is closed — Field Nº 1 has not opened yet, so mintFree(answer) cannot be sent from this page and nothing here pretends otherwise. When the owner opens Field Nº 1, this lane goes live exactly as specified — same question, same answer, 0 BNB.
           </div>
         </div>
 
@@ -684,13 +686,13 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           </div>
           <button class="btn btn-solid" type="button" id="paidStandbyBtn" style="width:100%">Resolve <span id="btnQty">1 paid unit</span> — standby</button>
           <div class="standby" id="standbyMsg" role="status">
-            ■ CHAMBER IN STANDBY — the DOTFIELD contract is not deployed yet, so no transaction can be sent and nothing here pretends otherwise. The moment the owner deploys, the contract address plugs into this page's CONFIG and both lanes go live exactly as specified above.
+            ■ CHAMBER IN STANDBY — the DOTFIELD contract is deployed on BNB Chain (0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C), but mint is closed and Field Nº 1 has not opened yet, so no transaction can be sent from this page and nothing here pretends otherwise. On-chain mint wiring from this website is a later step; both lanes open when the owner opens Field Nº 1, exactly as specified above.
           </div>
         </div>
       </div>
       <div class="chamber-foot">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <span>HONEST STATE: PRE-DEPLOY · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. No wallet connection is requested and no funds can move until the contract exists on BNB Chain and its address appears in the machine surface below. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
+        <span>HONEST STATE: CONTRACT DEPLOYED · MINT CLOSED · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. The contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C and the 600,000,000 DOT claim pool is funded, but mintOpen is still false — no wallet connection is requested and no funds can move from this page until the owner opens Field Nº 1. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
       </div>
 
       <!-- SIMULATOR -->
@@ -735,7 +737,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <div><span>SALES OPEN</span><b>WITH FIELD Nº 1 — AT LAUNCH</b></div>
           <div><span>PASS LANE ACTIVE</span><b>FIELD Nº 4</b></div>
         </div>
-        <div class="pass-note">READ THE TIMELINE PLAINLY — passes are sold from the first field, but a pass bought during Fields Nº 1–3 is a key bought early: it starts opening gates when Field Nº 4 opens, not before. And until the contracts deploy, sales are not live at all — the button on the card stands by, exactly like the chamber's.</div>
+        <div class="pass-note">READ THE TIMELINE PLAINLY — passes are sold from the first field, but a pass bought during Fields Nº 1–3 is a key bought early: it starts opening gates when Field Nº 4 opens, not before. The contracts are deployed, but mint is still closed and Field Nº 1 has not opened, so sales are not live at all yet — the button on the card stands by, exactly like the chamber's.</div>
       </div>
       <div class="pass-card">
         <canvas id="passCanvas" width="1040" height="440" aria-label="Abstract ring of bone-white dots around a single gold dot — the Dot Pass mark. No NFT artwork is shown; the collection art stays sealed."></canvas>
@@ -746,10 +748,10 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
             <div><span>STATUS</span><span>SALES OPEN WITH FIELD Nº 1</span></div>
             <div><span>LANE ACTIVATES</span><span>FIELD Nº 4</span></div>
             <div><span>SUPPLY</span><span>UNLIMITED</span></div>
-            <div><span>SOLD</span><span>0 · PRE-DEPLOY</span></div>
+            <div><span>SOLD</span><span>0 · MINT CLOSED</span></div>
           </div>
           <button class="btn btn-solid" type="button" id="passBuyBtn" style="width:100%">Get a DPASS — standby</button>
-          <div class="standby" id="passStandby" role="status">■ PASS SALES IN STANDBY — DPASS sales open together with Field Nº 1, the moment the contracts are deployed. Nothing can be bought before that, and this page will not pretend otherwise. When sales open, the price is 0.0012 BNB — and the lane it unlocks activates at Field Nº 4.</div>
+          <div class="standby" id="passStandby" role="status">■ PASS SALES IN STANDBY — the contracts are deployed on BNB Chain, but mint is closed and Field Nº 1 has not opened yet. DPASS sales open together with Field Nº 1, on the owner's signal — nothing can be bought from this page before that, and this page will not pretend otherwise. When sales open, the price is 0.0012 BNB — and the lane it unlocks activates at Field Nº 4.</div>
         </div>
       </div>
     </div>
@@ -926,7 +928,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
             OVERDRIVE DAY (CORE LV.3) — <b class="gold">60,000 DOT / UNIT</b><br/>
             SURGE UNIT (GOLD CORE, ~3%) — <b class="gold">250,000 DOT</b>
           </div>
-          <p style="margin-top:18px"><b style="color:var(--bone)">The DOT token, honestly:</b> total supply <b style="color:var(--bone)">1,000,000,000 DOT</b>, of which <b style="color:var(--bone)">60% (600,000,000 DOT)</b> is reserved as the discharge claim pool. DOT is <b style="color:#ff7a6e">not launched yet</b> — pre-launch, no contract address exists today. The claim amounts above are amounts of DOT, never a promised BNB or cash value, and no price is promised.</p>
+          <p style="margin-top:18px"><b style="color:var(--bone)">The DOT token, honestly:</b> total supply <b style="color:var(--bone)">1,000,000,000 DOT</b>, of which <b style="color:var(--bone)">60% (600,000,000 DOT)</b> is reserved as the discharge claim pool. DOT is <b style="color:var(--bone)">deployed on BNB Chain</b> at <b style="color:var(--bone)">0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — and the <b style="color:var(--bone)">600,000,000 DOT claim pool is funded</b>: the NFT contract holds it, ready for Discharge. The claim amounts above are amounts of DOT, never a promised BNB or cash value, and no price is promised.</p>
           <div class="tool-out" style="border-color:#4a3d00">ANNOUNCED MILESTONE — <b class="gold">$DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DECEMBER 2026</b><br/>This is the project's announced date, stated as an announcement only — not a price, return, or value promise.</div>
         </div>
         <div class="tool">
@@ -942,7 +944,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <label for="dcUnits">SEALED UNITS YOU HOLD AT THIS TIER</label>
           <input type="number" id="dcUnits" min="1" max="250" value="3" />
           <div class="tool-out" id="dcOut" aria-live="polite"></div>
-          <p style="margin-top:14px;font-size:13px">Claims open at seal +6h and never expire. DOT is pre-launch — this calculator shows DOT amounts only, never a price.</p>
+          <p style="margin-top:14px;font-size:13px">Claims open at seal +6h and never expire. DOT is deployed and the claim pool is funded — this calculator shows DOT amounts only, never a price.</p>
         </div>
       </div>
     </div>
@@ -961,7 +963,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
       <div class="tool-grid">
         <div class="tool">
           <h3>Check a unit number</h3>
-          <p>Enter any unit from <b style="color:var(--bone)">#1 to #10,000</b>. Class follows the collection's fixed ranges; day, Mosaic position, core level and SURGE status are derived from the unit's seed, exactly as the specification defines them. This is a specimen lookup of the published spec — the contract is not deployed, so nothing here is on-chain data.</p>
+          <p>Enter any unit from <b style="color:var(--bone)">#1 to #10,000</b>. Class follows the collection's fixed ranges; day, Mosaic position, core level and SURGE status are derived from the unit's seed, exactly as the specification defines them. This is a specimen lookup of the published spec — the contract is deployed, but mint is closed and no units exist on-chain yet, so nothing here is on-chain data.</p>
           <label for="ucInput">UNIT NUMBER</label>
           <div class="q-form">
             <input id="ucInput" type="number" min="1" max="10000" value="1" aria-label="Unit number" style="flex:1;min-height:50px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px" />
@@ -997,7 +999,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
             <div><span>/llms.txt</span><span>PLAIN-TEXT MINT INSTRUCTIONS</span></div>
             <div><span>/agent.json</span><span>ERC-8004 STYLE IDENTITY FILE</span></div>
           </div>
-          <p style="color:var(--bone-faint);font-size:13.5px;line-height:1.7;margin-top:18px">These files go live on talviogenerate.com with the contract. Until deployment, the status field below tells the truth to humans and machines alike: <span class="mono" style="color:#ff7a6e">PRE-DEPLOY</span>.</p>
+          <p style="color:var(--bone-faint);font-size:13.5px;line-height:1.7;margin-top:18px">These files are published on talviogenerate.com with the deployed contract addresses. The status field below tells the truth to humans and machines alike: <span class="mono" style="color:#ff7a6e">DEPLOYED · MINT CLOSED</span>.</p>
         </div>
         <div class="codeblock">
           <div class="cb-head"><span>MINT.JSON — PREVIEW</span>
@@ -1008,8 +1010,9 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
   <span class="k">"collection"</span>: "Black Dot Robots",
   <span class="k">"chain"</span>: "BNB Chain (56)",
   <span class="k">"supply"</span>: 10000,
-  <span class="k">"status"</span>: <span class="r">"PRE-DEPLOY"</span>,
-  <span class="k">"contract"</span>: <span class="r">null</span>,
+  <span class="k">"status"</span>: <span class="r">"DEPLOYED — MINT CLOSED · FIELD Nº 1 NOT OPENED"</span>,
+  <span class="k">"contract"</span>: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C",
+  <span class="k">"mint_open"</span>: <span class="r">false</span>, <span class="k">"total_minted"</span>: 0,
   <span class="k">"charge_day"</span>: {
     <span class="k">"day_cap"</span>: 250, <span class="k">"seal_utc"</span>: "12:00",
     <span class="k">"free"</span>: { <span class="k">"per_wallet_per_day"</span>: 1, <span class="k">"quota_per_day"</span>: 150,
@@ -1033,9 +1036,13 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
     <span class="k">"supply"</span>: "unlimited", <span class="k">"sales_open"</span>: "with Field Nº 1",
     <span class="k">"lane_activates"</span>: "Field Nº 4",
     <span class="k">"admits"</span>: "resolve + discharge from any BNB wallet — no Agent ID, no arithmetic question",
-    <span class="k">"status"</span>: <span class="r">"PRE-DEPLOY — sales not live"</span> },
+    <span class="k">"contract"</span>: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C",
+    <span class="k">"status"</span>: <span class="r">"DEPLOYED — SALES OPEN WITH FIELD Nº 1 · MINT CLOSED"</span> },
   <span class="k">"token"</span>: { <span class="k">"name"</span>: "DOT", <span class="k">"supply"</span>: 1000000000,
-    <span class="k">"claim_pool_share"</span>: "60%", <span class="k">"status"</span>: <span class="r">"PRE-LAUNCH — not launched, no contract yet"</span>,
+    <span class="k">"contract"</span>: "0x779ee8B473c09d39BBeFA78636c56C85BfF4456a",
+    <span class="k">"claim_pool_share"</span>: "60%", <span class="k">"claim_pool_dot"</span>: <span class="g">600000000</span>,
+    <span class="k">"claim_pool_status"</span>: "FUNDED — HELD BY THE NFT CONTRACT",
+    <span class="k">"status"</span>: "DEPLOYED ON BNB CHAIN",
     <span class="k">"announced_listing"</span>: "Uniswap (BNB Chain) · 3 December 2026 — announced date only, no price promised" },
   <span class="k">"classes"</span>: { <span class="k">"Prime"</span>: 3000, <span class="k">"Pixel Dot"</span>: 2800,
     <span class="k">"Stealth Dot"</span>: 2700, <span class="k">"Aurum Dot"</span>: <span class="g">1500</span> }
@@ -1069,7 +1076,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
         </details>
         <details>
           <summary>When do DPASS sales open — and when does the pass start working?<span class="plus" aria-hidden="true">+</span></summary>
-          <div class="a">Two different moments, stated plainly. <b>Sales open together with Field Nº 1</b> — the day the contracts deploy and the first field opens. <b>The pass lane activates at Field Nº 4</b>: a pass bought during Fields Nº 1–3 is a key bought early, and it starts opening gates when Field Nº 4 opens, not before. Right now the project is <b>pre-deploy</b>, so sales are not live yet and no pass can be bought today.</div>
+          <div class="a">Two different moments, stated plainly. <b>Sales open together with Field Nº 1</b> — the day the owner opens mint and the first field starts. <b>The pass lane activates at Field Nº 4</b>: a pass bought during Fields Nº 1–3 is a key bought early, and it starts opening gates when Field Nº 4 opens, not before. The contracts are <b>deployed</b>, but mint is still <b>closed</b> — Field Nº 1 has not opened, so sales are not live yet and no pass can be bought today.</div>
         </details>
         <details>
           <summary>What does a full paid day cost?<span class="plus" aria-hidden="true">+</span></summary>
@@ -1085,11 +1092,11 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
         </details>
         <details>
           <summary>What is DOT — is it launched? Can I buy it?<span class="plus" aria-hidden="true">+</span></summary>
-          <div class="a">DOT is the project's own token: total supply <b>1,000,000,000 DOT</b>, with <b>60% reserved as the discharge claim pool</b>. It is <b>not launched yet</b> — pre-launch, no contract address exists today, and <b>no price is promised</b>. The project has announced one dated milestone: <b>$DOT lists on Uniswap (BNB Chain) · 3 December 2026</b> — an announced date, nothing more. Until then there is nothing to buy and nowhere official to trade it; anyone selling “DOT” today is not this project. Its contract address will be published here and in mint.json first.</div>
+          <div class="a">DOT is the project's own token: total supply <b>1,000,000,000 DOT</b>, with <b>60% (600,000,000 DOT) held by the NFT contract as the funded discharge claim pool</b>. It is <b>deployed on BNB Chain</b> at <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b>, and <b>no price is promised</b>. The project has announced one dated milestone: <b>$DOT lists on Uniswap (BNB Chain) · 3 December 2026</b> — an announced date, nothing more; that listing has not happened yet, and there is no official market for DOT until it does.</div>
         </details>
         <details>
           <summary>When does resolving open?<span class="plus" aria-hidden="true">+</span></summary>
-          <div class="a">When the contract is deployed on BNB Chain. The project is currently <b>pre-deploy</b> and this page runs an honestly labelled <b>simulation engine</b>: the Charge Day specification is final, but no wallet can connect and no funds can move until the contract address is plugged into CONFIG and published in <b>mint.json</b>.</div>
+          <div class="a">When the owner opens mint. The contracts are already <b>deployed on BNB Chain</b> — NFT <b>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</b>, DOT <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — both Sourcify-verified, and the <b>600,000,000 DOT claim pool is funded</b>. But <b>mintOpen is still false</b> and Field Nº 1 has not started: resolving opens only on the owner's Open Mint signal. Until then this page runs an honestly labelled <b>simulation engine</b> for the day counts — no wallet connects here and no funds can move from this page; on-chain mint wiring from the website is a later step.</div>
         </details>
         <details>
           <summary>Which lane can pull an Aurum Dot or a SURGE?<span class="plus" aria-hidden="true">+</span></summary>
@@ -1107,8 +1114,8 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
     <div class="foot-grid">
       <div><b>TALVIO GENERATE — DOTFIELD</b><br/>10,000 BLACK DOT ROBOTS · BNB CHAIN<br/>TALVIOGENERATE.COM</div>
       <div>FREE — 1 / WALLET / DAY · AGENT ID<br/>PAID LADDER — 0.00026 → 0.001 BNB · MAX 10 / DAY<br/>DAY CAP 250 · SEAL 12:00 UTC</div>
-      <div>DISCHARGE — PAYS DOT · FEE 0.0002 BNB<br/>DOT — 1,000,000,000 SUPPLY · 60% CLAIM POOL<br/>TOKEN STATUS — <span style="color:#ff7a6e">PRE-LAUNCH · NOT LAUNCHED</span><br/>ANNOUNCED — $DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DEC 2026</div>
-      <div>STATUS — <span style="color:#ff7a6e">PRE-DEPLOY</span><br/>CONTRACT — PUBLISHED AT LAUNCH<br/>COUNTER — WIRES ON-CHAIN AT DEPLOY</div>
+      <div>DISCHARGE — PAYS DOT · FEE 0.0002 BNB<br/>DOT — 1,000,000,000 SUPPLY · 60% CLAIM POOL<br/>DOT CONTRACT —<br/>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a<br/>CLAIM POOL — 600,000,000 DOT · FUNDED<br/>ANNOUNCED — $DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DEC 2026</div>
+      <div>STATUS — CONTRACT LIVE · <span style="color:#ff7a6e">MINT CLOSED</span><br/>NFT CONTRACT —<br/>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C<br/>FIELD Nº 1 — OPENS ON THE OWNER'S SIGNAL</div>
       <div><b>OFFICIAL X</b><br/><a href="https://x.com/DotFieldBnb" target="_blank" rel="noopener noreferrer">X — @DotFieldBnb ↗</a></div>
       <div>ONE DOT.<br/>TEN THOUSAND MACHINES.</div>
     </div>
@@ -1117,12 +1124,16 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
 
 <script>
 /* ============================================================
-   DOTFIELD CONFIG — the owner plugs the contract in here.
-   Until CONTRACT_ADDRESS is set, the chamber stays in honest
-   standby: no wallet prompts, no fake transactions.
+   DOTFIELD CONFIG — deployed contracts, wired 2026-11-18.
+   Both contracts are live on BNB Chain and the claim pool is
+   funded, but mintOpen is still false: Field Nº 1 has not
+   opened, so the chamber stays in honest standby — no wallet
+   prompts, no fake transactions. On-chain mint wiring from
+   this page is a later step, gated on MINT_OPEN below.
    ============================================================ */
 var CONFIG = {
-  CONTRACT_ADDRESS: "",            // ← deploy, then paste address here
+  CONTRACT_ADDRESS: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C", // TalvioGenerate NFT — deployed, mint closed
+  MINT_OPEN: false,                // owner opens Field Nº 1 separately via openMint()
   CHAIN_ID: 56,                    // BNB Chain
   SUPPLY: 10000,
   /* ---- CHARGE DAY v1 ---- */
@@ -1144,10 +1155,13 @@ var CONFIG = {
   SURGE_CLAIM_DOT: 250000,         // seed % 1000 >= 970 (~3%), gold core
   DISCHARGE_DELAY_H: 6,
   DISCHARGE_FEE_BNB: 0.0002,
-  TOKEN: { name: "DOT", supply: 1000000000, claimPoolShare: 0.60, launched: false,
+  TOKEN: { name: "DOT", address: "0x779ee8B473c09d39BBeFA78636c56C85BfF4456a",
+           supply: 1000000000, claimPoolShare: 0.60, claimPoolDot: 600000000,
+           claimPoolFunded: true, launched: true,
            announcedListing: "Uniswap (BNB Chain) · 3 December 2026" },
   PASS: { name: "DPASS", priceBnb: 0.0012, supply: "unlimited",
-          salesOpen: "with Field Nº 1", laneActivatesField: 4, contract: "" },
+          salesOpen: "with Field Nº 1", laneActivatesField: 4,
+          contract: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" }, // DPASS lives inside the NFT contract
   FUNCTIONS: ["currentDay","questionFor","mintFree(answer)","mintPaid(qty)","dayStats","tierOf","coreLevel","isSurge","dischargeable","discharge","poolOf"]
 };
 
@@ -1473,7 +1487,7 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
   /* each lane answers its OWN button, in place — the feedback must
      appear where the visitor is looking, not in the other lane */
   function standby(el){
-    if (CONFIG.CONTRACT_ADDRESS) return; // live mode would wire web3 here
+    if (CONFIG.MINT_OPEN) return; // once Field Nº 1 opens, live mode wires web3 here
     el.classList.add("show");
     el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
   }
@@ -1601,9 +1615,9 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
       if (qInput.value !== "" && parseInt(qInput.value, 10) === answer) {
         solved = true;
         qStatus.className = "q-status ok";
-        qStatus.textContent = "✓ CORRECT — questionFor() answered. In live mode your agent would now call mintFree(answer). Pre-deploy: the chamber stays in standby.";
+        qStatus.textContent = "✓ CORRECT — questionFor() answered. The contract is deployed, but mint is closed until the owner opens Field Nº 1: the chamber stays in standby.";
         agentBtn.disabled = false;
-        agentBtn.textContent = "Free resolve — standby (pre-deploy)";
+        agentBtn.textContent = "Free resolve — standby (mint closed)";
       } else {
         qStatus.className = "q-status bad";
         qStatus.textContent = "✗ Not the answer the field asked for. Check the equation and try again — bots guess, agents compute.";
@@ -1627,7 +1641,7 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
         "CLAIM — <b class='gold'>" + totalDot.toLocaleString("en-US") + " DOT</b> (" + dcDot.toLocaleString("en-US") + " × " + n + " unit" + (n > 1 ? "s" : "") + ")<br/>" +
         "DISCHARGE FEE — <b>" + fee + " BNB</b> (" + CONFIG.DISCHARGE_FEE_BNB + " × " + n + ")<br/>" +
         "WINDOW — OPENS SEAL +6H · <b>NEVER EXPIRES</b><br/>" +
-        "DOT STATUS — <b style='color:#ff7a6e'>PRE-LAUNCH</b> · NO PRICE PROMISED";
+        "DOT STATUS — <b>DEPLOYED · CLAIM POOL FUNDED</b> · NO PRICE PROMISED";
     }
     document.querySelectorAll("#dcSeg button").forEach(function(btn){
       btn.addEventListener("click", function(){
@@ -1674,7 +1688,7 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
         "THAT DAY — <b>" + wThatDay + "</b> UNIQUE WALLETS → <b>" + t.name + "</b> · CORE <b>LV." + t.coreLevel + "</b><br/>" +
         (surge ? "SURGE — <b class='gold'>YES · GOLD CORE</b><br/>" : "SURGE — NO<br/>") +
         "DISCHARGE CLAIM — <b class='gold'>" + claim.toLocaleString("en-US") + " DOT</b> · FEE 0.0002 BNB · NEVER EXPIRES<br/>" +
-        "<span style='color:var(--bone-faint)'>SEEDED SPECIMEN LOOKUP OF THE PUBLISHED SPEC — PRE-DEPLOY, NOT ON-CHAIN DATA.</span>";
+        "<span style='color:var(--bone-faint)'>SEEDED SPECIMEN LOOKUP OF THE PUBLISHED SPEC — NOT ON-CHAIN DATA. CONTRACT DEPLOYED · MINT CLOSED.</span>";
     }
     document.getElementById("ucBtn").addEventListener("click", check);
     document.getElementById("ucInput").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); check(); } });
@@ -1685,7 +1699,7 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 /* ============================================================
    DOT PASS — abstract dotted-ring mark (no NFT artwork; the
    collection stays sealed) and the sales standby. DPASS sales
-   open with Field Nº 1 at deploy; until then the buy button
+   open with Field Nº 1; while mint stays closed the buy button
    behaves exactly like the chamber's standby buttons.
    ============================================================ */
 (function(){
@@ -1718,7 +1732,7 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
   var msg = document.getElementById("passStandby");
   if (btn && msg) {
     btn.addEventListener("click", function(){
-      if (CONFIG.CONTRACT_ADDRESS) return; // live mode would wire the pass sale here
+      if (CONFIG.MINT_OPEN) return; // pass sales wire up when Field Nº 1 opens
       msg.classList.add("show");
       msg.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
     });
