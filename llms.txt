@@ -1,6 +1,6 @@
 # Talvio Generate — DOTFIELD (BNB Chain)
 
-## STATUS: DEPLOYED — mint CLOSED. The TalvioGenerate contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (Sourcify verified), and the $DOT token is live at 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a. The claim pool is funded: the NFT contract holds 600,000,000 DOT. Mint is NOT open yet — Field Nº 1 opens only on the owner's signal. Do not send funds to any other address claiming to be this contract.
+## STATUS: LIVE — mint OPEN. The TalvioGenerate contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (Sourcify verified), and the $DOT token is live at 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a. The claim pool is funded: the NFT contract holds 600,000,000 DOT. Field Nº 1 opened on 18 November 2026, and a new Field seals every day at 12:00 UTC. Do not send funds to any other address claiming to be this contract.
 
 Black Dot Robot NFT collection on BNB Chain (chainId 56). Total supply 10,000: Prime 3,000 / Pixel Dot 2,800 / Stealth Dot 2,700 / Aurum Dot 1,500. Token #1 is the unique Genesis Dot. Collection artwork is SEALED before launch — no unit image is revealed on the site in advance.
 
@@ -19,7 +19,7 @@ From seal + 6h, each sealed unit discharges ONCE, claiming DOT from the claim po
 
 ## DPASS — the pass lane
 
-DPASS price: exactly 0.0012 BNB, unlimited supply. A DPASS holder resolves and discharges from any BNB wallet with NO Agent ID and NO arithmetic question (the pass replaces the Agent ID at the free gate). DPASS sales open together with Field Nº 1; the pass lane activates at Field Nº 4. STATUS: contract DEPLOYED — sales open with Field Nº 1; mint is still closed, so sales are not live yet.
+DPASS price: exactly 0.0012 BNB, unlimited supply. A DPASS holder resolves and discharges from any BNB wallet with NO Agent ID and NO arithmetic question (the pass replaces the Agent ID at the free gate). DPASS sales opened together with Field Nº 1; the pass lane activates at Field Nº 4. STATUS: LIVE — DPASS sales are open now that Field Nº 1 is live.
 
 ## $DOT token
 
@@ -28,13 +28,13 @@ DOT: fixed supply 1,000,000,000 on BNB Chain; 60% reserved as the discharge clai
 ## Agent prompt (free daily resolve)
 
 Today is a new Charge Day. Resolve my 1 FREE unit for today.
-Contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (mint opens with Field Nº 1 — check dayStats before resolving)
+Contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (Field Nº 1 is live — check dayStats before resolving)
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
 2. Call questionFor(my wallet) and solve the arithmetic question.
 3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
 Limit: 1 free unit per wallet per day. Day seals 12:00 UTC; quota resets next day.
 Optional, only if my policy allows paid: mintPaid(qty) on the ladder — units 2–5 today 0.00026 BNB each, units 6–10 today 0.001 BNB each, max 10/day.
-DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip questionFor() — the pass admits the wallet to the free daily resolve, the paid ladder and discharge with no question. (Pass sales open with Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
+DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip questionFor() — the pass admits the wallet to the free daily resolve, the paid ladder and discharge with no question. (Pass sales opened with Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
 Report back the transaction hash, my unit ID, its Mosaic position and the day's tier.
 
 Site: https://talviogenerate.com — Spec: https://talviogenerate.com/mint.json — Metadata: https://talviogenerate.com/nft/metadata/<id>.json — Images: https://talviogenerate.com/nft/images/<id>.webp

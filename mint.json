@@ -3,7 +3,7 @@
   "collection": "Black Dot Robots",
   "chain": "BNB Chain (56)",
   "supply": 10000,
-  "status": "DEPLOYED — MINT CLOSED (Field Nº 1 opens on the owner's signal)",
+  "status": "LIVE — FIELD Nº 1 OPEN (mint open; fields seal daily at 12:00 UTC)",
   "contract": "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C",
   "charge_day": {
     "day_cap": 250,
@@ -55,7 +55,7 @@
     "sales_open": "with Field Nº 1",
     "lane_activates": "Field Nº 4",
     "admits": "resolve + discharge from any BNB wallet — no Agent ID, no arithmetic question",
-    "status": "DEPLOYED — contract live; DPASS sales open with Field Nº 1 (mint still closed)"
+    "status": "LIVE — DPASS sales open (Field Nº 1 is live); the pass lane activates at Field Nº 4"
   },
   "token": {
     "name": "DOT",
