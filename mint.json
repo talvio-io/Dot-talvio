@@ -1,0 +1,75 @@
+{
+  "project": "Talvio Generate — DOTFIELD",
+  "collection": "Black Dot Robots",
+  "chain": "BNB Chain (56)",
+  "supply": 10000,
+  "status": "PRE-DEPLOY",
+  "contract": null,
+  "charge_day": {
+    "day_cap": 250,
+    "seal_utc": "12:00",
+    "free": {
+      "per_wallet_per_day": 1,
+      "quota_per_day": 150,
+      "requires": "Binance Agent ID + arithmetic answer"
+    },
+    "paid_ladder_bnb": {
+      "units_2_to_5": 0.00026,
+      "units_6_to_10": 0.001,
+      "max_per_wallet_per_day": 10
+    },
+    "tiers_by_unique_wallets": {
+      "SPARK": "<25 · Core Lv.1",
+      "CHARGED": "25-99 · Core Lv.2",
+      "OVERDRIVE": "100+ · Core Lv.3"
+    },
+    "functions": [
+      "currentDay",
+      "questionFor",
+      "mintFree(answer)",
+      "mintPaid(qty)",
+      "dayStats",
+      "tierOf",
+      "coreLevel",
+      "isSurge",
+      "dischargeable",
+      "discharge",
+      "poolOf"
+    ]
+  },
+  "discharge": {
+    "opens": "seal + 6h",
+    "fee_bnb": 0.0002,
+    "claims_expire": "never",
+    "claim_dot_per_unit": {
+      "SPARK": 2500,
+      "CHARGED": 12500,
+      "OVERDRIVE": 60000,
+      "SURGE": 250000
+    }
+  },
+  "pass": {
+    "name": "DPASS",
+    "price_bnb": 0.0012,
+    "supply": "unlimited",
+    "sales_open": "with Field Nº 1",
+    "lane_activates": "Field Nº 4",
+    "admits": "resolve + discharge from any BNB wallet — no Agent ID, no arithmetic question",
+    "status": "PRE-DEPLOY — sales not live"
+  },
+  "token": {
+    "name": "DOT",
+    "supply": 1000000000,
+    "claim_pool_share": "60%",
+    "status": "PRE-LAUNCH — not launched, no contract yet",
+    "announced_listing": "Uniswap (BNB Chain) · 3 December 2026 — announced date only, no price promised"
+  },
+  "classes": {
+    "Prime": 3000,
+    "Pixel Dot": 2800,
+    "Stealth Dot": 2700,
+    "Aurum Dot": 1500
+  },
+  "metadata_base": "https://talviogenerate.com/nft/metadata/",
+  "images_base": "https://talviogenerate.com/nft/images/"
+}

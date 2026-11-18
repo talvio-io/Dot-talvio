@@ -1,0 +1,1870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="DOTFIELD Charge Day — 10,000 Black Dot Robots on BNB Chain. One free unit daily per wallet with Agent ID, a quiet paid ladder, a daily Mosaic, Charge Tiers and Discharge. Pre-deploy specification." />
+<meta property="og:title" content="Talvio Generate — DOTFIELD" />
+<meta property="og:description" content="One dot. Ten thousand machines. A daily Charge Day cycle: resolve, seal the Mosaic at 12:00 UTC, then Discharge." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:," />
+<title>Talvio Generate — DOTFIELD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#060606;
+    --ink-2:#0c0c0b;
+    --ink-3:#131311;
+    --bone:#eceade;
+    --bone-dim:#a9a79b;
+    --bone-faint:#6d6b61;
+    --line:#26261f;
+    --line-soft:#1a1a16;
+    --signal:#ff2d1e;
+    --gold:#ffce00;
+    --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--ink);color:var(--bone);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--signal);color:#fff}
+  a{color:inherit}
+  button{font-family:inherit;cursor:pointer}
+  button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{
+    outline:2px solid var(--bone);outline-offset:3px;
+  }
+
+  .mono{font-family:var(--mono)}
+  .wrap{max-width:1440px;margin:0 auto;padding:0 clamp(18px,4vw,56px)}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:60;
+    background:rgba(6,6,6,.86);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .head-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px}
+  .wordmark{display:flex;align-items:baseline;gap:12px;text-decoration:none;min-height:44px;align-items:center}
+  .wordmark b{font-weight:900;letter-spacing:.02em;font-size:17px}
+  .wordmark .dotsep{color:var(--signal);font-weight:900}
+  .wordmark span{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--bone-dim)}
+  nav.main{display:flex;gap:4px}
+  nav.main a{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--bone-dim);text-decoration:none;padding:12px 12px;min-height:44px;
+    display:inline-flex;align-items:center;transition:color .18s ease;
+  }
+  nav.main a:hover{color:var(--bone)}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:9px;
+    border:1px solid var(--line);padding:9px 14px;min-height:40px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--bone-dim);
+    white-space:nowrap;
+  }
+  .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--signal);flex:none;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,45,30,.55)}55%{box-shadow:0 0 0 8px rgba(255,45,30,0)}}
+
+  /* ---------- mobile menu (the nav must never vanish) ---------- */
+  .menu-btn{
+    display:none;align-items:center;gap:10px;min-height:44px;padding:0 18px;flex:none;
+    background:transparent;border:1px solid var(--line);color:var(--bone);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;
+  }
+  .menu-btn .plus{color:var(--signal);font-size:17px;line-height:1;transition:transform .2s ease}
+  .menu-btn[aria-expanded="true"] .plus{transform:rotate(45deg)}
+  .mobile-nav{
+    display:none;border-top:1px solid var(--line);background:rgba(6,6,6,.98);
+    max-height:calc(100svh - 61px);overflow:auto;
+  }
+  .mobile-nav a{
+    display:flex;align-items:center;gap:14px;min-height:54px;padding:0 clamp(18px,4vw,56px);
+    border-bottom:1px solid var(--line-soft);text-decoration:none;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-dim);
+  }
+  .mobile-nav a:last-child{border-bottom:0}
+  .mobile-nav a .n{color:var(--signal);font-size:10.5px;letter-spacing:.12em}
+  .mobile-nav a:hover,.mobile-nav a:active{color:var(--bone);background:rgba(236,234,222,.05)}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;border-bottom:1px solid var(--line);overflow:hidden;background:var(--ink)}
+  #field{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+  .hero-shade{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(6,6,6,.55) 0%,rgba(6,6,6,0) 26%,rgba(6,6,6,0) 55%,rgba(6,6,6,.88) 100%);}
+  .hero-in{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;
+    min-height:min(94svh,880px);padding-top:26px;padding-bottom:30px;pointer-events:none}
+  .hero-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .hero-meta{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--bone-dim);line-height:2}
+  .hero-meta b{color:var(--bone);font-weight:600}
+  .hero-meta .live{color:var(--signal)}
+  .hero-bottom{pointer-events:none}
+  h1.mega{
+    margin:0;font-weight:900;line-height:.88;letter-spacing:-.015em;text-transform:uppercase;
+    font-size:clamp(52px,11.5vw,168px);
+  }
+  h1.mega .hollow{color:transparent;-webkit-text-stroke:2px var(--bone)}
+  h1.mega .dotword{color:var(--bone)}
+  h1.mega .period{color:var(--signal);-webkit-text-stroke:0}
+  .hero-sub{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap;
+    margin-top:26px;
+  }
+  .hero-sub p{max-width:520px;margin:0;font-size:clamp(15px,1.6vw,19px);line-height:1.55;color:var(--bone-dim)}
+  .hero-sub p b{color:var(--bone);font-weight:600}
+  .counter{
+    border:1px solid var(--line);background:rgba(10,10,9,.72);
+    padding:16px 20px;min-width:270px;pointer-events:auto;
+  }
+  .counter .lab{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--bone-dim)}
+  .counter .num{font-size:44px;font-weight:900;line-height:1.05;letter-spacing:-.01em;margin-top:6px;font-variant-numeric:tabular-nums}
+  .counter .num small{font-size:20px;color:var(--bone-faint);font-weight:700}
+  .counter .bar{height:3px;background:var(--ink-3);margin-top:12px;position:relative}
+  .counter .bar i{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--signal)}
+  .counter .note{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--bone-faint);margin-top:10px;line-height:1.7}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px;pointer-events:auto}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    min-height:52px;padding:0 26px;border:1px solid var(--bone);
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;
+    text-decoration:none;transition:background .18s ease,color .18s ease,border-color .18s ease;
+    background:transparent;color:var(--bone);
+  }
+  .btn-solid{background:var(--bone);color:#0a0a09;font-weight:600}
+  .btn-solid:hover{background:#fff;border-color:#fff}
+  .btn-ghost:hover{background:rgba(236,234,222,.1)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .btn-signal{border-color:var(--signal);color:#ffb3ad}
+  .btn-signal:hover{background:rgba(255,45,30,.12)}
+
+  /* ---------- ticker ---------- */
+  .ticker{border-bottom:1px solid var(--line);overflow:hidden;background:var(--ink-2)}
+  .ticker-track{display:flex;width:max-content;animation:tick 36s linear infinite}
+  .ticker span{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.26em;color:var(--bone-faint);
+    padding:11px 0;white-space:nowrap;
+  }
+  .ticker b{color:var(--bone-dim);font-weight:500}
+  .ticker .sep{color:var(--signal);padding:11px 18px}
+  @keyframes tick{to{transform:translateX(-50%)}}
+
+  /* ---------- sections ---------- */
+  section{border-bottom:1px solid var(--line)}
+  /* anchor jumps must land BELOW the sticky header, never under it */
+  section[id],#top{scroll-margin-top:78px}
+  .sec-head{display:flex;align-items:baseline;gap:18px;padding:64px 0 8px;flex-wrap:wrap}
+  .sec-no{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--signal)}
+  .sec-head h2{margin:0;font-size:clamp(30px,4.6vw,58px);font-weight:900;text-transform:uppercase;line-height:.95;letter-spacing:-.01em}
+  .sec-head .side{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--bone-faint);max-width:300px;line-height:1.9;text-align:right}
+  .reveal{opacity:1;transform:translateY(16px);transition:transform .7s ease}
+  .reveal.in{transform:none}
+
+  /* manifesto */
+  .manifesto{padding:26px 0 76px;display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(28px,5vw,80px)}
+  .manifesto .big{font-size:clamp(22px,2.9vw,36px);line-height:1.32;font-weight:600;letter-spacing:-.01em;margin:0}
+  .manifesto .big em{font-style:normal;color:var(--bone-faint)}
+  .manifesto .big .rd{color:var(--signal)}
+  .spec-list{border-top:1px solid var(--line)}
+  .spec-list div{display:flex;justify-content:space-between;gap:16px;padding:13px 2px;border-bottom:1px solid var(--line-soft);
+    font-family:var(--mono);font-size:12px;letter-spacing:.1em}
+  .spec-list div span:first-child{color:var(--bone-faint)}
+  .spec-list div span:last-child{color:var(--bone);text-align:right}
+
+  /* ---------- chamber ---------- */
+  .chamber{padding:8px 0 84px}
+  .chamber-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:0;border:1px solid var(--line);margin-top:26px}
+  .lane{padding:clamp(22px,3vw,38px)}
+  .lane + .lane{border-left:1px solid var(--line)}
+  .lane-tag{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .lane-tag .t{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--bone-dim)}
+  .lane-tag .price{font-size:30px;font-weight:900}
+  .lane-tag .price small{font-size:13px;color:var(--bone-faint);font-weight:700}
+  .lane h3{margin:16px 0 8px;font-size:clamp(24px,2.6vw,34px);font-weight:900;text-transform:uppercase;line-height:1}
+  .lane p{color:var(--bone-dim);line-height:1.6;font-size:15px;margin:0 0 18px}
+  .lane p b{color:var(--bone)}
+  .lane ul{list-style:none;margin:0 0 22px;padding:0}
+  .lane li{display:flex;gap:11px;padding:8px 0;border-top:1px solid var(--line-soft);
+    font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--bone-dim);line-height:1.6}
+  .lane li::before{content:"·";color:var(--signal);font-weight:900;font-size:18px;line-height:1.1}
+  .lane li b{color:var(--bone);font-weight:600}
+  .free-flag{color:var(--signal);font-family:var(--mono);font-size:11px;letter-spacing:.2em}
+
+  .prompt-box{border:1px solid var(--line);background:var(--ink-2);margin:0 0 16px}
+  .prompt-box .pb-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line-soft);padding:8px 14px}
+  .prompt-box .pb-head span{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint)}
+  .prompt-box pre{
+    margin:0;padding:16px;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--bone);
+    white-space:pre-wrap;word-break:break-word;max-height:300px;overflow:auto;
+  }
+  .prompt-box pre .c{color:var(--bone-faint)}
+  .prompt-box pre .r{color:#ff7a6e}
+  .copy-btn{
+    min-height:44px;padding:0 16px;background:transparent;border:1px solid var(--line);color:var(--bone);
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;transition:border-color .18s ease,background .18s ease;
+  }
+  .copy-btn:hover{border-color:var(--bone);background:rgba(236,234,222,.07)}
+
+  .stepper{display:flex;align-items:stretch;border:1px solid var(--line);width:max-content;margin-bottom:18px}
+  .stepper button{
+    width:52px;min-height:52px;background:transparent;border:0;color:var(--bone);font-size:22px;font-weight:700;
+    transition:background .15s ease;
+  }
+  .stepper button:hover{background:rgba(236,234,222,.09)}
+  .stepper .qty{
+    min-width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-left:1px solid var(--line);border-right:1px solid var(--line);padding:4px 0;
+  }
+  .stepper .qty b{font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+  .stepper .qty span{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--bone-faint);margin-top:3px}
+  .calc{border:1px solid var(--line-soft);background:var(--ink-2);padding:14px 16px;margin-bottom:18px}
+  .calc div{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:12px;padding:5px 0;letter-spacing:.05em}
+  .calc div span:first-child{color:var(--bone-faint)}
+  .calc div span:last-child{color:var(--bone);text-align:right;word-break:break-all;font-variant-numeric:tabular-nums}
+  .calc .tot span:last-child{color:#fff;font-weight:600}
+  .standby{
+    display:none;border:1px solid var(--signal);color:#ffb3ad;background:rgba(255,45,30,.07);
+    padding:13px 16px;font-family:var(--mono);font-size:12px;line-height:1.7;letter-spacing:.04em;margin-top:14px;
+  }
+  .standby.show{display:block}
+  .chamber-foot{
+    display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-top:0;
+    padding:16px clamp(22px,3vw,38px);font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--bone-faint);letter-spacing:.05em;
+  }
+  .chamber-foot .pulse-dot{margin-top:5px}
+
+  /* simulator */
+  .sim{margin-top:26px;border:1px solid var(--line);display:grid;grid-template-columns:340px 1fr}
+  .sim-canvas-box{position:relative;background:#000;border-right:1px solid var(--line);min-height:300px}
+  #simCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .sim-side{padding:clamp(20px,3vw,34px)}
+  .sim-side h3{margin:0 0 10px;font-size:22px;font-weight:900;text-transform:uppercase}
+  .sim-side p{color:var(--bone-dim);line-height:1.65;font-size:14.5px;margin:0 0 18px;max-width:520px}
+  .sim-readout{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--bone-faint);line-height:2;border-top:1px solid var(--line-soft);padding-top:14px;margin-top:18px}
+  .sim-readout b{color:var(--bone);font-weight:600}
+
+  /* ---------- classes ---------- */
+  .classes{padding:8px 0 84px}
+  .class-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin-top:26px}
+  .class-card{padding:22px;border-left:1px solid var(--line);position:relative;transition:background .2s ease}
+  .class-card:first-child{border-left:0}
+  .class-card:hover{background:var(--ink-2)}
+  .class-card canvas{width:100%;height:170px;display:block;background:#000;border:1px solid var(--line-soft)}
+  .class-card .cc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .class-card .cc-top span{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint)}
+  .class-card .cc-top b{font-family:var(--mono);font-size:12px;color:var(--bone)}
+  .class-card h3{margin:16px 0 6px;font-size:23px;font-weight:900;text-transform:uppercase;line-height:1}
+  .class-card p{margin:0;color:var(--bone-dim);font-size:13.5px;line-height:1.6}
+  .class-card .density{margin-top:16px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--bone-faint);line-height:1.9}
+  .class-card .density i{display:block;height:3px;background:var(--ink-3);margin-top:6px;position:relative}
+  .class-card .density i::after{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--bone);width:var(--w,25%)}
+  .class-card.gold .density i::after{background:var(--gold)}
+  .class-card.gold h3{color:var(--gold)}
+  .sealed-stamp{
+    width:max-content;max-width:90%;margin:-104px auto 68px;position:relative;z-index:2;
+    transform:rotate(-6deg);border:2px solid var(--signal);color:#ff8a7d;background:rgba(0,0,0,.62);
+    font-family:var(--mono);font-size:11px;letter-spacing:.26em;padding:7px 14px;text-align:center;
+  }
+  .sealed-note{
+    border:1px dashed #4a3d00;color:var(--gold);font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.1em;line-height:1.8;padding:13px 16px;margin-top:22px;
+  }
+  .genesis{
+    margin-top:0;border:1px solid var(--line);border-top:0;padding:20px 22px;
+    display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:var(--ink-2);
+  }
+  .genesis .g-id{font-size:30px;font-weight:900;letter-spacing:-.01em}
+  .genesis p{margin:0;color:var(--bone-dim);font-size:14px;line-height:1.6;max-width:640px}
+  .genesis .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--signal)}
+
+  /* ---------- protocol ---------- */
+  .protocol{padding:8px 0 84px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);margin-top:26px}
+  .step{padding:26px 24px 30px;border-left:1px solid var(--line)}
+  .step:first-child{border-left:0}
+  .step .n{font-size:52px;font-weight:900;color:transparent;-webkit-text-stroke:1.5px var(--bone-faint);line-height:1}
+  .step h3{margin:16px 0 8px;font-size:19px;font-weight:800;text-transform:uppercase}
+  .step p{margin:0;color:var(--bone-dim);font-size:14px;line-height:1.65}
+  .step .ann{margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--bone-faint);line-height:1.8}
+
+  /* ---------- machine surface ---------- */
+  .machine{padding:8px 0 84px}
+  .machine-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(28px,5vw,72px);margin-top:20px;align-items:start}
+  .machine-grid p.lede{font-size:19px;line-height:1.55;color:var(--bone-dim);margin:0 0 18px}
+  .machine-grid p.lede b{color:var(--bone)}
+  .endpoint-list{border-top:1px solid var(--line)}
+  .endpoint-list div{display:flex;justify-content:space-between;gap:14px;padding:12px 2px;border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:12px}
+  .endpoint-list span:first-child{color:var(--bone)}
+  .endpoint-list span:last-child{color:var(--bone-faint);text-align:right}
+  .codeblock{border:1px solid var(--line);background:var(--ink-2)}
+  .codeblock .cb-head{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid var(--line-soft)}
+  .codeblock .cb-head span{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint)}
+  .codeblock pre{margin:0;padding:18px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--bone-dim);overflow:auto;max-height:430px}
+  .codeblock pre .k{color:var(--bone)}
+  .codeblock pre .r{color:#ff7a6e}
+  .codeblock pre .g{color:var(--gold)}
+
+  /* ---------- faq ---------- */
+  .faq{padding:8px 0 84px}
+  .faq-list{margin-top:26px;border-top:1px solid var(--line)}
+  details{border-bottom:1px solid var(--line)}
+  summary{
+    list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:18px;
+    padding:20px 4px;min-height:56px;font-size:17px;font-weight:700;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary .plus{font-family:var(--mono);color:var(--signal);font-size:20px;flex:none;transition:transform .2s ease}
+  details[open ] summary .plus{transform:rotate(45deg)}
+  details .a{padding:0 4px 22px;color:var(--bone-dim);line-height:1.65;font-size:14.5px;max-width:760px}
+  details .a b{color:var(--bone)}
+
+  /* ---------- footer ---------- */
+  footer{padding:56px 0 40px}
+  .foot-mega{font-size:clamp(44px,9vw,128px);font-weight:900;text-transform:uppercase;line-height:.9;letter-spacing:-.015em;margin:0 0 34px}
+  .foot-mega .hollow{color:transparent;-webkit-text-stroke:2px var(--bone-faint)}
+  .foot-grid{display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+  .foot-grid div{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--bone-faint);line-height:2.1}
+  .foot-grid b{color:var(--bone-dim);font-weight:600}
+  .foot-grid a{color:var(--bone-dim);text-decoration:none}
+  .foot-grid a:hover{color:var(--bone)}
+
+  @media (max-width:1020px){
+    .class-grid{grid-template-columns:repeat(2,1fr)}
+    .class-card:nth-child(3){border-left:0}
+    .class-card{border-top:1px solid var(--line)}
+    .class-card:nth-child(-n+2){border-top:0}
+    .steps{grid-template-columns:1fr}
+    .step{border-left:0;border-top:1px solid var(--line)}
+    .step:first-child{border-top:0}
+    .manifesto{grid-template-columns:1fr}
+    .machine-grid{grid-template-columns:1fr}
+    .sim{grid-template-columns:1fr}
+    .sim-canvas-box{border-right:0;border-bottom:1px solid var(--line);min-height:280px}
+  }
+  @media (max-width:1020px){
+    /* below this width the full nav no longer fits beside the wordmark and
+       status pill — swap it for the menu button + panel instead of hiding it */
+    nav.main{display:none}
+    .menu-btn{display:inline-flex}
+    .mobile-nav.open{display:block}
+    section[id],#top{scroll-margin-top:98px}
+  }
+  @media (max-width:760px){
+    .status-pill{font-size:10px;letter-spacing:.1em;padding:8px 10px;white-space:normal;text-align:right}
+    .status-pill .hide-m{display:none}
+    .wordmark b{font-size:15px}
+    .chamber-grid{grid-template-columns:1fr}
+    .lane + .lane{border-left:0;border-top:1px solid var(--line)}
+    .wordmark span{display:none}
+    .counter{min-width:0;width:100%}
+    .sec-head .side{display:none}
+  }
+  @media (max-width:520px){
+    .class-grid{grid-template-columns:1fr}
+    .class-card{border-left:0;border-top:1px solid var(--line)}
+    .class-card:first-child{border-top:0}
+    h1.mega{font-size:clamp(44px,13.4vw,80px)}
+  }
+  /* ---------- charge day panel (hero) ---------- */
+  .charge-panel{border:1px solid var(--line);background:rgba(10,10,9,.82);padding:18px 20px;min-width:min(340px,100%);pointer-events:auto;max-width:420px}
+  .charge-panel .cp-head{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);padding-bottom:12px}
+  .charge-panel .cp-day{font-size:26px;font-weight:900;line-height:1}
+  .charge-panel .cp-day small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--bone-faint);font-weight:400;margin-top:5px}
+  .countdown{font-family:var(--mono);text-align:right}
+  .countdown b{display:block;font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+  .countdown span{font-size:9.5px;letter-spacing:.2em;color:var(--bone-faint)}
+  .cp-row{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  .cp-row span:first-child{color:var(--bone-faint)} .cp-row span:last-child{color:var(--bone);font-variant-numeric:tabular-nums;text-align:right}
+  .cp-bar{height:6px;background:var(--ink-3);margin:12px 0 4px;position:relative}
+  .cp-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);width:0%}
+  .cp-bar.free i{background:var(--bone)}
+  .cp-sim{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--gold);border:1px dashed #4a3d00;padding:8px 10px;margin-top:12px;line-height:1.7}
+
+  /* ---------- question widget / ladder ---------- */
+  .qbox{border:1px solid var(--line);background:var(--ink-2);padding:16px;margin-bottom:16px}
+  .qbox .q-lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint);margin-bottom:10px}
+  .qbox .q-eq{font-size:30px;font-weight:900;letter-spacing:.02em;margin-bottom:12px}
+  .qbox .q-eq span{color:var(--gold)}
+  .q-form{display:flex;gap:10px;flex-wrap:wrap}
+  .q-form input{flex:1;min-width:120px;min-height:48px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px}
+  .q-status{font-family:var(--mono);font-size:11.5px;line-height:1.7;margin-top:12px;color:var(--bone-dim)}
+  .q-status.ok{color:#b7e39a}.q-status.bad{color:#ff8a7d}
+  .breakdown{border:1px solid var(--line-soft);background:var(--ink-2);padding:6px 16px;margin-bottom:18px}
+  .breakdown div{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);letter-spacing:.04em}
+  .breakdown div:last-child{border-bottom:0}
+  .breakdown span:first-child{color:var(--bone-faint)} .breakdown span:last-child{color:var(--bone);text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ---------- mosaic / tiers / discharge / checker ---------- */
+  .mosaic-wrap{margin-top:26px;border:1px solid var(--line)}
+  .mosaic-wrap canvas{width:100%;height:auto;display:block;background:#000;aspect-ratio:25/10}
+  .mosaic-legend{display:flex;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line);padding:14px 18px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--bone-dim)}
+  .mosaic-legend i{display:inline-block;width:10px;height:10px;margin-right:7px;vertical-align:-1px}
+  .tier-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);margin-top:26px}
+  .tier-card{padding:24px;border-left:1px solid var(--line);position:relative}
+  .tier-card:first-child{border-left:0}
+  .tier-card .t-name{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--bone-faint)}
+  .tier-card h3{margin:12px 0 6px;font-size:26px;font-weight:900;text-transform:uppercase}
+  .tier-card p{margin:0;color:var(--bone-dim);font-size:14px;line-height:1.65}
+  .tier-card .weight{margin-top:16px;font-size:34px;font-weight:900;color:var(--gold)}
+  .tier-card .weight small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--bone-faint);font-weight:400;margin-top:4px}
+  .tier-card.active{outline:2px solid var(--gold);outline-offset:-2px;background:rgba(255,206,0,.05)}
+  .tier-card.active .t-name{color:var(--gold)}
+  .gauge{margin-top:22px;border:1px solid var(--line);padding:18px}
+  .gauge .g-top{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--bone-dim)}
+  .gauge .g-top b{color:var(--bone)}
+  .gauge-track{height:10px;background:var(--ink-3);margin-top:14px;position:relative}
+  .gauge-track i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);width:0%}
+  .gauge-marks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--bone-faint);margin-top:8px;letter-spacing:.1em}
+  .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);margin-top:26px}
+  .tool{padding:clamp(22px,3vw,34px)} .tool + .tool{border-left:1px solid var(--line)}
+  .tool h3{margin:0 0 10px;font-size:22px;font-weight:900;text-transform:uppercase}
+  .tool p{color:var(--bone-dim);line-height:1.65;font-size:14.5px;margin:0 0 18px}
+  .tool label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--bone-faint);margin:16px 0 8px}
+  .tool input[type=number],.tool select{width:100%;min-height:50px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px}
+  .tool input[type=range]{width:100%;accent-color:var(--gold);min-height:44px}
+  .tool-out{border:1px solid var(--line-soft);background:var(--ink-2);padding:14px 16px;margin-top:18px;font-family:var(--mono);font-size:12px;line-height:2;letter-spacing:.04em;color:var(--bone-dim)}
+  .tool-out b{color:var(--bone)} .tool-out .gold{color:var(--gold)}
+  .seg{display:flex;border:1px solid var(--line);flex-wrap:wrap}
+  .seg button{flex:1;min-width:86px;min-height:48px;background:transparent;border:0;border-right:1px solid var(--line);color:var(--bone-dim);font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:8px}
+  .seg button:last-child{border-right:0}.seg button.on{background:var(--gold);color:#111;font-weight:700}
+  .unit-result{display:none}.unit-result.show{display:block}
+
+  /* ---------- dot pass ---------- */
+  .pass-grid{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);margin:26px 0 84px}
+  .pass-info{padding:clamp(22px,3vw,38px)}
+  .pass-info h3{margin:14px 0 10px;font-size:clamp(24px,2.6vw,34px);font-weight:900;text-transform:uppercase;line-height:1}
+  .pass-info p{color:var(--bone-dim);line-height:1.65;font-size:15px;margin:0 0 18px}
+  .pass-info p b{color:var(--bone)}
+  .pass-info ul{list-style:none;margin:0 0 22px;padding:0}
+  .pass-info li{display:flex;gap:11px;padding:8px 0;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--bone-dim);line-height:1.6}
+  .pass-info li::before{content:"·";color:var(--signal);font-weight:900;font-size:18px;line-height:1.1}
+  .pass-info li b{color:var(--bone);font-weight:600}
+  .pass-timeline{border:1px solid var(--line-soft);background:var(--ink-2);padding:6px 16px;margin-bottom:18px}
+  .pass-timeline div{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:12px;padding:9px 0;border-bottom:1px solid var(--line-soft);letter-spacing:.06em}
+  .pass-timeline div:last-child{border-bottom:0}
+  .pass-timeline span{color:var(--bone-faint)} .pass-timeline b{color:var(--gold);font-weight:600;text-align:right}
+  .pass-note{border:1px dashed #4a3d00;color:var(--gold);padding:13px 16px;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;line-height:1.8}
+  .pass-card{border-left:1px solid var(--line);background:var(--ink-2);display:flex;flex-direction:column}
+  .pass-card canvas{width:100%;height:210px;display:block;background:#000;border-bottom:1px solid var(--line)}
+  .pass-card-body{padding:clamp(20px,3vw,30px)}
+  .pc-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--bone-dim)}
+  .pc-top b{color:var(--bone);font-size:13px}
+  .pc-price{font-size:38px;font-weight:900;margin:14px 0 6px}
+  .pc-price small{font-size:12px;color:var(--bone-faint);font-weight:700;letter-spacing:.14em}
+  .pc-rows{margin:14px 0 20px;border-top:1px solid var(--line-soft)}
+  .pc-rows div{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  .pc-rows span:first-child{color:var(--bone-faint)} .pc-rows span:last-child{color:var(--bone);text-align:right}
+  @media (max-width:760px){.pass-grid{grid-template-columns:1fr}.pass-card{border-left:0;border-top:1px solid var(--line)}}
+  @media (max-width:900px){.tier-grid{grid-template-columns:1fr}.tier-card{border-left:0;border-top:1px solid var(--line)}.tier-card:first-child{border-top:0}.tool-grid{grid-template-columns:1fr}.tool + .tool{border-left:0;border-top:1px solid var(--line)}}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .ticker-track{animation:none}
+    .pulse-dot{animation:none}
+    .reveal{opacity:1;transform:none;transition:none}
+    *{transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-in">
+    <a class="wordmark" href="#top" aria-label="Talvio Generate — DOTFIELD home">
+      <b>TALVIO<span class="dotsep">.</span>GENERATE</b>
+      <span>DOTFIELD</span>
+    </a>
+    <nav class="main" aria-label="Main">
+      <a href="#chamber">Charge</a>
+      <a href="#pass">Pass</a>
+      <a href="#mosaic">Mosaic</a>
+      <a href="#tiers">Tier</a>
+      <a href="#discharge">Discharge</a>
+      <a href="#checker">Unit Checker</a>
+      <a href="#machine">Agent Surface</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="menu-btn" type="button" id="menuBtn" aria-expanded="false" aria-controls="mobileNav">MENU<span class="plus" aria-hidden="true">+</span></button>
+    <div class="status-pill" role="status"><span class="pulse-dot" aria-hidden="true"></span><span class="hide-m">FIELD </span>STANDBY · PRE-DEPLOY</div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Sections">
+    <a href="#chamber"><span class="n">02</span>Charge — Resolution Chamber</a>
+    <a href="#pass"><span class="n">03</span>Pass — Dot Pass</a>
+    <a href="#mosaic"><span class="n">04</span>Mosaic of the Day</a>
+    <a href="#tiers"><span class="n">05</span>Charge Tier</a>
+    <a href="#classes"><span class="n">06</span>Four Densities — Classes</a>
+    <a href="#discharge"><span class="n">08</span>Discharge — Claim DOT</a>
+    <a href="#checker"><span class="n">09</span>Unit Checker</a>
+    <a href="#machine"><span class="n">10</span>Agent Surface</a>
+    <a href="#faq"><span class="n">11</span>FAQ — Field Notes</a>
+  </nav>
+</header>
+
+<!-- ================= HERO / THE FIELD ================= -->
+<div class="hero" id="top">
+  <canvas id="field" aria-label="Interactive dot field forming a Black Dot Robot. Move your cursor or finger through the field to disturb the dots."></canvas>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap hero-in">
+    <div class="hero-top">
+      <div class="hero-meta">
+        FIELD Nº 001 — <b>BLACK DOT ROBOTS</b><br/>
+        BNB CHAIN · SUPPLY <b>10,000 UNITS</b>
+      </div>
+      <div class="hero-meta" style="text-align:right">
+        SIGNAL <span class="live">● LIVE CANVAS</span><br/>
+        MOVE THROUGH THE FIELD — <b>THE DOTS ANSWER</b>
+      </div>
+    </div>
+    <div class="hero-bottom">
+      <h1 class="mega">
+        One <span class="dotword">dot</span><span class="period">.</span><br/>
+        <span class="hollow">Ten thousand</span><br/>
+        Machines<span class="period">.</span>
+      </h1>
+      <div class="hero-sub">
+        <p><b>DOTFIELD now runs on Charge Day.</b> Every day is one charge cycle: one <b>free unit per wallet per day</b> for Agent ID holders, a quiet paid ladder beside it, then the day <b>seals at 12:00 UTC</b> — its units freeze into one Mosaic, its Charge Tier is set forever, and from seal +6h every sealed unit can <b>Discharge</b> once. The free daily charge is the hero. Paid is the side door.</p>
+        <div class="charge-panel" aria-label="Charge Day live panel">
+          <div class="cp-head">
+            <div class="cp-day"><span id="cdDay">DAY Nº —</span><small>CHARGE DAY · SEALS 12:00 UTC</small></div>
+            <div class="countdown"><b id="cdCountdown">--:--:--</b><span>TO NEXT SEAL</span></div>
+          </div>
+          <div class="cp-row"><span>UNITS TODAY</span><span id="cdUnits">— / 250 CAP</span></div>
+          <div class="cp-bar" aria-hidden="true"><i id="cdUnitsBar"></i></div>
+          <div class="cp-row"><span>FREE QUOTA TODAY</span><span id="cdFree">— / 150</span></div>
+          <div class="cp-bar free" aria-hidden="true"><i id="cdFreeBar"></i></div>
+          <div class="cp-row"><span>UNIQUE WALLETS TODAY</span><span id="cdWallets">—</span></div>
+          <div class="cp-row"><span>CHARGE TIER NOW</span><span id="cdTier" style="color:var(--gold)">—</span></div>
+          <div class="cp-row"><span>TOTAL RESOLVED</span><span>0 / 10,000 · PRE-DEPLOY</span></div>
+          <div class="cp-sim">SIMULATION ENGINE — contract not deployed yet. Day, countdown and seal time are real clock math; unit / wallet counts are a labelled local simulation of the published spec, not on-chain data.</div>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="#chamber">Enter the Resolution Chamber</a>
+        <a class="btn btn-ghost" href="#classes">The four classes — artwork sealed</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span><b>10,000</b> BLACK DOT ROBOTS</span><span class="sep">·</span>
+    <span>FREE — <b>1 / WALLET / DAY</b></span><span class="sep">·</span>
+    <span>DAY CAP — <b>250 UNITS</b></span><span class="sep">·</span>
+    <span>SEAL — <b>12:00 UTC DAILY</b></span><span class="sep">·</span>
+    <span>PAID LADDER — <b>0.00026 → 0.001 BNB</b></span><span class="sep">·</span>
+    <span>ANNOUNCED — <b>$DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DECEMBER 2026</b></span><span class="sep">·</span>
+    <span>DISCHARGE — <b>SEAL +6H · PAYS DOT</b></span><span class="sep">·</span>
+    <span>OVERDRIVE DAY — <b>60,000 DOT / UNIT</b></span><span class="sep">·</span>
+    <span>ARTWORK — <b>SEALED · NO UNIT IMAGE SHOWN BEFORE REVEAL</b></span><span class="sep">·</span>
+    <span>SPECIMEN #0001 — <b>GENESIS DOT</b></span><span class="sep">·</span>
+  </div>
+</div>
+
+<!-- ================= 01 MANIFESTO ================= -->
+<section aria-labelledby="manifesto-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">01</span>
+      <h2 id="manifesto-h">The Field</h2>
+      <span class="side">NO ILLUSTRATION.<br/>ONLY DENSITY, LIGHT, POSITION.</span>
+    </div>
+    <div class="manifesto reveal">
+      <p class="big">A Black Dot Robot is not rendered. It is <em>found</em> — thousands of bone-white points tighten, brighten and lock into a machine. <span class="rd">Rarity is density:</span> the rarer the unit, the more dots it takes to hold it together, and the harder it shines. One class breaks the monochrome — its dots are <em>gold</em>.</p>
+      <div class="spec-list" role="table" aria-label="Collection specifications">
+        <div><span>COLLECTION</span><span>BLACK DOT ROBOTS</span></div>
+        <div><span>ARTWORK</span><span>SEALED — NOT SHOWN ON THIS SITE</span></div>
+        <div><span>SUPPLY</span><span>10,000 UNITS</span></div>
+        <div><span>DAY CAP</span><span>250 UNITS / DAY</span></div>
+        <div><span>FREE</span><span>1 / WALLET / DAY · QUOTA 150</span></div>
+        <div><span>SEAL</span><span>12:00 UTC DAILY</span></div>
+        <div><span>SECOND ACT</span><span>DISCHARGE · SEAL +6H · PAYS DOT</span></div>
+        <div><span>TOKEN</span><span>DOT · 1,000,000,000 · PRE-LAUNCH</span></div>
+        <div><span>NETWORK</span><span>BNB CHAIN</span></div>
+        <div><span>CONTRACT</span><span>NOT DEPLOYED — YET</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 RESOLUTION CHAMBER ================= -->
+<section id="chamber" aria-labelledby="chamber-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">02</span>
+      <h2 id="chamber-h">Resolution Chamber</h2>
+      <span class="side">ONE DAY. ONE CHARGE.<br/>FREE IS THE HERO —<br/>PAID STANDS QUIETLY BESIDE IT.</span>
+    </div>
+
+    <div class="chamber reveal">
+      <div class="chamber-grid">
+        <!-- AGENT LANE -->
+        <div class="lane">
+          <div class="lane-tag">
+            <span class="t">LANE A — FREE DAILY CHARGE</span>
+            <span class="price">0 <small>BNB</small></span>
+          </div>
+          <h3>Agent Resolve — Daily</h3>
+          <p><span class="free-flag">THE FIELD RESOLVES ITSELF FOR MACHINES — EVERY DAY.</span><br/>
+          Holders of a <b>Binance Agent ID</b> resolve <b>1 unit free per wallet per day</b> — no mint price, network fee only. The old “2 free ever” is gone: come back tomorrow, charge again. Free quota is <b>150 of the day's 250 units</b>. Before the free resolve, the field asks one small <b>on-chain arithmetic question</b> — agents answer it, bots stall on it.</p>
+          <ul>
+            <li><b>1 free unit / wallet / day</b> — Agent ID required, resets at seal</li>
+            <li>Price <b>0 BNB</b> · network fee only</li>
+            <li>Free quota <b>150 / day</b> inside the 250 day cap</li>
+            <li>Anti-bot gate — <b>one arithmetic question</b> per free resolve</li>
+          </ul>
+          <div class="qbox" aria-label="Anti-bot arithmetic question simulation">
+            <div class="q-lab">ANTI-BOT QUESTION — SIMULATION OF questionFor() / mintFree(answer)</div>
+            <div class="q-eq" id="qEq">— <span>+</span> — <span>=</span> ?</div>
+            <div class="q-form">
+              <input id="qInput" type="number" inputmode="numeric" placeholder="Your answer" aria-label="Arithmetic answer" />
+              <button class="copy-btn" type="button" id="qNew" style="min-height:48px">NEW QUESTION</button>
+              <button class="copy-btn" type="button" id="qCheck" style="min-height:48px;border-color:var(--gold);color:var(--gold)">VERIFY</button>
+            </div>
+            <div class="q-status" id="qStatus">Answer correctly to unlock the simulated free resolve. On-chain, the contract checks the same answer inside mintFree(answer).</div>
+          </div>
+          <div class="prompt-box">
+            <div class="pb-head">
+              <span>COORDINATE COMMAND — SEND TO YOUR AGENT</span>
+              <button class="copy-btn" id="copyPrompt" type="button">COPY</button>
+            </div>
+            <pre id="agentPrompt"><span class="c">// DOTFIELD CHARGE DAY · talviogenerate.com · BNB Chain</span>
+Today is a new Charge Day. Resolve my 1 FREE unit for today.
+Contract: <span class="r">[published at deploy — read it from talviogenerate.com/mint.json]</span>
+1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
+2. Call questionFor(my wallet) and solve the arithmetic question.
+3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
+Limit: 1 free unit per wallet per day. Day seals 12:00 UTC; quota resets next day.
+Optional, only if my policy allows paid: mintPaid(qty) on the ladder —
+units 2–5 today 0.00026 BNB each, units 6–10 today 0.001 BNB each, max 10/day.
+DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip
+questionFor() — the pass admits the wallet to the free daily resolve,
+the paid ladder and discharge with no question. (Pass sales open with
+Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
+Report back the transaction hash, my unit ID, its Mosaic position and the day's tier.</pre>
+          </div>
+          <button class="btn btn-ghost" type="button" id="agentStandbyBtn" style="width:100%" disabled>Free resolve — answer the question first</button>
+          <div class="standby" id="agentStandbyMsg" role="status">
+            ■ FREE LANE IN STANDBY — question answered correctly, but the DOTFIELD contract is not deployed yet, so mintFree(answer) cannot be sent and nothing here pretends otherwise. The moment the owner deploys, this button calls the contract directly — same question, same answer, 0 BNB.
+          </div>
+        </div>
+
+        <!-- PAID LANE -->
+        <div class="lane">
+          <div class="lane-tag">
+            <span class="t">LANE B — PAID LADDER · QUIET</span>
+            <span class="price">0.00026 <small>BNB ↑</small></span>
+          </div>
+          <h3>Direct Resolve</h3>
+          <p>Every wallet, no Agent ID needed, open <b>in parallel</b> from the first block of the day. Paid counts <b>your units today, including the free one</b>: unit 1 is the free daily charge, units <b>2–5 cost 0.00026 BNB each</b>, units <b>6–10 cost 0.001 BNB each</b>. Hard stop at <b>10 units per wallet per day</b>. Small numbers, on purpose.</p>
+          <ul>
+            <li>Units <b>2–5 today — 0.00026 BNB</b> each</li>
+            <li>Units <b>6–10 today — 0.001 BNB</b> each</li>
+            <li><b>Max 10 units / wallet / day</b> (free unit counts as unit 1)</li>
+            <li>Class rolled at resolve — <b>every lane can pull Aurum</b></li>
+          </ul>
+          <div class="stepper" role="group" aria-label="Quantity today including free unit">
+            <button type="button" id="qtyMinus" aria-label="Decrease quantity">−</button>
+            <div class="qty"><b id="qtyVal">2</b><span>UNITS TODAY</span></div>
+            <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="breakdown" id="ladderBreakdown" aria-live="polite"></div>
+          <div class="calc" aria-live="polite">
+            <div><span>PAID UNITS</span><span id="calcQty">1</span></div>
+            <div class="tot"><span>TOTAL TO PAY</span><span id="calcTotal">0.00026 BNB</span></div>
+            <div><span>VALUE (WEI)</span><span id="calcWei">260000000000000</span></div>
+            <div><span>VALUE (HEX)</span><span id="calcHex">0xec77f7a44000</span></div>
+            <div><span>DISCHARGE CLAIM</span><span>SET BY THE DAY'S TIER · PAID IN DOT ↓</span></div>
+          </div>
+          <button class="btn btn-solid" type="button" id="paidStandbyBtn" style="width:100%">Resolve <span id="btnQty">1 paid unit</span> — standby</button>
+          <div class="standby" id="standbyMsg" role="status">
+            ■ CHAMBER IN STANDBY — the DOTFIELD contract is not deployed yet, so no transaction can be sent and nothing here pretends otherwise. The moment the owner deploys, the contract address plugs into this page's CONFIG and both lanes go live exactly as specified above.
+          </div>
+        </div>
+      </div>
+      <div class="chamber-foot">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>HONEST STATE: PRE-DEPLOY · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. No wallet connection is requested and no funds can move until the contract exists on BNB Chain and its address appears in the machine surface below. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
+      </div>
+
+      <!-- SIMULATOR -->
+      <div class="sim reveal">
+        <div class="sim-canvas-box">
+          <canvas id="simCanvas" aria-label="Simulation canvas: loose dots converge into a sealed block. The unit artwork itself is sealed and never shown."></canvas>
+        </div>
+        <div class="sim-side">
+          <h3>Feel a resolve</h3>
+          <p>This is a simulation — no wallet, no chain. Press the button and watch loose field dots do what a mint will do at launch: converge, tighten, and harden into one <b style="color:var(--bone)">sealed</b> unit. The artwork inside stays hidden — the seal only opens at the reveal.</p>
+          <button class="btn btn-signal" type="button" id="simBtn">Run resolve simulation</button>
+          <div class="sim-readout" id="simReadout">
+            STATE — <b>SCATTERED FIELD</b><br/>
+            DOTS IN PLAY — <b id="simDots">0</b> · CLASS ROLLED — <b id="simClass">—</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 DOT PASS ================= -->
+<section id="pass" aria-labelledby="pass-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">03</span>
+      <h2 id="pass-h">Dot Pass</h2>
+      <span class="side">THE WALLET-ONLY KEY.<br/>SALES OPEN WITH FIELD Nº 1.<br/>THE LANE WAKES AT FIELD Nº 4.</span>
+    </div>
+    <div class="pass-grid reveal">
+      <div class="pass-info">
+        <span class="free-flag">FOR WALLETS WITHOUT A BINANCE AGENT ID</span>
+        <h3>One pass. Every gate opens.</h3>
+        <p>The free daily charge was built for agents: an Agent ID at the door, an arithmetic question at the gate. <b>DPASS is the same field, keyed for humans.</b> Hold one Dot Pass and your own BNB wallet resolves units and discharges them with <b>no Agent ID and no anti-bot question</b> — at the free gate, the pass itself is the credential.</p>
+        <ul>
+          <li><b>Free daily resolve</b> — 1 unit / wallet / day, the pass standing in for the Agent ID, no question asked; draws on the same 150-unit daily free quota</li>
+          <li><b>Paid ladder</b> — identical rungs: units 2–5 at 0.00026 BNB, units 6–10 at 0.001 BNB, max 10 / day</li>
+          <li><b>Discharge</b> — pass holders discharge sealed units for DOT at the same 0.0002 BNB fee; claims never expire</li>
+          <li>The pass changes <b>who can enter</b> — never what anything costs</li>
+        </ul>
+        <div class="pass-timeline">
+          <div><span>SALES OPEN</span><b>WITH FIELD Nº 1 — AT LAUNCH</b></div>
+          <div><span>PASS LANE ACTIVE</span><b>FIELD Nº 4</b></div>
+        </div>
+        <div class="pass-note">READ THE TIMELINE PLAINLY — passes are sold from the first field, but a pass bought during Fields Nº 1–3 is a key bought early: it starts opening gates when Field Nº 4 opens, not before. And until the contracts deploy, sales are not live at all — the button on the card stands by, exactly like the chamber's.</div>
+      </div>
+      <div class="pass-card">
+        <canvas id="passCanvas" width="1040" height="440" aria-label="Abstract ring of bone-white dots around a single gold dot — the Dot Pass mark. No NFT artwork is shown; the collection art stays sealed."></canvas>
+        <div class="pass-card-body">
+          <div class="pc-top"><span>DOTFIELD PASS</span><b>DPASS</b></div>
+          <div class="pc-price">0.0012 <small>BNB · ONE-TIME</small></div>
+          <div class="pc-rows">
+            <div><span>STATUS</span><span>SALES OPEN WITH FIELD Nº 1</span></div>
+            <div><span>LANE ACTIVATES</span><span>FIELD Nº 4</span></div>
+            <div><span>SUPPLY</span><span>UNLIMITED</span></div>
+            <div><span>SOLD</span><span>0 · PRE-DEPLOY</span></div>
+          </div>
+          <button class="btn btn-solid" type="button" id="passBuyBtn" style="width:100%">Get a DPASS — standby</button>
+          <div class="standby" id="passStandby" role="status">■ PASS SALES IN STANDBY — DPASS sales open together with Field Nº 1, the moment the contracts are deployed. Nothing can be bought before that, and this page will not pretend otherwise. When sales open, the price is 0.0012 BNB — and the lane it unlocks activates at Field Nº 4.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 MOSAIC ================= -->
+<section id="mosaic" aria-labelledby="mosaic-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">04</span>
+      <h2 id="mosaic-h">Mosaic of the Day</h2>
+      <span class="side">250 CELLS. ONE DAY.<br/>FROZEN AT THE SEAL<br/>AS MOSAIC Nº N.</span>
+    </div>
+    <div class="reveal">
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — free units in bone, paid units brighter, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is the simulation engine's seeded picture of a day in progress — not live chain data.</p>
+      <div class="mosaic-wrap">
+        <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Simulated halftone mosaic grid of 250 cells for today, filling as the simulated day progresses."></canvas>
+        <div class="mosaic-legend">
+          <span><i style="background:#eceade"></i>FREE UNIT</span>
+          <span><i style="background:#fff"></i>PAID UNIT</span>
+          <span><i style="background:var(--gold)"></i>SURGE UNIT</span>
+          <span><i style="background:#23231e"></i>UNRESOLVED CELL</span>
+          <span id="mosaicCount" style="margin-left:auto;color:var(--bone)">— / 250 CELLS FILLED (SIMULATION)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 CHARGE TIER ================= -->
+<section id="tiers" aria-labelledby="tiers-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">05</span>
+      <h2 id="tiers-h">Charge Tier</h2>
+      <span class="side">SET BY UNIQUE WALLETS,<br/>NOT BY VOLUME. SEALED<br/>INTO METADATA FOREVER.</span>
+    </div>
+    <div class="reveal">
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">The day's tier is decided by <b style="color:var(--bone)">how many unique wallets showed up</b> — so every new wallet literally charges everyone else's units harder. The tier becomes a <b style="color:var(--bone)">permanent metadata trait</b> of every unit sealed that day (its Core Level), and it fixes exactly how much <b style="color:var(--gold)">DOT</b> each of those units can claim at Discharge.</p>
+      <div class="tier-grid" id="tierGrid">
+        <article class="tier-card" data-tier="0">
+          <div class="t-name">TIER 1 · &lt; 25 UNIQUE WALLETS</div>
+          <h3>Spark</h3>
+          <p>A quiet day. The field barely hums — every unit sealed today carries a Core Lv.1.</p>
+          <div class="weight">2,500<small>DOT PER UNIT AT DISCHARGE · CORE LV.1</small></div>
+        </article>
+        <article class="tier-card" data-tier="1">
+          <div class="t-name">TIER 2 · 25–99 UNIQUE WALLETS</div>
+          <h3>Charged</h3>
+          <p>The field is awake. Units sealed today carry a Core Lv.2 — five times the Spark claim.</p>
+          <div class="weight">12,500<small>DOT PER UNIT AT DISCHARGE · CORE LV.2</small></div>
+        </article>
+        <article class="tier-card" data-tier="2">
+          <div class="t-name">TIER 3 · 100+ UNIQUE WALLETS</div>
+          <h3>Overdrive</h3>
+          <p>The field overloads. Units sealed today carry a Core Lv.3 — twenty-four times the Spark claim.</p>
+          <div class="weight">60,000<small>DOT PER UNIT AT DISCHARGE · CORE LV.3</small></div>
+        </article>
+      </div>
+      <div class="gauge" aria-label="Charge tier gauge, simulation">
+        <div class="g-top"><span>UNIQUE WALLETS TODAY — <b id="gaugeWallets">—</b> (SIMULATION)</span><span>CURRENT TIER — <b id="gaugeTier" style="color:var(--gold)">—</b></span></div>
+        <div class="gauge-track" aria-hidden="true"><i id="gaugeFill"></i></div>
+        <div class="gauge-marks"><span>0 · SPARK</span><span>25 · CHARGED</span><span>100+ · OVERDRIVE</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 CLASSES ================= -->
+<section id="classes" aria-labelledby="classes-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">06</span>
+      <h2 id="classes-h">Four Densities</h2>
+      <span class="side">THE ARTWORK IS SEALED.<br/>ONLY NAMES, SHARES AND<br/>DENSITY ARE PUBLIC.</span>
+    </div>
+    <div class="classes reveal">
+      <div class="sealed-note">■ ARTWORK SEALED — no unit image appears anywhere on this site before the reveal. What you see below is each class's dot-density field only: how many dots, how tight, how bright. The machines themselves stay hidden until the project opens the seal.</div>
+      <div class="class-grid">
+        <article class="class-card">
+          <div class="cc-top"><span>CLASS / 01</span><b>≈30%</b></div>
+          <canvas data-class="prime" width="520" height="340" aria-label="Abstract dot-density field for the Prime class. The artwork itself is sealed and not shown."></canvas>
+          <div class="sealed-stamp" aria-hidden="true">ARTWORK SEALED</div>
+          <h3>Prime</h3>
+          <p>The field's standard machine. Wide dot spacing, calm light — the density every other class is measured against. Its face stays sealed until the reveal.</p>
+          <div class="density">DOT DENSITY — LOW<i style="--w:28%"></i></div>
+        </article>
+        <article class="class-card">
+          <div class="cc-top"><span>CLASS / 02</span><b>≈28%</b></div>
+          <canvas data-class="pixel" width="520" height="340" aria-label="Abstract dot-density field for the Pixel Dot class. The artwork itself is sealed and not shown."></canvas>
+          <div class="sealed-stamp" aria-hidden="true">ARTWORK SEALED</div>
+          <h3>Pixel Dot</h3>
+          <p>The dots snap to a visible grid, edges turning blocky and deliberate — a machine that remembers being a sprite. What the grid is hiding stays sealed.</p>
+          <div class="density">DOT DENSITY — GRID-LOCKED<i style="--w:52%"></i></div>
+        </article>
+        <article class="class-card">
+          <div class="cc-top"><span>CLASS / 03</span><b>≈27%</b></div>
+          <canvas data-class="stealth" width="520" height="340" aria-label="Abstract dot-density field for the Stealth Dot class. The artwork itself is sealed and not shown."></canvas>
+          <div class="sealed-stamp" aria-hidden="true">ARTWORK SEALED</div>
+          <h3>Stealth Dot</h3>
+          <p>Dense, but dimmed to a whisper. A Stealth unit sits in the field almost invisible — fitting, since its artwork is the most hidden of all until the reveal.</p>
+          <div class="density">DOT DENSITY — HIGH / DIM<i style="--w:76%"></i></div>
+        </article>
+        <article class="class-card gold">
+          <div class="cc-top"><span>CLASS / 04</span><b>≈15%</b></div>
+          <canvas data-class="aurum" width="520" height="340" aria-label="Abstract gold dot-density field for the Aurum Dot class. The artwork itself is sealed and not shown."></canvas>
+          <div class="sealed-stamp" aria-hidden="true">ARTWORK SEALED</div>
+          <h3>Aurum Dot</h3>
+          <p>The only break in the monochrome. Packed tightest, lit in gold — when an Aurum resolves, the whole field notices. Nobody sees what it looks like until the seal opens.</p>
+          <div class="density">DOT DENSITY — MAXIMUM · GOLD<i style="--w:100%"></i></div>
+        </article>
+      </div>
+      <div class="genesis">
+        <span class="g-id">#0001</span>
+        <div>
+          <span class="tag">SPECIMEN Nº 001 — FIRST RESOLVE</span>
+          <p><b style="color:var(--bone)">Genesis Dot.</b> The first unit that will ever harden out of the field. Whatever class it rolls, #0001 is the coordinate everything else is counted from — and its artwork is sealed like every other unit's until the reveal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 PROTOCOL ================= -->
+<section id="protocol" aria-labelledby="protocol-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">07</span>
+      <h2 id="protocol-h">Charge · Seal · Discharge</h2>
+      <span class="side">ONE DAY, THREE MOVEMENTS.<br/>THE CYCLE REPEATS<br/>UNTIL 10,000 ARE GONE.</span>
+    </div>
+    <div class="protocol reveal">
+      <div class="steps">
+        <div class="step">
+          <div class="n">01</div>
+          <h3>Charge — during the day</h3>
+          <p>Resolve your free daily unit with an Agent ID and one arithmetic answer, or climb the quiet paid ladder. Every unit takes its cell in today's Mosaic and pushes the unique-wallet count toward a higher Charge Tier.</p>
+          <div class="ann">FREE — 1 / WALLET / DAY · QUOTA 150<br/>PAID — 0.00026 → 0.001 · MAX 10 / DAY<br/>DAY CAP — 250 UNITS</div>
+        </div>
+        <div class="step">
+          <div class="n">02</div>
+          <h3>Seal — 12:00 UTC</h3>
+          <p>The day closes. The Mosaic freezes as Mosaic Nº N, the Charge Tier locks in as a permanent trait of every unit sealed today, and a fresh blank day opens. At 250 units a day, the full field resolves in roughly 40–60 days.</p>
+          <div class="ann">MOSAIC — FROZEN AS Nº N<br/>TIER — SPARK / CHARGED / OVERDRIVE<br/>CORE LEVEL — SET PERMANENTLY</div>
+        </div>
+        <div class="step">
+          <div class="n">03</div>
+          <h3>Discharge — seal +6h</h3>
+          <p>The second act. From six hours after the seal, each sealed unit discharges exactly once and claims DOT — the project's own token — at the rate its day's tier set: 2,500 / 12,500 / 60,000 DOT, or 250,000 DOT for a SURGE unit. Claims never expire — a unit sealed in November can discharge next year.</p>
+          <div class="ann">CLAIM — IN DOT · SET BY THE DAY'S TIER<br/>SURGE — 250,000 DOT<br/>FEE — 0.0002 BNB PER DISCHARGE<br/>WINDOW — OPENS +6H · NEVER EXPIRES</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 DISCHARGE ================= -->
+<section id="discharge" aria-labelledby="discharge-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">08</span>
+      <h2 id="discharge-h">Discharge — The Second Act</h2>
+      <span class="side">THE UNIT YOU ALREADY HOLD<br/>IS THE KEY. THE FEE OPENS<br/>ITS DOT CLAIM.</span>
+    </div>
+    <div class="reveal">
+      <div class="tool-grid">
+        <div class="tool">
+          <h3>Discharge pays DOT</h3>
+          <p>From <b style="color:var(--bone)">seal +6 hours</b>, every sealed unit may discharge <b style="color:var(--bone)">exactly once</b> and claim <b style="color:var(--gold)">DOT</b> — the project's own token — from the reserved claim pool. The amount is <b style="color:var(--bone)">fixed by the Charge Tier of the day the unit sealed</b>, not by trading volume. The discharge fee is <b style="color:var(--bone)">0.0002 BNB per unit</b>, and claims <b style="color:var(--bone)">never expire</b>.</p>
+          <div class="tool-out" aria-label="Discharge claim table">
+            SPARK DAY (CORE LV.1) — <b class="gold">2,500 DOT / UNIT</b><br/>
+            CHARGED DAY (CORE LV.2) — <b class="gold">12,500 DOT / UNIT</b><br/>
+            OVERDRIVE DAY (CORE LV.3) — <b class="gold">60,000 DOT / UNIT</b><br/>
+            SURGE UNIT (GOLD CORE, ~3%) — <b class="gold">250,000 DOT</b>
+          </div>
+          <p style="margin-top:18px"><b style="color:var(--bone)">The DOT token, honestly:</b> total supply <b style="color:var(--bone)">1,000,000,000 DOT</b>, of which <b style="color:var(--bone)">60% (600,000,000 DOT)</b> is reserved as the discharge claim pool. DOT is <b style="color:#ff7a6e">not launched yet</b> — pre-launch, no contract address exists today. The claim amounts above are amounts of DOT, never a promised BNB or cash value, and no price is promised.</p>
+          <div class="tool-out" style="border-color:#4a3d00">ANNOUNCED MILESTONE — <b class="gold">$DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DECEMBER 2026</b><br/>This is the project's announced date, stated as an announcement only — not a price, return, or value promise.</div>
+        </div>
+        <div class="tool">
+          <h3>Calculate a claim</h3>
+          <p>No estimation needed — the table is fixed. Pick the tier of the day your unit sealed (or SURGE) and how many sealed units you hold.</p>
+          <label>DAY'S CHARGE TIER / UNIT TYPE</label>
+          <div class="seg" id="dcSeg" role="group" aria-label="Charge tier">
+            <button type="button" data-dot="2500" data-name="SPARK · CORE LV.1">SPARK · 2,500</button>
+            <button type="button" data-dot="12500" data-name="CHARGED · CORE LV.2">CHARGED · 12,500</button>
+            <button type="button" data-dot="60000" data-name="OVERDRIVE · CORE LV.3" class="on">OVERDRIVE · 60,000</button>
+            <button type="button" data-dot="250000" data-name="SURGE · GOLD CORE">SURGE · 250,000</button>
+          </div>
+          <label for="dcUnits">SEALED UNITS YOU HOLD AT THIS TIER</label>
+          <input type="number" id="dcUnits" min="1" max="250" value="3" />
+          <div class="tool-out" id="dcOut" aria-live="polite"></div>
+          <p style="margin-top:14px;font-size:13px">Claims open at seal +6h and never expire. DOT is pre-launch — this calculator shows DOT amounts only, never a price.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 UNIT CHECKER ================= -->
+<section id="checker" aria-labelledby="checker-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">09</span>
+      <h2 id="checker-h">Unit Checker</h2>
+      <span class="side">SEEDED SPECIMEN LOOKUP.<br/>DETERMINISTIC — THE SAME<br/>NUMBER, THE SAME ANSWER.</span>
+    </div>
+    <div class="reveal">
+      <div class="tool-grid">
+        <div class="tool">
+          <h3>Check a unit number</h3>
+          <p>Enter any unit from <b style="color:var(--bone)">#1 to #10,000</b>. Class follows the collection's fixed ranges; day, Mosaic position, core level and SURGE status are derived from the unit's seed, exactly as the specification defines them. This is a specimen lookup of the published spec — the contract is not deployed, so nothing here is on-chain data.</p>
+          <label for="ucInput">UNIT NUMBER</label>
+          <div class="q-form">
+            <input id="ucInput" type="number" min="1" max="10000" value="1" aria-label="Unit number" style="flex:1;min-height:50px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px" />
+            <button class="btn btn-solid" type="button" id="ucBtn" style="min-height:50px">Check unit</button>
+          </div>
+          <div class="tool-out unit-result" id="ucOut" aria-live="polite"></div>
+        </div>
+        <div class="tool">
+          <h3>How to read it</h3>
+          <p><b style="color:var(--bone)">Class ranges</b> — #1 Genesis Dot · Prime #2–#3001 (3,000) · Pixel Dot #3002–#5801 (2,800) · Stealth Dot #5802–#8501 (2,700) · Aurum Dot #8502–#10,000 (1,499, plus Genesis = 1,500 Aurum in total).</p>
+          <p><b style="color:var(--bone)">SURGE</b> — if seed % 1000 ≥ 970 (≈3% of units), the unit carries a gold core trait (its artwork, like every unit's, is sealed until the reveal) and claims <b style="color:var(--gold)">250,000 DOT</b> at Discharge, whatever its day's tier.</p>
+          <p><b style="color:var(--gold)">Core Level &amp; DOT claim</b> — both come from the Charge Tier of the day the unit sealed: SPARK → Lv.1 · 2,500 DOT, CHARGED → Lv.2 · 12,500 DOT, OVERDRIVE → Lv.3 · 60,000 DOT. Neither ever changes after the seal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 10 MACHINE SURFACE ================= -->
+<section id="machine" aria-labelledby="machine-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">10</span>
+      <h2 id="machine-h">Agent Surface</h2>
+      <span class="side">BUILT FOR MACHINES<br/>TO READ FIRST.</span>
+    </div>
+    <div class="machine reveal">
+      <div class="machine-grid">
+        <div>
+          <p class="lede">DOTFIELD is an <b>agent-first mint</b>. The same Charge Day facts on this page are published in machine-readable form, so a Binance agent can read the day, answer the question, resolve its free unit and later discharge it for DOT <b>without a human touching this page</b>.</p>
+          <div class="endpoint-list">
+            <div><span>/mint.json</span><span>LANES · PASS · PRICES · CAPS · STATUS</span></div>
+            <div><span>/llms.txt</span><span>PLAIN-TEXT MINT INSTRUCTIONS</span></div>
+            <div><span>/agent.json</span><span>ERC-8004 STYLE IDENTITY FILE</span></div>
+          </div>
+          <p style="color:var(--bone-faint);font-size:13.5px;line-height:1.7;margin-top:18px">These files go live on talviogenerate.com with the contract. Until deployment, the status field below tells the truth to humans and machines alike: <span class="mono" style="color:#ff7a6e">PRE-DEPLOY</span>.</p>
+        </div>
+        <div class="codeblock">
+          <div class="cb-head"><span>MINT.JSON — PREVIEW</span>
+            <button class="copy-btn" id="copyJson" type="button">COPY</button>
+          </div>
+<pre id="mintJson">{
+  <span class="k">"project"</span>: "Talvio Generate — DOTFIELD",
+  <span class="k">"collection"</span>: "Black Dot Robots",
+  <span class="k">"chain"</span>: "BNB Chain (56)",
+  <span class="k">"supply"</span>: 10000,
+  <span class="k">"status"</span>: <span class="r">"PRE-DEPLOY"</span>,
+  <span class="k">"contract"</span>: <span class="r">null</span>,
+  <span class="k">"charge_day"</span>: {
+    <span class="k">"day_cap"</span>: 250, <span class="k">"seal_utc"</span>: "12:00",
+    <span class="k">"free"</span>: { <span class="k">"per_wallet_per_day"</span>: 1, <span class="k">"quota_per_day"</span>: 150,
+             <span class="k">"requires"</span>: "Binance Agent ID + arithmetic answer" },
+    <span class="k">"paid_ladder_bnb"</span>: { <span class="k">"units_2_to_5"</span>: 0.00026, <span class="k">"units_6_to_10"</span>: 0.001,
+             <span class="k">"max_per_wallet_per_day"</span>: 10 },
+    <span class="k">"tiers_by_unique_wallets"</span>: {
+      <span class="k">"SPARK"</span>: "&lt;25 · Core Lv.1", <span class="k">"CHARGED"</span>: "25-99 · Core Lv.2",
+      <span class="k">"OVERDRIVE"</span>: "100+ · Core Lv.3" },
+    <span class="k">"functions"</span>: ["currentDay","questionFor","mintFree(answer)",
+      "mintPaid(qty)","dayStats","tierOf","coreLevel","isSurge",
+      "dischargeable","discharge","poolOf"]
+  },
+  <span class="k">"discharge"</span>: {
+    <span class="k">"opens"</span>: "seal + 6h", <span class="k">"fee_bnb"</span>: 0.0002,
+    <span class="k">"claims_expire"</span>: "never",
+    <span class="k">"claim_dot_per_unit"</span>: { <span class="k">"SPARK"</span>: 2500, <span class="k">"CHARGED"</span>: 12500,
+      <span class="k">"OVERDRIVE"</span>: <span class="g">60000</span>, <span class="k">"SURGE"</span>: <span class="g">250000</span> }
+  },
+  <span class="k">"pass"</span>: { <span class="k">"name"</span>: "DPASS", <span class="k">"price_bnb"</span>: 0.0012,
+    <span class="k">"supply"</span>: "unlimited", <span class="k">"sales_open"</span>: "with Field Nº 1",
+    <span class="k">"lane_activates"</span>: "Field Nº 4",
+    <span class="k">"admits"</span>: "resolve + discharge from any BNB wallet — no Agent ID, no arithmetic question",
+    <span class="k">"status"</span>: <span class="r">"PRE-DEPLOY — sales not live"</span> },
+  <span class="k">"token"</span>: { <span class="k">"name"</span>: "DOT", <span class="k">"supply"</span>: 1000000000,
+    <span class="k">"claim_pool_share"</span>: "60%", <span class="k">"status"</span>: <span class="r">"PRE-LAUNCH — not launched, no contract yet"</span>,
+    <span class="k">"announced_listing"</span>: "Uniswap (BNB Chain) · 3 December 2026 — announced date only, no price promised" },
+  <span class="k">"classes"</span>: { <span class="k">"Prime"</span>: 3000, <span class="k">"Pixel Dot"</span>: 2800,
+    <span class="k">"Stealth Dot"</span>: 2700, <span class="k">"Aurum Dot"</span>: <span class="g">1500</span> }
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 11 FAQ ================= -->
+<section id="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">11</span>
+      <h2 id="faq-h">Field Notes</h2>
+    </div>
+    <div class="faq reveal">
+      <div class="faq-list">
+        <details>
+          <summary>Can I see the NFT artwork anywhere?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a"><b>No — and that is deliberate.</b> The collection artwork is <b>sealed</b>: no unit image, class illustration or specimen render appears on this site or in its machine files before the reveal. What is public now is everything around the art — the four classes and their shares, the dot-density of each class, the Charge Day rules, the Mosaic and the DOT claim table. You resolve a sealed unit; what it looks like is the reveal's business, and the reveal date will be announced by the project, not leaked by this page.</div>
+        </details>
+        <details>
+          <summary>How does the free mint work now — is it really daily?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">Yes. Holders of a <b>Binance Agent ID</b> resolve <b>1 unit free per wallet per day</b> (0 BNB, network fee only), after answering the day's on-chain <b>arithmetic question</b>. The free quota is <b>150 units per day</b> inside the 250-unit day cap, and it <b>resets at every seal, 12:00 UTC</b>. There is no lifetime free allowance anymore — yesterday's free says nothing about today's.</div>
+        </details>
+        <details>
+          <summary>I have no Binance Agent ID — is there a way in?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">Yes — <b>DPASS, the Dot Pass</b>. One pass costs <b>0.0012 BNB</b> (supply unlimited), and a wallet holding one resolves units and discharges them with <b>no Agent ID and no anti-bot arithmetic question</b>: at the free gate the pass stands in for the Agent ID, and the question is never asked. Everything else is identical — the same <b>1 free unit per day</b>, the same paid ladder (0.00026 → 0.001 BNB, max 10/day), the same discharge fee and DOT claims. The pass changes who can enter, never what anything costs.</div>
+        </details>
+        <details>
+          <summary>When do DPASS sales open — and when does the pass start working?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">Two different moments, stated plainly. <b>Sales open together with Field Nº 1</b> — the day the contracts deploy and the first field opens. <b>The pass lane activates at Field Nº 4</b>: a pass bought during Fields Nº 1–3 is a key bought early, and it starts opening gates when Field Nº 4 opens, not before. Right now the project is <b>pre-deploy</b>, so sales are not live yet and no pass can be bought today.</div>
+        </details>
+        <details>
+          <summary>What does a full paid day cost?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">Paid counts your units today, including the free one. Units <b>2–5 cost 0.00026 BNB each</b> and units <b>6–10 cost 0.001 BNB each</b>, max <b>10 units per wallet per day</b>. A wallet taking the free unit plus all 9 paid units pays <b>4 × 0.00026 + 5 × 0.001 = 0.00604 BNB</b> in total. The paid lane is open in parallel from the day's first block — never gated behind the free lane.</div>
+        </details>
+        <details>
+          <summary>What decides the day's Charge Tier?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a"><b>Unique wallets that day</b> — not volume. Under 25 unique wallets seals as <b>SPARK</b> (Core Lv.1), 25–99 as <b>CHARGED</b> (Core Lv.2), 100+ as <b>OVERDRIVE</b> (Core Lv.3). The tier is written into every unit's metadata at the seal and never changes, which is why showing up — and bringing another wallet with you — raises the DOT claim of every unit sealed that day.</div>
+        </details>
+        <details>
+          <summary>What is Discharge, and what does it pay?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">The second act. From <b>seal +6 hours</b>, each sealed unit can discharge <b>once</b> for a <b>0.0002 BNB</b> fee and claim <b>DOT</b>: <b>2,500 DOT</b> on a SPARK day, <b>12,500 DOT</b> on a CHARGED day, <b>60,000 DOT</b> on an OVERDRIVE day, and <b>250,000 DOT</b> for a rare SURGE unit with a gold core (≈3% of units, seed % 1000 ≥ 970). Claims <b>never expire</b>. The DOT amount per unit is fixed by the tier — what is <b>not</b> promised is any price for DOT.</div>
+        </details>
+        <details>
+          <summary>What is DOT — is it launched? Can I buy it?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">DOT is the project's own token: total supply <b>1,000,000,000 DOT</b>, with <b>60% reserved as the discharge claim pool</b>. It is <b>not launched yet</b> — pre-launch, no contract address exists today, and <b>no price is promised</b>. The project has announced one dated milestone: <b>$DOT lists on Uniswap (BNB Chain) · 3 December 2026</b> — an announced date, nothing more. Until then there is nothing to buy and nowhere official to trade it; anyone selling “DOT” today is not this project. Its contract address will be published here and in mint.json first.</div>
+        </details>
+        <details>
+          <summary>When does resolving open?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a">When the contract is deployed on BNB Chain. The project is currently <b>pre-deploy</b> and this page runs an honestly labelled <b>simulation engine</b>: the Charge Day specification is final, but no wallet can connect and no funds can move until the contract address is plugged into CONFIG and published in <b>mint.json</b>.</div>
+        </details>
+        <details>
+          <summary>Which lane can pull an Aurum Dot or a SURGE?<span class="plus" aria-hidden="true">+</span></summary>
+          <div class="a"><b>Both.</b> Class is rolled at resolve, not assigned by lane: Prime 3,000 · Pixel Dot 2,800 · Stealth Dot 2,700 · Aurum Dot 1,500 (token #1 is the unique Genesis Dot). SURGE is a separate seeded trait (~3%) that can land on a free or a paid unit alike.</div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <p class="foot-mega">Dot<span style="color:var(--signal)">·</span><span class="hollow">Field</span></p>
+    <div class="foot-grid">
+      <div><b>TALVIO GENERATE — DOTFIELD</b><br/>10,000 BLACK DOT ROBOTS · BNB CHAIN<br/>TALVIOGENERATE.COM</div>
+      <div>FREE — 1 / WALLET / DAY · AGENT ID<br/>PAID LADDER — 0.00026 → 0.001 BNB · MAX 10 / DAY<br/>DAY CAP 250 · SEAL 12:00 UTC</div>
+      <div>DISCHARGE — PAYS DOT · FEE 0.0002 BNB<br/>DOT — 1,000,000,000 SUPPLY · 60% CLAIM POOL<br/>TOKEN STATUS — <span style="color:#ff7a6e">PRE-LAUNCH · NOT LAUNCHED</span><br/>ANNOUNCED — $DOT LISTS ON UNISWAP (BNB CHAIN) · 3 DEC 2026</div>
+      <div>STATUS — <span style="color:#ff7a6e">PRE-DEPLOY</span><br/>CONTRACT — PUBLISHED AT LAUNCH<br/>COUNTER — WIRES ON-CHAIN AT DEPLOY</div>
+      <div>ONE DOT.<br/>TEN THOUSAND MACHINES.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   DOTFIELD CONFIG — the owner plugs the contract in here.
+   Until CONTRACT_ADDRESS is set, the chamber stays in honest
+   standby: no wallet prompts, no fake transactions.
+   ============================================================ */
+var CONFIG = {
+  CONTRACT_ADDRESS: "",            // ← deploy, then paste address here
+  CHAIN_ID: 56,                    // BNB Chain
+  SUPPLY: 10000,
+  /* ---- CHARGE DAY v1 ---- */
+  DAY_CAP: 250,
+  FREE_PER_DAY: 1,                 // per wallet, Agent ID + arithmetic answer
+  FREE_DAILY_QUOTA: 150,
+  PAID_LADDER: [                   // counts units today incl. the free one
+    { upTo: 5,  priceBnb: 0.00026 },
+    { upTo: 10, priceBnb: 0.001 }
+  ],
+  PAID_MAX_PER_DAY: 10,
+  DAY_SEAL_UTC: "12:00",
+  GENESIS_UTC: Date.UTC(2026, 10, 16, 12, 0, 0), // Day Nº 1 opens here (spec clock)
+  TIERS: [
+    { name: "SPARK",     minWallets: 0,   coreLevel: 1, claimDot: 2500 },
+    { name: "CHARGED",   minWallets: 25,  coreLevel: 2, claimDot: 12500 },
+    { name: "OVERDRIVE", minWallets: 100, coreLevel: 3, claimDot: 60000 }
+  ],
+  SURGE_CLAIM_DOT: 250000,         // seed % 1000 >= 970 (~3%), gold core
+  DISCHARGE_DELAY_H: 6,
+  DISCHARGE_FEE_BNB: 0.0002,
+  TOKEN: { name: "DOT", supply: 1000000000, claimPoolShare: 0.60, launched: false,
+           announcedListing: "Uniswap (BNB Chain) · 3 December 2026" },
+  PASS: { name: "DPASS", priceBnb: 0.0012, supply: "unlimited",
+          salesOpen: "with Field Nº 1", laneActivatesField: 4, contract: "" },
+  FUNCTIONS: ["currentDay","questionFor","mintFree(answer)","mintPaid(qty)","dayStats","tierOf","coreLevel","isSurge","dischargeable","discharge","poolOf"]
+};
+
+function tierForWallets(w){
+  var t = CONFIG.TIERS[0];
+  for (var i = 0; i < CONFIG.TIERS.length; i++) if (w >= CONFIG.TIERS[i].minWallets) t = CONFIG.TIERS[i];
+  return t;
+}
+function seededRand(seed){
+  var s = seed >>> 0;
+  return function(){
+    s = (s + 0x6D2B79F5) >>> 0;
+    var t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- mobile menu ----------------
+   Below 1020px the full nav cannot fit the header, so it moves into
+   this panel. The button is the only way in — it must always work:
+   toggle on tap, close on link tap, outside tap, Escape, or when
+   the viewport grows back past the breakpoint. */
+(function(){
+  var btn = document.getElementById("menuBtn");
+  var panel = document.getElementById("mobileNav");
+  if (!btn || !panel) return;
+  function close(){
+    panel.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  }
+  btn.addEventListener("click", function(){
+    var open = panel.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  panel.querySelectorAll("a").forEach(function(a){ a.addEventListener("click", close); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
+  document.addEventListener("click", function(e){
+    if (panel.classList.contains("open") && !panel.contains(e.target) && !btn.contains(e.target)) close();
+  });
+  window.addEventListener("resize", function(){ if (window.innerWidth > 1020) close(); });
+})();
+
+/* ---------------- ticker duplicate for seamless loop ---------------- */
+(function(){
+  var t = document.getElementById("tickerTrack");
+  t.innerHTML += t.innerHTML;
+})();
+
+/* ---------------- reveal on scroll ---------------- */
+(function(){
+  var els = document.querySelectorAll(".reveal");
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    els.forEach(function(e){ e.classList.add("in"); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(function(e){ io.observe(e); });
+})();
+
+/* ============================================================
+   HERO DOT FIELD — dots sampled from a robot silhouette.
+   They hold formation, jitter like a living field, and scatter
+   away from the visitor's cursor / finger.
+   ============================================================ */
+(function(){
+  var canvas = document.getElementById("field");
+  var ctx = canvas.getContext("2d");
+  var hero = canvas.parentElement;
+  var W = 0, H = 0, dots = [], raf = null;
+  var pointer = { x: -9999, y: -9999, active: false };
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  // Draw the robot silhouette offscreen, then sample filled pixels.
+  function robotPoints(w, h){
+    var off = document.createElement("canvas");
+    var S = 200; off.width = S; off.height = S;
+    var c = off.getContext("2d");
+    c.fillStyle = "#fff";
+    // antenna
+    c.fillRect(96, 8, 8, 22);
+    c.beginPath(); c.arc(100, 10, 9, 0, Math.PI * 2); c.fill();
+    // head
+    roundRect(c, 38, 32, 124, 96, 18); c.fill();
+    // ears
+    c.fillRect(26, 66, 12, 34); c.fillRect(162, 66, 12, 34);
+    // neck + body
+    c.fillRect(88, 128, 24, 10);
+    roundRect(c, 52, 138, 96, 54, 12); c.fill();
+    // cut the eyes + mouth out of the silhouette
+    c.globalCompositeOperation = "destination-out";
+    c.beginPath(); c.arc(76, 78, 11, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(124, 78, 11, 0, Math.PI * 2); c.fill();
+    c.fillRect(82, 106, 36, 6);
+    c.globalCompositeOperation = "source-over";
+
+    var data = c.getImageData(0, 0, S, S).data;
+    var scale = Math.min(w, h) * 0.98 / S;
+    var ox = w - S * scale - w * 0.015;   // robot anchors to the right
+    var oy = (h - S * scale) / 2;
+    if (w < 700) { ox = (w - S * scale) / 2; oy = h * 0.02; }
+    var step = w < 700 ? 5 : 4;
+    var pts = [];
+    for (var y = 0; y < S; y += step) {
+      for (var x = 0; x < S; x += step) {
+        if (data[(y * S + x) * 4 + 3] > 120) {
+          pts.push({ x: ox + x * scale, y: oy + y * scale });
+        }
+      }
+    }
+    return pts;
+  }
+  function roundRect(c, x, y, w, h, r){
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+
+  function build(){
+    var rect = hero.getBoundingClientRect();
+    W = Math.max(320, rect.width); H = Math.max(420, rect.height);
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var pts = robotPoints(W, H);
+    // ambient sparse field behind everything
+    var ambient = Math.floor(W * H / 26000);
+    for (var i = 0; i < ambient; i++) {
+      pts.push({ x: Math.random() * W, y: Math.random() * H, amb: true });
+    }
+    dots = pts.map(function(p){
+      return {
+        hx: p.x, hy: p.y,
+        x: p.x + (Math.random() - 0.5) * 60,
+        y: p.y + (Math.random() - 0.5) * 60,
+        vx: 0, vy: 0,
+        amb: !!p.amb,
+        r: p.amb ? 1 : (1.1 + Math.random() * 1.3),
+        ph: Math.random() * Math.PI * 2
+      };
+    });
+  }
+
+  var t0 = 0;
+  function frame(ts){
+    t0 = ts * 0.001;
+    ctx.clearRect(0, 0, W, H);
+    var R = 110, R2 = R * R;
+    for (var i = 0; i < dots.length; i++) {
+      var d = dots[i];
+      var jx = Math.sin(t0 * 1.3 + d.ph) * 1.6;
+      var jy = Math.cos(t0 * 1.1 + d.ph * 1.7) * 1.6;
+      var tx = d.hx + jx, ty = d.hy + jy;
+      var fx = (tx - d.x) * 0.045, fy = (ty - d.y) * 0.045;
+      if (pointer.active && !d.amb) {
+        var dx = d.x - pointer.x, dy = d.y - pointer.y;
+        var dist2 = dx * dx + dy * dy;
+        if (dist2 < R2 && dist2 > 0.01) {
+          var dist = Math.sqrt(dist2);
+          var push = (1 - dist / R) * 3.4;
+          fx += (dx / dist) * push; fy += (dy / dist) * push;
+        }
+      }
+      d.vx = (d.vx + fx) * 0.86; d.vy = (d.vy + fy) * 0.86;
+      d.x += d.vx; d.y += d.vy;
+      var tw = 0.72 + 0.28 * Math.sin(t0 * 2 + d.ph * 3);
+      ctx.globalAlpha = d.amb ? 0.16 * tw : 0.92 * tw;
+      ctx.fillStyle = "#eceade";
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function drawStatic(){
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#eceade";
+    for (var i = 0; i < dots.length; i++) {
+      var d = dots[i];
+      ctx.globalAlpha = d.amb ? 0.14 : 0.9;
+      ctx.beginPath(); ctx.arc(d.hx, d.hy, d.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function setPointer(e){
+    var rect = canvas.getBoundingClientRect();
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    pointer.x = cx; pointer.y = cy; pointer.active = true;
+  }
+  hero.addEventListener("mousemove", setPointer);
+  hero.addEventListener("touchmove", setPointer, { passive: true });
+  hero.addEventListener("mouseleave", function(){ pointer.active = false; });
+  hero.addEventListener("touchend", function(){ pointer.active = false; });
+
+  var resizeTimer;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      build();
+      if (reducedMotion) drawStatic();
+    }, 180);
+  });
+
+  build();
+  if (reducedMotion) { drawStatic(); }
+  else { raf = requestAnimationFrame(frame); }
+
+  // pause when hero is off-screen
+  if ("IntersectionObserver" in window && !reducedMotion) {
+    new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) { if (!raf) raf = requestAnimationFrame(frame); }
+      else { cancelAnimationFrame(raf); raf = null; }
+    }).observe(hero);
+  }
+})();
+
+/* ============================================================
+   CLASS CARD DOT FIELDS — density only, artwork SEALED.
+   The collection art is deliberately NOT drawn anywhere on
+   this page: each card shows an abstract dot-density field
+   (spacing / brightness / colour) and nothing of the machine.
+   ============================================================ */
+(function(){
+  document.querySelectorAll(".class-card canvas").forEach(function(cv){
+    var c = cv.getContext("2d");
+    var w = cv.width, h = cv.height, kind = cv.getAttribute("data-class");
+    c.fillStyle = "#000"; c.fillRect(0, 0, w, h);
+    var seed = 7;
+    function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var step, alpha, color, jitter;
+    if (kind === "prime")        { step = 17; alpha = 0.95; color = "#eceade"; jitter = 3; }
+    else if (kind === "pixel")   { step = 12; alpha = 0.95; color = "#eceade"; jitter = 0; }
+    else if (kind === "stealth") { step = 9;  alpha = 0.30; color = "#eceade"; jitter = 2; }
+    else                         { step = 7;  alpha = 1;    color = "#ffce00"; jitter = 1.5; }
+    for (var y = step / 2; y < h; y += step) {
+      for (var x = step / 2; x < w; x += step) {
+        // soft radial falloff — a field of dots, never a figure
+        var dx = (x - w / 2) / (w / 2), dy = (y - h / 2) / (h / 2);
+        var fall = Math.max(0, 1 - (dx * dx + dy * dy) * 0.55);
+        if (rnd() > 0.25 + fall * 0.75) continue;
+        c.globalAlpha = alpha * (0.35 + fall * 0.65) * (0.75 + rnd() * 0.25);
+        c.fillStyle = color;
+        var jx = (rnd() - 0.5) * jitter, jy = (rnd() - 0.5) * jitter;
+        var r = kind === "aurum" ? 2.3 : 2;
+        c.beginPath(); c.arc(x + jx, y + jy, r, 0, Math.PI * 2); c.fill();
+      }
+    }
+    c.globalAlpha = 1;
+  });
+})();
+
+/* ============================================================
+   RESOLUTION CHAMBER — paid ladder stepper + standby honesty.
+   Stepper counts UNITS TODAY including the free unit (unit 1).
+   Units 2–5: 0.00026 BNB · units 6–10: 0.001 BNB · max 10/day.
+   ============================================================ */
+(function(){
+  var total = 2; // units today incl. free
+  var qtyVal = document.getElementById("qtyVal");
+  var calcQty = document.getElementById("calcQty");
+  var calcTotal = document.getElementById("calcTotal");
+  var calcWei = document.getElementById("calcWei");
+  var calcHex = document.getElementById("calcHex");
+  var btnQty = document.getElementById("btnQty");
+  var bd = document.getElementById("ladderBreakdown");
+  var WEI = 1000000000000000000n;
+
+  function priceForUnit(n){ // n = 1-based unit number today
+    if (n <= 1) return 0;
+    for (var i = 0; i < CONFIG.PAID_LADDER.length; i++) if (n <= CONFIG.PAID_LADDER[i].upTo) return CONFIG.PAID_LADDER[i].priceBnb;
+    return CONFIG.PAID_LADDER[CONFIG.PAID_LADDER.length - 1].priceBnb;
+  }
+  function fmtBnb(x){ return x.toFixed(8).replace(/0+$/, "").replace(/\.$/, ".0"); }
+
+  function render(){
+    qtyVal.textContent = total;
+    var paidUnits = total - 1, totalWei = 0n, rows = "";
+    rows += "<div><span>UNIT 1 TODAY — FREE DAILY CHARGE</span><span>0 BNB</span></div>";
+    var lo = null, hi = null, cnt = 0, sub = 0;
+    function flush(){
+      if (!cnt) return;
+      rows += "<div><span>UNIT" + (cnt > 1 ? "S " + lo + "–" + hi : " " + lo) + " — " + fmtBnb(priceForUnit(lo)) + " BNB EACH</span><span>" + fmtBnb(sub) + " BNB</span></div>";
+      cnt = 0; sub = 0;
+    }
+    for (var n = 2; n <= total; n++) {
+      var p = priceForUnit(n);
+      if (cnt && priceForUnit(lo) !== p) flush();
+      if (!cnt) lo = n;
+      hi = n; cnt++; sub += p;
+      totalWei += BigInt(Math.round(p * 1e18));
+    }
+    flush();
+    calcQty.textContent = paidUnits;
+    var totalBnb = Number(totalWei) / 1e18;
+    calcTotal.textContent = fmtBnb(totalBnb) + " BNB";
+    calcWei.textContent = totalWei.toString();
+    calcHex.textContent = "0x" + totalWei.toString(16);
+    btnQty.textContent = paidUnits + (paidUnits === 1 ? " paid unit" : " paid units");
+    bd.innerHTML = rows;
+    document.getElementById("qtyMinus").disabled = total <= 1;
+    document.getElementById("qtyPlus").disabled = total >= CONFIG.PAID_MAX_PER_DAY;
+  }
+  document.getElementById("qtyMinus").addEventListener("click", function(){
+    if (total > 1) { total--; render(); }
+  });
+  document.getElementById("qtyPlus").addEventListener("click", function(){
+    if (total < CONFIG.PAID_MAX_PER_DAY) { total++; render(); }
+  });
+  render();
+
+  /* each lane answers its OWN button, in place — the feedback must
+     appear where the visitor is looking, not in the other lane */
+  function standby(el){
+    if (CONFIG.CONTRACT_ADDRESS) return; // live mode would wire web3 here
+    el.classList.add("show");
+    el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
+  }
+  document.getElementById("paidStandbyBtn").addEventListener("click", function(){
+    standby(document.getElementById("standbyMsg"));
+  });
+  document.getElementById("agentStandbyBtn").addEventListener("click", function(){
+    standby(document.getElementById("agentStandbyMsg"));
+  });
+})();
+
+/* ============================================================
+   CHARGE DAY ENGINE — simulation, honestly labelled.
+   Real clock math for Day Nº / countdown / seal; unit & wallet
+   counts are a seeded local simulation of the published spec.
+   ============================================================ */
+(function(){
+  function nextSeal(now){
+    var d = new Date(now);
+    var seal = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12, 0, 0);
+    if (now >= seal) seal += 86400000;
+    return seal;
+  }
+  function dayNumber(now){
+    var n = Math.floor((now - CONFIG.GENESIS_UTC) / 86400000) + 1;
+    return Math.max(1, n);
+  }
+  var now0 = Date.now();
+  var dayNo = dayNumber(now0);
+  var rnd = seededRand(dayNo * 7919 + 13);
+  var unitsToday = 90 + Math.floor(rnd() * 140);              // 90–229 of 250
+  var walletsToday = Math.min(unitsToday, 30 + Math.floor(rnd() * 110)); // 30–139
+  var freeUsed = Math.min(CONFIG.FREE_DAILY_QUOTA, Math.floor(unitsToday * 0.62));
+  var tier = tierForWallets(walletsToday);
+  window.DOTFIELD_SIM = { dayNo: dayNo, units: unitsToday, wallets: walletsToday, freeUsed: freeUsed, tier: tier };
+
+  /* hero panel */
+  var cdDay = document.getElementById("cdDay");
+  if (cdDay) {
+    cdDay.textContent = "DAY Nº " + dayNo;
+    document.getElementById("cdUnits").textContent = unitsToday + " / " + CONFIG.DAY_CAP + " CAP";
+    document.getElementById("cdUnitsBar").style.width = (unitsToday / CONFIG.DAY_CAP * 100) + "%";
+    document.getElementById("cdFree").textContent = freeUsed + " / " + CONFIG.FREE_DAILY_QUOTA;
+    document.getElementById("cdFreeBar").style.width = (freeUsed / CONFIG.FREE_DAILY_QUOTA * 100) + "%";
+    document.getElementById("cdWallets").textContent = walletsToday;
+    document.getElementById("cdTier").textContent = tier.name + " · CORE LV." + tier.coreLevel;
+    var cdEl = document.getElementById("cdCountdown");
+    function tick(){
+      var diff = Math.max(0, nextSeal(Date.now()) - Date.now());
+      var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
+      cdEl.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    }
+    tick(); setInterval(tick, 1000);
+  }
+
+  /* tier gauge + active card */
+  var gw = document.getElementById("gaugeWallets");
+  if (gw) {
+    gw.textContent = walletsToday;
+    document.getElementById("gaugeTier").textContent = tier.name + " · " + tier.claimDot.toLocaleString("en-US") + " DOT / UNIT";
+    document.getElementById("gaugeFill").style.width = Math.min(100, walletsToday / 120 * 100) + "%";
+    var idx = CONFIG.TIERS.indexOf(tier);
+    document.querySelectorAll(".tier-card").forEach(function(card){
+      if (parseInt(card.getAttribute("data-tier"), 10) === idx) card.classList.add("active");
+    });
+  }
+
+  /* mosaic of the day — 25 × 10 halftone cells */
+  var mc = document.getElementById("mosaicCanvas");
+  if (mc) {
+    var c = mc.getContext("2d"), W = mc.width, H = mc.height;
+    c.fillStyle = "#000"; c.fillRect(0, 0, W, H);
+    var cols = 25, rows = 10, cw = W / cols, ch = H / rows;
+    var mr = seededRand(dayNo * 104729 + 7);
+    var surgeCount = 0;
+    for (var i = 0; i < cols * rows; i++) {
+      var x = (i % cols) * cw + cw / 2, y = Math.floor(i / cols) * ch + ch / 2;
+      var hash = Math.floor(mr() * 100000);
+      var rBase = 3 + (hash % 100) / 100 * 9; // halftone radius variation
+      var filled = i < unitsToday;
+      if (!filled) {
+        c.globalAlpha = 0.35; c.fillStyle = "#2a2a24";
+        c.beginPath(); c.arc(x, y, Math.max(1.6, rBase * 0.35), 0, Math.PI * 2); c.fill();
+      } else if (hash % 1000 >= 970) {
+        surgeCount++;
+        c.globalAlpha = 1; c.fillStyle = "#ffce00";
+        c.beginPath(); c.arc(x, y, rBase + 2, 0, Math.PI * 2); c.fill();
+      } else if (i < freeUsed) {
+        c.globalAlpha = 0.75; c.fillStyle = "#eceade";
+        c.beginPath(); c.arc(x, y, rBase, 0, Math.PI * 2); c.fill();
+      } else {
+        c.globalAlpha = 1; c.fillStyle = "#ffffff";
+        c.beginPath(); c.arc(x, y, rBase, 0, Math.PI * 2); c.fill();
+      }
+    }
+    c.globalAlpha = 1;
+    document.getElementById("mosaicCount").textContent =
+      unitsToday + " / 250 CELLS FILLED · " + surgeCount + " SURGE (SIMULATION · MOSAIC Nº " + dayNo + " IN PROGRESS)";
+  }
+
+  /* anti-bot arithmetic question */
+  var qEq = document.getElementById("qEq");
+  if (qEq) {
+    var answer = 0, solved = false;
+    var qInput = document.getElementById("qInput");
+    var qStatus = document.getElementById("qStatus");
+    var agentBtn = document.getElementById("agentStandbyBtn");
+    function newQuestion(){
+      var ops = ["+", "−", "×"];
+      var op = ops[Math.floor(Math.random() * ops.length)];
+      var a, b;
+      if (op === "×") { a = 2 + Math.floor(Math.random() * 8); b = 2 + Math.floor(Math.random() * 8); answer = a * b; }
+      else if (op === "−") { a = 12 + Math.floor(Math.random() * 40); b = 2 + Math.floor(Math.random() * 10); answer = a - b; }
+      else { a = 7 + Math.floor(Math.random() * 40); b = 3 + Math.floor(Math.random() * 30); answer = a + b; }
+      qEq.innerHTML = a + " <span>" + op + "</span> " + b + " <span>=</span> ?";
+      solved = false;
+      qInput.value = "";
+      qStatus.className = "q-status";
+      qStatus.textContent = "Answer correctly to unlock the simulated free resolve. On-chain, the contract checks the same answer inside mintFree(answer).";
+      agentBtn.disabled = true;
+      agentBtn.textContent = "Free resolve — answer the question first";
+    }
+    document.getElementById("qNew").addEventListener("click", newQuestion);
+    document.getElementById("qCheck").addEventListener("click", function(){
+      if (qInput.value !== "" && parseInt(qInput.value, 10) === answer) {
+        solved = true;
+        qStatus.className = "q-status ok";
+        qStatus.textContent = "✓ CORRECT — questionFor() answered. In live mode your agent would now call mintFree(answer). Pre-deploy: the chamber stays in standby.";
+        agentBtn.disabled = false;
+        agentBtn.textContent = "Free resolve — standby (pre-deploy)";
+      } else {
+        qStatus.className = "q-status bad";
+        qStatus.textContent = "✗ Not the answer the field asked for. Check the equation and try again — bots guess, agents compute.";
+      }
+    });
+    qInput.addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); document.getElementById("qCheck").click(); } });
+    newQuestion();
+  }
+
+  /* discharge calculator — fixed DOT claim table */
+  var dcOut = document.getElementById("dcOut");
+  if (dcOut) {
+    var dcDot = 60000, dcName = "OVERDRIVE · CORE LV.3";
+    var dcUnits = document.getElementById("dcUnits");
+    function dcRender(){
+      var n = Math.max(1, Math.min(250, parseInt(dcUnits.value, 10) || 1));
+      var totalDot = dcDot * n;
+      var fee = (CONFIG.DISCHARGE_FEE_BNB * n).toFixed(4);
+      dcOut.innerHTML =
+        "TIER — <b>" + dcName + "</b><br/>" +
+        "CLAIM — <b class='gold'>" + totalDot.toLocaleString("en-US") + " DOT</b> (" + dcDot.toLocaleString("en-US") + " × " + n + " unit" + (n > 1 ? "s" : "") + ")<br/>" +
+        "DISCHARGE FEE — <b>" + fee + " BNB</b> (" + CONFIG.DISCHARGE_FEE_BNB + " × " + n + ")<br/>" +
+        "WINDOW — OPENS SEAL +6H · <b>NEVER EXPIRES</b><br/>" +
+        "DOT STATUS — <b style='color:#ff7a6e'>PRE-LAUNCH</b> · NO PRICE PROMISED";
+    }
+    document.querySelectorAll("#dcSeg button").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        document.querySelectorAll("#dcSeg button").forEach(function(b){ b.classList.remove("on"); });
+        btn.classList.add("on");
+        dcDot = parseInt(btn.getAttribute("data-dot"), 10);
+        dcName = btn.getAttribute("data-name");
+        dcRender();
+      });
+    });
+    dcUnits.addEventListener("input", dcRender);
+    dcRender();
+  }
+
+  /* unit checker — deterministic seeded specimen lookup */
+  var ucOut = document.getElementById("ucOut");
+  if (ucOut) {
+    function classOf(id){
+      if (id === 1) return "GENESIS DOT (AURUM)";
+      if (id <= 3001) return "PRIME";
+      if (id <= 5801) return "PIXEL DOT";
+      if (id <= 8501) return "STEALTH DOT";
+      return "AURUM DOT";
+    }
+    function check(){
+      var id = parseInt(document.getElementById("ucInput").value, 10);
+      if (!id || id < 1 || id > 10000) {
+        ucOut.classList.add("show");
+        ucOut.innerHTML = "ENTER A UNIT NUMBER BETWEEN <b>1</b> AND <b>10,000</b>.";
+        return;
+      }
+      var seed = (Math.imul(id, 2654435761) >>> 0);
+      var surge = seed % 1000 >= 970;
+      var r = seededRand(seed);
+      var mDay = 1 + Math.floor(r() * 50);
+      var mPos = (id - 1) % 250 + 1;
+      var wThatDay = 8 + Math.floor(r() * 150);
+      var t = tierForWallets(wThatDay);
+      var claim = surge ? CONFIG.SURGE_CLAIM_DOT : t.claimDot;
+      ucOut.classList.add("show");
+      ucOut.innerHTML =
+        "UNIT — <b>#" + id.toLocaleString("en-US") + "</b> · CLASS — <b>" + classOf(id) + "</b><br/>" +
+        "SEALED — DAY / MOSAIC <b>Nº " + mDay + "</b> · CELL <b>" + mPos + " / 250</b><br/>" +
+        "THAT DAY — <b>" + wThatDay + "</b> UNIQUE WALLETS → <b>" + t.name + "</b> · CORE <b>LV." + t.coreLevel + "</b><br/>" +
+        (surge ? "SURGE — <b class='gold'>YES · GOLD CORE</b><br/>" : "SURGE — NO<br/>") +
+        "DISCHARGE CLAIM — <b class='gold'>" + claim.toLocaleString("en-US") + " DOT</b> · FEE 0.0002 BNB · NEVER EXPIRES<br/>" +
+        "<span style='color:var(--bone-faint)'>SEEDED SPECIMEN LOOKUP OF THE PUBLISHED SPEC — PRE-DEPLOY, NOT ON-CHAIN DATA.</span>";
+    }
+    document.getElementById("ucBtn").addEventListener("click", check);
+    document.getElementById("ucInput").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); check(); } });
+    check();
+  }
+})();
+
+/* ============================================================
+   DOT PASS — abstract dotted-ring mark (no NFT artwork; the
+   collection stays sealed) and the sales standby. DPASS sales
+   open with Field Nº 1 at deploy; until then the buy button
+   behaves exactly like the chamber's standby buttons.
+   ============================================================ */
+(function(){
+  var cv = document.getElementById("passCanvas");
+  if (cv) {
+    var c = cv.getContext("2d");
+    var w = cv.width, h = cv.height;
+    c.fillStyle = "#000"; c.fillRect(0, 0, w, h);
+    var cx = w / 2, cy = h / 2;
+    var rnd = seededRand(90210);
+    var rings = [52, 88, 124, 160];
+    for (var ri = 0; ri < rings.length; ri++) {
+      var r = rings[ri];
+      var n = Math.floor(r * 0.5);
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2 + ri * 0.4;
+        var rr = r + (rnd() - 0.5) * 8;
+        c.globalAlpha = 0.3 + rnd() * 0.65;
+        c.fillStyle = "#eceade";
+        c.beginPath();
+        c.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.78, 2.6, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+    c.globalAlpha = 1; c.fillStyle = "#ffce00";
+    c.beginPath(); c.arc(cx, cy, 11, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = 1;
+  }
+  var btn = document.getElementById("passBuyBtn");
+  var msg = document.getElementById("passStandby");
+  if (btn && msg) {
+    btn.addEventListener("click", function(){
+      if (CONFIG.CONTRACT_ADDRESS) return; // live mode would wire the pass sale here
+      msg.classList.add("show");
+      msg.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
+    });
+  }
+})();
+
+/* ---------------- copy buttons ----------------
+   Feedback must tell the truth: "COPIED" only appears when a copy
+   actually succeeded. If the clipboard API is blocked (sandboxed
+   webviews refuse it) and the legacy path also fails, the source
+   text is left selected on screen so it can still be copied by hand. */
+function wireCopy(btnId, sourceId, isText){
+  var btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.addEventListener("click", function(){
+    var src = document.getElementById(sourceId);
+    var text = isText ? src.textContent : src.innerText;
+    var old = btn.textContent;
+    function label(t){
+      btn.textContent = t;
+      setTimeout(function(){ btn.textContent = old; }, 2400);
+    }
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      if (ok) { label("COPIED ✓"); return; }
+      var range = document.createRange();
+      range.selectNodeContents(src);
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      src.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+      label("SELECTED — COPY IT");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ label("COPIED ✓"); }).catch(function(){ fallback(); });
+    } else { fallback(); }
+  });
+}
+wireCopy("copyPrompt", "agentPrompt", false);
+wireCopy("copyJson", "mintJson", false);
+
+/* ============================================================
+   RESOLVE SIMULATOR — scattered dots converge into a unit.
+   ============================================================ */
+(function(){
+  var cv = document.getElementById("simCanvas");
+  var c = cv.getContext("2d");
+  var box = cv.parentElement;
+  var W = 0, H = 0, dots = [], mode = "scatter", raf = null, startT = 0;
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var classes = [
+    { name: "PRIME", w: 30 }, { name: "PIXEL DOT", w: 28 },
+    { name: "STEALTH DOT", w: 27 }, { name: "AURUM DOT", w: 15 }
+  ];
+  var rolled = null;
+
+  function targets(){
+    // SEALED block — dots harden into a closed vault slab with a
+    // keyhole, never into the unit itself. The artwork is not
+    // drawn anywhere on this page before the reveal.
+    var pts = [];
+    var gw = 15, gh = 17, cell = Math.min(W / (gw + 4), H / (gh + 4));
+    var ox = (W - gw * cell) / 2, oy = (H - gh * cell) / 2;
+    for (var y = 0; y < gh; y++) {
+      for (var x = 0; x < gw; x++) {
+        var border = (y === 0 || y === gh - 1 || x === 0 || x === gw - 1);
+        var innerFrame = (y === 2 || y === gh - 3 || x === 2 || x === gw - 3) && x >= 2 && x <= gw - 3 && y >= 2 && y <= gh - 3;
+        var keyhole = (Math.abs(x - 7) <= 1 && y >= 7 && y <= 9) || (x === 7 && y === 10);
+        if (border || innerFrame || keyhole) pts.push({ x: ox + x * cell, y: oy + y * cell });
+      }
+    }
+    return pts;
+  }
+
+  function build(){
+    var rect = box.getBoundingClientRect();
+    W = Math.max(260, rect.width); H = Math.max(280, rect.height);
+    cv.width = W * DPR; cv.height = H * DPR;
+    c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var pts = targets();
+    dots = pts.map(function(p){
+      return {
+        hx: p.x, hy: p.y,
+        sx: Math.random() * W, sy: Math.random() * H,
+        x: Math.random() * W, y: Math.random() * H,
+        ph: Math.random() * Math.PI * 2
+      };
+    });
+    document.getElementById("simDots").textContent = dots.length;
+    draw(0);
+  }
+
+  function draw(ts){
+    c.clearRect(0, 0, W, H);
+    var t = ts * 0.001;
+    var gold = rolled && rolled.name === "AURUM DOT";
+    for (var i = 0; i < dots.length; i++) {
+      var d = dots[i];
+      var tx, ty;
+      if (mode === "formed") {
+        tx = d.hx + Math.sin(t * 1.4 + d.ph) * 0.8;
+        ty = d.hy + Math.cos(t * 1.2 + d.ph) * 0.8;
+      } else {
+        tx = d.sx + Math.sin(t * 0.6 + d.ph) * 14;
+        ty = d.sy + Math.cos(t * 0.5 + d.ph * 1.3) * 14;
+      }
+      d.x += (tx - d.x) * 0.055;
+      d.y += (ty - d.y) * 0.055;
+      c.globalAlpha = mode === "formed" ? 0.95 : 0.5;
+      c.fillStyle = gold && mode === "formed" ? "#ffce00" : "#eceade";
+      c.beginPath(); c.arc(d.x, d.y, 1.9, 0, Math.PI * 2); c.fill();
+    }
+    c.globalAlpha = 1;
+    if (!reducedMotion && (mode === "forming" || mode === "formed" || ts - startT < 2600)) {
+      raf = requestAnimationFrame(draw);
+    } else if (!reducedMotion) {
+      raf = requestAnimationFrame(draw); // keep gentle drift alive
+    }
+  }
+
+  document.getElementById("simBtn").addEventListener("click", function(){
+    // weighted class roll, same distribution as the collection
+    var roll = Math.random() * 100, acc = 0; rolled = classes[0];
+    for (var i = 0; i < classes.length; i++) { acc += classes[i].w; if (roll < acc) { rolled = classes[i]; break; } }
+    document.getElementById("simClass").textContent = rolled.name;
+    document.querySelector("#simReadout b").textContent = "RESOLVING…";
+    mode = "forming"; startT = performance.now();
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(draw);
+    setTimeout(function(){
+      mode = "formed";
+      document.querySelector("#simReadout b").textContent = "UNIT RESOLVED — ARTWORK SEALED (SIMULATION)";
+    }, reducedMotion ? 60 : 1400);
+    if (reducedMotion) { mode = "formed"; draw(0); }
+  });
+
+  var rt;
+  window.addEventListener("resize", function(){
+    clearTimeout(rt); rt = setTimeout(build, 200);
+  });
+  build();
+  if (!reducedMotion) raf = requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

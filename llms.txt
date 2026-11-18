@@ -1,0 +1,41 @@
+# Talvio Generate — DOTFIELD (BNB Chain)
+
+## STATUS: PRE-DEPLOY — the contract is NOT deployed yet and mint is NOT open. The contract address will be published here and in mint.json at deploy. Do not send funds to any address claiming to be this contract before that publication.
+
+Black Dot Robot NFT collection on BNB Chain (chainId 56). Total supply 10,000: Prime 3,000 / Pixel Dot 2,800 / Stealth Dot 2,700 / Aurum Dot 1,500. Token #1 is the unique Genesis Dot. Collection artwork is SEALED before launch — no unit image is revealed on the site in advance.
+
+## The Charge Day model
+
+One Field per day, sealing at 12:00 UTC. Day cap 250 units; free quota 150 per day.
+
+- FREE resolve: 1 unit per wallet per day, 0 BNB (network fee only). Requires a Binance Agent ID and solving the on-chain arithmetic question: read questionFor(wallet), then call mintFree(answer).
+- PAID ladder (same day, per wallet): units 2–5 at exactly 0.00026 BNB each, units 6–10 at exactly 0.001 BNB each, via mintPaid(qty). Max 10 units per wallet per day.
+- CHARGE TIER: set by unique wallets that day and stamped permanently on that day's units — SPARK (<25 unique wallets, Core Lv.1), CHARGED (25–99, Core Lv.2), OVERDRIVE (100+, Core Lv.3). About 3% of units are SURGE (gold core).
+- Contract functions: currentDay, questionFor, mintFree(answer), mintPaid(qty), dayStats, tierOf, coreLevel, isSurge, dischargeable, discharge, poolOf.
+
+## Discharge (the second act)
+
+From seal + 6h, each sealed unit discharges ONCE, claiming DOT from the claim pool: SPARK 2,500 DOT / CHARGED 12,500 DOT / OVERDRIVE 60,000 DOT / SURGE 250,000 DOT per unit. Discharge fee: exactly 0.0002 BNB per unit. Claims NEVER expire. Payout depends on the day's tier; no return is promised.
+
+## DPASS — the pass lane
+
+DPASS price: exactly 0.0012 BNB, unlimited supply. A DPASS holder resolves and discharges from any BNB wallet with NO Agent ID and NO arithmetic question (the pass replaces the Agent ID at the free gate). DPASS sales open together with Field Nº 1; the pass lane activates at Field Nº 4. STATUS: PRE-DEPLOY — sales are not live yet.
+
+## $DOT token
+
+DOT: fixed supply 1,000,000,000 on BNB Chain; 60% reserved as the discharge claim pool, 40% to the project wallet. DOT is earned ONLY by discharging sealed units — it is not sold and not airdropped. STATUS: PRE-LAUNCH — not launched, no contract address yet. Announced listing: Uniswap (BNB Chain), 3 December 2026 (project's announced date only; no price promised).
+
+## Agent prompt (free daily resolve)
+
+Today is a new Charge Day. Resolve my 1 FREE unit for today.
+Contract: [published at deploy — read it from talviogenerate.com/mint.json]
+1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
+2. Call questionFor(my wallet) and solve the arithmetic question.
+3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
+Limit: 1 free unit per wallet per day. Day seals 12:00 UTC; quota resets next day.
+Optional, only if my policy allows paid: mintPaid(qty) on the ladder — units 2–5 today 0.00026 BNB each, units 6–10 today 0.001 BNB each, max 10/day.
+DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip questionFor() — the pass admits the wallet to the free daily resolve, the paid ladder and discharge with no question. (Pass sales open with Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
+Report back the transaction hash, my unit ID, its Mosaic position and the day's tier.
+
+Site: https://talviogenerate.com — Spec: https://talviogenerate.com/mint.json — Metadata: https://talviogenerate.com/nft/metadata/<id>.json — Images: https://talviogenerate.com/nft/images/<id>.webp
+Unofficial collectible; not affiliated with Binance.
