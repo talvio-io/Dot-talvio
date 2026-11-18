@@ -540,7 +540,7 @@
       </h1>
       <div class="hero-sub">
         <p><b>DOTFIELD is built on Charge Day.</b> Every day is one charge cycle: one <b>free unit per wallet per day</b> for Agent ID holders, a quiet paid ladder beside it, then the day <b>seals at 12:00 UTC</b> — its units freeze into one Mosaic, its Charge Tier is set forever, and from seal +6h every sealed unit can <b>Discharge</b> once. The free daily charge is the hero. Paid is the side door.</p>
-        <div class="charge-panel" aria-label="Charge Day status panel">
+        <div class="charge-panel" aria-label="Charge Day live panel">
           <div class="cp-head">
             <div class="cp-day"><span id="cdDay">DAY Nº —</span><small>CHARGE DAY · SEALS 12:00 UTC</small></div>
             <div class="countdown"><b id="cdCountdown">--:--:--</b><span>TO NEXT SEAL</span></div>
@@ -552,7 +552,7 @@
           <div class="cp-row"><span>UNIQUE WALLETS TODAY</span><span id="cdWallets">—</span></div>
           <div class="cp-row"><span>CHARGE TIER NOW</span><span id="cdTier" style="color:var(--gold)">—</span></div>
           <div class="cp-row"><span>TOTAL RESOLVED</span><span>0 / 10,000 · MINT CLOSED</span></div>
-          <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN · MINT CLOSED — FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL. Nothing has minted yet: total resolved is 0, every counter above reads zero, and the day clock starts only when Field Nº 1 opens. Until then this panel shows the true closed state — no simulated day is running.</div>
+          <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN · MINT CLOSED — FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL. Day, countdown and seal time are real clock math; unit / wallet counts are a labelled local simulation of the published spec, not on-chain data. Total resolved is 0 — nothing has minted yet.</div>
         </div>
       </div>
       <div class="hero-cta">
@@ -778,7 +778,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
       <span class="side">250 CELLS. ONE DAY.<br/>FROZEN AT THE SEAL<br/>AS MOSAIC Nº N.</span>
     </div>
     <div class="reveal">
-      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — free units in bone, paid units brighter, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. Until Field Nº 1 opens, the grid below stays empty; once the field runs, it fills cell by cell as each day progresses — the rendering here is the simulation engine's, never live chain data.</p>
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">Every unit resolved today takes the next cell in today's halftone Mosaic — free units in bone, paid units brighter, a SURGE unit in gold. At <b style="color:var(--bone)">12:00 UTC</b> the Mosaic freezes forever as <b style="color:var(--bone)">Mosaic Nº N</b>, and every unit's metadata records its <b style="color:var(--bone)">mosaic number and cell position</b>. Tomorrow, a blank field. The grid below is the simulation engine's seeded picture of a day in progress — not live chain data.</p>
       <div class="mosaic-wrap">
         <canvas id="mosaicCanvas" width="1000" height="400" aria-label="Simulated halftone mosaic grid of 250 cells for today, filling as the simulated day progresses."></canvas>
         <div class="mosaic-legend">
@@ -1107,7 +1107,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
         </details>
         <details>
           <summary>When does resolving open?<span class="plus" aria-hidden="true">+</span></summary>
-          <div class="a">When the owner opens mint. The contracts are already <b>deployed on BNB Chain</b> — NFT <b>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</b>, DOT <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — both Sourcify-verified, and the <b>600,000,000 DOT claim pool is funded</b>. But <b>mintOpen is still false</b> and Field Nº 1 has not started: resolving opens only on the owner's Open Mint signal. Until then the Charge Day panel shows the true closed state — zero counts, no tier, no running clock — and the page's only simulations are its labelled specimen tools: no wallet connects here and no funds can move from this page; on-chain mint wiring from the website is a later step.</div>
+          <div class="a">When the owner opens mint. The contracts are already <b>deployed on BNB Chain</b> — NFT <b>0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</b>, DOT <b>0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</b> — both Sourcify-verified, and the <b>600,000,000 DOT claim pool is funded</b>. But <b>mintOpen is still false</b> and Field Nº 1 has not started: resolving opens only on the owner's Open Mint signal. Until then this page runs an honestly labelled <b>simulation engine</b> for the day counts — no wallet connects here and no funds can move from this page; on-chain mint wiring from the website is a later step.</div>
         </details>
         <details>
           <summary>Which lane can pull an Aurum Dot or a SURGE?<span class="plus" aria-hidden="true">+</span></summary>
@@ -1511,11 +1511,9 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 })();
 
 /* ============================================================
-   CHARGE DAY ENGINE — while CONFIG.MINT_OPEN is false, the
-   panel, gauge and mosaic show the TRUE CLOSED STATE: Field
-   Nº 1 not opened, zero counts, no tier, no running clock.
-   The seeded day below only displays once the owner opens
-   Field Nº 1 (live on-chain wiring is a later step).
+   CHARGE DAY ENGINE — simulation, honestly labelled.
+   Real clock math for Day Nº / countdown / seal; unit & wallet
+   counts are a seeded local simulation of the published spec.
    ============================================================ */
 (function(){
   function nextSeal(now){
@@ -1535,61 +1533,37 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
   var walletsToday = Math.min(unitsToday, 30 + Math.floor(rnd() * 110)); // 30–139
   var freeUsed = Math.min(CONFIG.FREE_DAILY_QUOTA, Math.floor(unitsToday * 0.62));
   var tier = tierForWallets(walletsToday);
-  if (!CONFIG.MINT_OPEN) {
-    /* Mint closed, Field Nº 1 not opened: zero the day. No fake
-       live counters may render while nothing can mint. */
-    unitsToday = 0; walletsToday = 0; freeUsed = 0; tier = null;
-  }
   window.DOTFIELD_SIM = { dayNo: dayNo, units: unitsToday, wallets: walletsToday, freeUsed: freeUsed, tier: tier };
 
   /* hero panel */
   var cdDay = document.getElementById("cdDay");
   if (cdDay) {
+    cdDay.textContent = "DAY Nº " + dayNo;
+    document.getElementById("cdUnits").textContent = unitsToday + " / " + CONFIG.DAY_CAP + " CAP";
+    document.getElementById("cdUnitsBar").style.width = (unitsToday / CONFIG.DAY_CAP * 100) + "%";
+    document.getElementById("cdFree").textContent = freeUsed + " / " + CONFIG.FREE_DAILY_QUOTA;
+    document.getElementById("cdFreeBar").style.width = (freeUsed / CONFIG.FREE_DAILY_QUOTA * 100) + "%";
+    document.getElementById("cdWallets").textContent = walletsToday;
+    document.getElementById("cdTier").textContent = tier.name + " · CORE LV." + tier.coreLevel;
     var cdEl = document.getElementById("cdCountdown");
-    if (!CONFIG.MINT_OPEN) {
-      cdDay.textContent = "FIELD Nº 1 — NOT OPENED";
-      document.getElementById("cdUnits").textContent = "0 / " + CONFIG.DAY_CAP + " CAP";
-      document.getElementById("cdUnitsBar").style.width = "0%";
-      document.getElementById("cdFree").textContent = "0 / " + CONFIG.FREE_DAILY_QUOTA;
-      document.getElementById("cdFreeBar").style.width = "0%";
-      document.getElementById("cdWallets").textContent = "0";
-      document.getElementById("cdTier").textContent = "—";
-      cdEl.textContent = "12:00 UTC";
-      var cdLab = cdEl.parentElement.querySelector("span");
-      if (cdLab) cdLab.textContent = "SEALS DAILY · CLOCK STARTS AT FIELD Nº 1";
-    } else {
-      cdDay.textContent = "DAY Nº " + dayNo;
-      document.getElementById("cdUnits").textContent = unitsToday + " / " + CONFIG.DAY_CAP + " CAP";
-      document.getElementById("cdUnitsBar").style.width = (unitsToday / CONFIG.DAY_CAP * 100) + "%";
-      document.getElementById("cdFree").textContent = freeUsed + " / " + CONFIG.FREE_DAILY_QUOTA;
-      document.getElementById("cdFreeBar").style.width = (freeUsed / CONFIG.FREE_DAILY_QUOTA * 100) + "%";
-      document.getElementById("cdWallets").textContent = walletsToday;
-      document.getElementById("cdTier").textContent = tier.name + " · CORE LV." + tier.coreLevel;
-      function tick(){
-        var diff = Math.max(0, nextSeal(Date.now()) - Date.now());
-        var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
-        cdEl.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
-      }
-      tick(); setInterval(tick, 1000);
+    function tick(){
+      var diff = Math.max(0, nextSeal(Date.now()) - Date.now());
+      var h = Math.floor(diff / 3600000), m = Math.floor(diff % 3600000 / 60000), s = Math.floor(diff % 60000 / 1000);
+      cdEl.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
     }
+    tick(); setInterval(tick, 1000);
   }
 
   /* tier gauge + active card */
   var gw = document.getElementById("gaugeWallets");
   if (gw) {
-    if (!CONFIG.MINT_OPEN) {
-      gw.textContent = "0";
-      document.getElementById("gaugeTier").textContent = "— · NO FIELD OPEN YET";
-      document.getElementById("gaugeFill").style.width = "0%";
-    } else {
-      gw.textContent = walletsToday;
-      document.getElementById("gaugeTier").textContent = tier.name + " · " + tier.claimDot.toLocaleString("en-US") + " DOT / UNIT";
-      document.getElementById("gaugeFill").style.width = Math.min(100, walletsToday / 120 * 100) + "%";
-      var idx = CONFIG.TIERS.indexOf(tier);
-      document.querySelectorAll(".tier-card").forEach(function(card){
-        if (parseInt(card.getAttribute("data-tier"), 10) === idx) card.classList.add("active");
-      });
-    }
+    gw.textContent = walletsToday;
+    document.getElementById("gaugeTier").textContent = tier.name + " · " + tier.claimDot.toLocaleString("en-US") + " DOT / UNIT";
+    document.getElementById("gaugeFill").style.width = Math.min(100, walletsToday / 120 * 100) + "%";
+    var idx = CONFIG.TIERS.indexOf(tier);
+    document.querySelectorAll(".tier-card").forEach(function(card){
+      if (parseInt(card.getAttribute("data-tier"), 10) === idx) card.classList.add("active");
+    });
   }
 
   /* mosaic of the day — 25 × 10 halftone cells */
@@ -1621,9 +1595,8 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
       }
     }
     c.globalAlpha = 1;
-    document.getElementById("mosaicCount").textContent = !CONFIG.MINT_OPEN
-      ? "0 / 250 CELLS FILLED — FIELD Nº 1 NOT OPENED · NO LIVE DAY (SIMULATION)"
-      : unitsToday + " / 250 CELLS FILLED · " + surgeCount + " SURGE (SIMULATION · MOSAIC Nº " + dayNo + " IN PROGRESS)";
+    document.getElementById("mosaicCount").textContent =
+      unitsToday + " / 250 CELLS FILLED · " + surgeCount + " SURGE (SIMULATION · MOSAIC Nº " + dayNo + " IN PROGRESS)";
   }
 
   /* anti-bot arithmetic question */
