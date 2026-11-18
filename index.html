@@ -244,6 +244,19 @@
     padding:13px 16px;font-family:var(--mono);font-size:12px;line-height:1.7;letter-spacing:.04em;margin-top:14px;
   }
   .standby.show{display:block}
+  .wallet-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-bottom:0;margin-top:26px;padding:14px clamp(22px,3vw,38px);background:var(--ink-2)}
+  .wallet-bar .wstate{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:var(--bone-dim);line-height:1.7}
+  .wallet-bar .wstate b{color:var(--bone)}
+  .chain-line{border:1px solid var(--line);border-bottom:0;padding:11px clamp(22px,3vw,38px);font-family:var(--mono);font-size:11.5px;line-height:1.8;letter-spacing:.05em;color:var(--bone-dim)}
+  .chain-line b{color:var(--bone)}
+  .txmsg{display:none;border:1px solid var(--line);padding:13px 16px;font-family:var(--mono);font-size:12px;line-height:1.7;letter-spacing:.04em;margin-top:14px;color:var(--bone-dim);background:var(--ink-2);word-break:break-word}
+  .txmsg.show{display:block}
+  .txmsg.ok{border-color:#3d5a27;color:#cfe8b8}
+  .txmsg.err{border-color:var(--signal);color:#ffb3ad;background:rgba(255,45,30,.07)}
+  .txmsg a{color:var(--gold)}
+  .agent-id-row{margin-bottom:14px}
+  .agent-id-row label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--bone-faint);margin-bottom:8px}
+  .agent-id-row input{width:100%;min-height:48px;background:#000;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;padding:0 14px;box-sizing:border-box}
   .chamber-foot{
     display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-top:0;
     padding:16px clamp(22px,3vw,38px);font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--bone-faint);letter-spacing:.05em;
@@ -502,7 +515,7 @@
       <a href="#faq">FAQ</a>
     </nav>
     <button class="menu-btn" type="button" id="menuBtn" aria-expanded="false" aria-controls="mobileNav">MENU<span class="plus" aria-hidden="true">+</span></button>
-    <div class="status-pill" role="status"><span class="pulse-dot" aria-hidden="true"></span><span class="hide-m">CONTRACT LIVE · </span>MINT CLOSED</div>
+    <div class="status-pill" role="status"><span class="pulse-dot" aria-hidden="true"></span><span class="hide-m">CONTRACT LIVE · </span><span id="statusPillState">MINT CLOSED</span></div>
   </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Sections">
     <a href="#chamber"><span class="n">02</span>Charge — Resolution Chamber</a>
@@ -616,7 +629,12 @@
     </div>
 
     <div class="chamber reveal">
-      <div class="chamber-grid">
+      <div class="wallet-bar">
+        <button class="btn btn-solid" type="button" id="walletConnectBtn">Connect wallet</button>
+        <span class="wstate" id="walletState">NOT CONNECTED — the lanes below read BNB Chain live; connect a wallet to resolve, buy a pass or discharge.</span>
+      </div>
+      <div class="chain-line" id="chainStatus" role="status">■ READING BNB CHAIN…</div>
+      <div class="chamber-grid" style="margin-top:0">
         <!-- AGENT LANE -->
         <div class="lane">
           <div class="lane-tag">
@@ -632,15 +650,19 @@
             <li>Free quota <b>150 / day</b> inside the 250 day cap</li>
             <li>Anti-bot gate — <b>one arithmetic question</b> per free resolve</li>
           </ul>
-          <div class="qbox" aria-label="Anti-bot arithmetic question simulation">
-            <div class="q-lab">ANTI-BOT QUESTION — SIMULATION OF questionFor() / mintFree(answer)</div>
+          <div class="agent-id-row">
+            <label for="agentIdInput">YOUR BINANCE AGENT ID (NUMERIC)</label>
+            <input id="agentIdInput" type="number" inputmode="numeric" placeholder="The Agent ID the connected wallet owns" aria-label="Binance Agent ID" />
+          </div>
+          <div class="qbox" aria-label="Anti-bot arithmetic question from the contract">
+            <div class="q-lab">ANTI-BOT QUESTION — FROM THE CONTRACT · questionFor(YOUR WALLET) · CHECKED INSIDE mintFree(agentId, answer)</div>
             <div class="q-eq" id="qEq">— <span>+</span> — <span>=</span> ?</div>
             <div class="q-form">
               <input id="qInput" type="number" inputmode="numeric" placeholder="Your answer" aria-label="Arithmetic answer" />
               <button class="copy-btn" type="button" id="qNew" style="min-height:48px">NEW QUESTION</button>
               <button class="copy-btn" type="button" id="qCheck" style="min-height:48px;border-color:var(--gold);color:var(--gold)">VERIFY</button>
             </div>
-            <div class="q-status" id="qStatus">Answer correctly to unlock the simulated free resolve. On-chain, the contract checks the same answer inside mintFree(answer).</div>
+            <div class="q-status" id="qStatus">Connect a wallet — the contract's own question for your wallet appears here. No local questions: questionFor() asks, and mintFree() checks the same answer on-chain.</div>
           </div>
           <div class="prompt-box">
             <div class="pb-head">
@@ -663,9 +685,7 @@ Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
 Report back the transaction hash, my unit ID, its Mosaic position and the day's tier.</pre>
           </div>
           <button class="btn btn-ghost" type="button" id="agentStandbyBtn" style="width:100%" disabled>Free resolve — answer the question first</button>
-          <div class="standby" id="agentStandbyMsg" role="status">
-            ■ FREE LANE IN STANDBY — question answered correctly. The DOTFIELD contract is deployed on BNB Chain, but mint is closed — Field Nº 1 has not opened yet, so mintFree(answer) cannot be sent from this page and nothing here pretends otherwise. When the owner opens Field Nº 1, this lane goes live exactly as specified — same question, same answer, 0 BNB.
-          </div>
+          <div class="txmsg" id="agentStandbyMsg" role="status"></div>
         </div>
 
         <!-- PAID LANE -->
@@ -696,14 +716,12 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
             <div><span>DISCHARGE CLAIM</span><span>SET BY THE DAY'S TIER · PAID IN DOT ↓</span></div>
           </div>
           <button class="btn btn-solid" type="button" id="paidStandbyBtn" style="width:100%">Resolve <span id="btnQty">1 paid unit</span> — standby</button>
-          <div class="standby" id="standbyMsg" role="status">
-            ■ CHAMBER IN STANDBY — the DOTFIELD contract is deployed on BNB Chain (0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C), but mint is closed and Field Nº 1 has not opened yet, so no transaction can be sent from this page and nothing here pretends otherwise. On-chain mint wiring from this website is a later step; both lanes open when the owner opens Field Nº 1, exactly as specified above.
-          </div>
+          <div class="txmsg" id="standbyMsg" role="status"></div>
         </div>
       </div>
       <div class="chamber-foot">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <span>HONEST STATE: CONTRACT DEPLOYED · MINT CLOSED · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. The contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C and the 600,000,000 DOT claim pool is funded, but mintOpen is still false — no wallet connection is requested and no funds can move from this page until the owner opens Field Nº 1. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
+        <span id="chamberFootText">HONEST STATE: CONTRACT DEPLOYED · MINT CLOSED · SIMULATION ENGINE. Prices, caps, ladder and lane rules on this page are the approved Charge Day v1 specification. The contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C and the 600,000,000 DOT claim pool is funded, but mintOpen is still false — no wallet connection is requested and no funds can move from this page until the owner opens Field Nº 1. Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.</span>
       </div>
 
       <!-- SIMULATOR -->
@@ -748,7 +766,7 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <div><span>SALES OPEN</span><b>WITH FIELD Nº 1 — AT LAUNCH</b></div>
           <div><span>PASS LANE ACTIVE</span><b>FIELD Nº 4</b></div>
         </div>
-        <div class="pass-note">READ THE TIMELINE PLAINLY — passes are sold from the first field, but a pass bought during Fields Nº 1–3 is a key bought early: it starts opening gates when Field Nº 4 opens, not before. The contracts are deployed, but mint is still closed and Field Nº 1 has not opened, so sales are not live at all yet — the button on the card stands by, exactly like the chamber's.</div>
+        <div class="pass-note">READ THE TIMELINE PLAINLY — passes are sold from the first field, but a pass bought during Fields Nº 1–3 is a key bought early: it starts opening gates when Field Nº 4 opens, not before. The contracts are deployed, but mint is still closed and Field Nº 1 has not opened, so sales are not live yet. The button on the card is wired to buyPass() — it activates on this page the moment Field Nº 1 opens.</div>
       </div>
       <div class="pass-card">
         <canvas id="passCanvas" width="1040" height="440" aria-label="Abstract ring of bone-white dots around a single gold dot — the Dot Pass mark. No NFT artwork is shown; the collection art stays sealed."></canvas>
@@ -756,13 +774,13 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <div class="pc-top"><span>DOTFIELD PASS</span><b>DPASS</b></div>
           <div class="pc-price">0.0012 <small>BNB · ONE-TIME</small></div>
           <div class="pc-rows">
-            <div><span>STATUS</span><span>SALES OPEN WITH FIELD Nº 1</span></div>
+            <div><span>STATUS</span><span id="pcPassStatus">SALES OPEN WITH FIELD Nº 1</span></div>
             <div><span>LANE ACTIVATES</span><span>FIELD Nº 4</span></div>
             <div><span>SUPPLY</span><span>UNLIMITED</span></div>
-            <div><span>SOLD</span><span>0 · MINT CLOSED</span></div>
+            <div><span>YOUR PASSES</span><span id="pcPasses">—</span></div>
           </div>
           <button class="btn btn-solid" type="button" id="passBuyBtn" style="width:100%">Get a DPASS — standby</button>
-          <div class="standby" id="passStandby" role="status">■ PASS SALES IN STANDBY — the contracts are deployed on BNB Chain, but mint is closed and Field Nº 1 has not opened yet. DPASS sales open together with Field Nº 1, on the owner's signal — nothing can be bought from this page before that, and this page will not pretend otherwise. When sales open, the price is 0.0012 BNB — and the lane it unlocks activates at Field Nº 4.</div>
+          <div class="txmsg" id="passStandby" role="status"></div>
         </div>
       </div>
     </div>
@@ -958,6 +976,18 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
           <p style="margin-top:14px;font-size:13px">Claims open at seal +6h and never expire. DOT is deployed and the claim pool is funded — this calculator shows DOT amounts only, never a price.</p>
         </div>
       </div>
+      <div class="tool" style="border:1px solid var(--line);border-top:0">
+        <h3>Discharge a unit you hold</h3>
+        <p>Live against the contract: enter a unit ID to read its owner, the tier of the day it sealed and its exact DOT claim. Discharge works whether or not mint is open — but a unit can only discharge once it exists and its day has sealed +6h. The fee is <b style="color:var(--bone)">0.0002 BNB</b>, paid to the contract with the call; the DOT lands in the owner's wallet.</p>
+        <label for="dcTokenId">UNIT (TOKEN) ID</label>
+        <div class="q-form" style="margin-bottom:14px">
+          <input type="number" id="dcTokenId" min="1" max="10000" placeholder="e.g. 1" aria-label="Unit token ID" />
+          <button class="copy-btn" type="button" id="dcCheckBtn" style="min-height:48px;border-color:var(--gold);color:var(--gold)">CHECK UNIT</button>
+        </div>
+        <div class="tool-out" id="dcLiveOut" aria-live="polite">NO UNIT CHECKED YET — EVERY UNIT'S STATE IS READ LIVE FROM THE CONTRACT.</div>
+        <button class="btn btn-signal" type="button" id="dcSendBtn" style="margin-top:16px" disabled>Discharge — 0.0002 BNB fee</button>
+        <div class="txmsg" id="dcMsg" role="status"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1137,14 +1167,17 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
 /* ============================================================
    DOTFIELD CONFIG — deployed contracts, wired 2026-11-18.
    Both contracts are live on BNB Chain and the claim pool is
-   funded, but mintOpen is still false: Field Nº 1 has not
-   opened, so the chamber stays in honest standby — no wallet
-   prompts, no fake transactions. On-chain mint wiring from
-   this page is a later step, gated on MINT_OPEN below.
+   funded. The chamber, pass and discharge on this page are
+   wired to the contract (chain module at the end of this
+   script): live reads drive every state shown, and sends go
+   through the visitor's own wallet. MINT_OPEN below is only
+   the fallback before the first live read lands — the
+   chain's own mintOpen() is the truth, and until the owner
+   opens Field Nº 1 every send reverts on-chain.
    ============================================================ */
 var CONFIG = {
   CONTRACT_ADDRESS: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C", // TalvioGenerate NFT — deployed, mint closed
-  MINT_OPEN: false,                // owner opens Field Nº 1 separately via openMint()
+  MINT_OPEN: false,                // pre-read fallback only — the live mintOpen() read drives this page
   CHAIN_ID: 56,                    // BNB Chain
   SUPPLY: 10000,
   /* ---- CHARGE DAY v1 ---- */
@@ -1173,8 +1206,136 @@ var CONFIG = {
   PASS: { name: "DPASS", priceBnb: 0.0012, supply: "unlimited",
           salesOpen: "with Field Nº 1", laneActivatesField: 4,
           contract: "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" }, // DPASS lives inside the NFT contract
-  FUNCTIONS: ["currentDay","questionFor","mintFree(answer)","mintPaid(qty)","dayStats","tierOf","coreLevel","isSurge","dischargeable","discharge","poolOf"]
+  FUNCTIONS: ["currentDay","questionFor","mintFree(agentId,answer)","mintPaid(qty)","dayStats","tierOf","coreLevel","isSurge","dischargeable","discharge","poolOf"]
 };
+
+/* __PURE_CHAIN_HELPERS_START__
+   Hand-rolled chain helpers — Keccak-256, ABI encode/decode and the
+   Charge Day ladder pricing, mirroring TalvioGenerate exactly.
+   Pure functions only: no DOM, no network, no libraries. This block
+   is extracted and executed standalone by the wiring proof harness.
+   ============================================================ */
+function dfKeccak256(str){
+  var RC = [0x0000000000000001n,0x0000000000008082n,0x800000000000808an,0x8000000080008000n,
+            0x000000000000808bn,0x0000000080000001n,0x8000000080008081n,0x8000000000008009n,
+            0x000000000000008an,0x0000000000000088n,0x0000000080008009n,0x000000008000000an,
+            0x000000008000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,
+            0x8000000000008002n,0x8000000000000080n,0x000000000000800an,0x800000008000000an,
+            0x8000000080008081n,0x8000000000008080n,0x0000000080000001n,0x8000000080008008n];
+  var ROT = [0,1,62,28,27, 36,44,6,55,20, 3,10,43,25,39, 41,45,15,21,8, 18,2,61,56,14]; // r[x+5y]
+  var MASK = (1n << 64n) - 1n;
+  function rotl(v, n){ if (!n) return v; var b = BigInt(n); return ((v << b) | (v >> (64n - b))) & MASK; }
+  function permute(S){
+    var B = new Array(25), C = new Array(5), D = new Array(5);
+    for (var round = 0; round < 24; round++){
+      for (var x = 0; x < 5; x++) C[x] = S[x] ^ S[x+5] ^ S[x+10] ^ S[x+15] ^ S[x+20];
+      for (var x2 = 0; x2 < 5; x2++) D[x2] = C[(x2+4)%5] ^ rotl(C[(x2+1)%5], 1);
+      for (var i = 0; i < 25; i++) S[i] ^= D[i % 5];
+      for (var y = 0; y < 5; y++) for (var x3 = 0; x3 < 5; x3++){
+        B[y + 5 * ((2*x3 + 3*y) % 5)] = rotl(S[x3 + 5*y], ROT[x3 + 5*y]);
+      }
+      for (var y2 = 0; y2 < 5; y2++) for (var x4 = 0; x4 < 5; x4++){
+        S[x4 + 5*y2] = B[x4 + 5*y2] ^ ((~B[(x4+1)%5 + 5*y2]) & B[(x4+2)%5 + 5*y2]);
+      }
+      S[0] ^= RC[round];
+    }
+  }
+  var bytes = new TextEncoder().encode(str);
+  var RATE = 136;
+  var total = Math.ceil((bytes.length + 1) / RATE) * RATE;
+  var padded = new Uint8Array(total);
+  padded.set(bytes);
+  padded[bytes.length] = 0x01;
+  padded[total - 1] |= 0x80;
+  var S = new Array(25).fill(0n);
+  for (var off = 0; off < total; off += RATE){
+    for (var i = 0; i < RATE; i++){
+      S[i >> 3] ^= BigInt(padded[off + i]) << BigInt((i & 7) * 8);
+    }
+    permute(S);
+  }
+  var out = "";
+  for (var j = 0; j < 32; j++){
+    var byte = Number((S[j >> 3] >> BigInt((j & 7) * 8)) & 0xffn);
+    out += byte.toString(16).padStart(2, "0");
+  }
+  return out;
+}
+function dfSelector(sig){ return dfKeccak256(sig).slice(0, 8); }
+function dfEncodeCall(sig, types, values){
+  var data = dfSelector(sig);
+  for (var i = 0; i < types.length; i++){
+    var t = types[i], v = values[i];
+    if (t === "uint256") data += BigInt(v).toString(16).padStart(64, "0");
+    else if (t === "address") data += String(v).toLowerCase().replace(/^0x/, "").padStart(64, "0");
+    else if (t === "bool") data += (v ? "1" : "0").padStart(64, "0");
+    else throw new Error("dfEncodeCall: unsupported type " + t);
+  }
+  return "0x" + data;
+}
+function dfWord(hex, i){
+  var h = String(hex).replace(/^0x/, "");
+  return h.slice(i * 64, (i + 1) * 64);
+}
+function dfDecUint(hex, i){
+  var w = dfWord(hex, i);
+  return w ? BigInt("0x" + w) : 0n;
+}
+function dfDecBool(hex, i){ return dfDecUint(hex, i) !== 0n; }
+function dfDecAddr(hex, i){ return "0x" + dfWord(hex, i).slice(24); }
+var DF_PRICE_LOW = 260000000000000n;      // 0.00026 BNB — unit indices 2..5
+var DF_PRICE_HIGH = 1000000000000000n;    // 0.001 BNB   — unit indices 6..10
+var DF_PASS_PRICE = 1200000000000000n;    // 0.0012 BNB  — DPASS
+var DF_DISCHARGE_FEE = 200000000000000n;  // 0.0002 BNB  — discharge fee
+/* Exact mirror of TalvioGenerate.mintPaid pricing: the basket covers
+   unit indices count+1 .. count+qty; each index is priced at
+   max(index, 2) — indices 2..5 at PRICE_LOW, 6..10 at PRICE_HIGH. */
+function dfBasketWei(count, qty){
+  var t = 0n;
+  count = Number(count); qty = Number(qty);
+  for (var i = 1; i <= qty; i++){
+    var idx = count + i;
+    var eff = idx < 2 ? 2 : idx;
+    t += eff <= 5 ? DF_PRICE_LOW : DF_PRICE_HIGH;
+  }
+  return t;
+}
+function dfWeiToHex(w){ return "0x" + BigInt(w).toString(16); }
+function dfFmtBnb(w){
+  w = BigInt(w);
+  var whole = (w / 1000000000000000000n).toString();
+  var frac = (w % 1000000000000000000n).toString().padStart(18, "0").replace(/0+$/, "");
+  return frac ? whole + "." + frac : whole;
+}
+function dfFmtDot(wei){
+  var whole = (BigInt(wei) / 1000000000000000000n).toString();
+  return Number(whole).toLocaleString("en-US");
+}
+function dfRevertString(err){
+  var datas = [];
+  try {
+    if (err && typeof err.data === "string") datas.push(err.data);
+    if (err && err.data && typeof err.data.data === "string") datas.push(err.data.data);
+    if (err && err.info && err.info.error && typeof err.info.error.data === "string") datas.push(err.info.error.data);
+    if (err && err.error && typeof err.error.data === "string") datas.push(err.error.data);
+  } catch (e) {}
+  for (var i = 0; i < datas.length; i++){
+    var d = datas[i];
+    if (typeof d === "string" && d.indexOf("0x08c379a0") === 0){
+      try {
+        var len = Number(BigInt("0x" + d.slice(74, 138)));
+        var hexBytes = d.slice(138, 138 + len * 2);
+        var s = "";
+        for (var j = 0; j + 2 <= hexBytes.length; j += 2) s += String.fromCharCode(parseInt(hexBytes.slice(j, j + 2), 16));
+        if (s) return s;
+      } catch (e) {}
+    }
+  }
+  var m = /execution reverted:?\s*"?([^"\n]+?)"?\s*$/i.exec((err && err.message) || "");
+  if (m) return m[1].trim();
+  return null;
+}
+/* __PURE_CHAIN_HELPERS_END__ */
 
 function tierForWallets(w){
   var t = CONFIG.TIERS[0];
@@ -1437,77 +1598,75 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 })();
 
 /* ============================================================
-   RESOLUTION CHAMBER — paid ladder stepper + standby honesty.
-   Stepper counts UNITS TODAY including the free unit (unit 1).
-   Units 2–5: 0.00026 BNB · units 6–10: 0.001 BNB · max 10/day.
+   RESOLUTION CHAMBER — LANE B paid ladder (live-aware display).
+   The stepper picks how many NEW paid units to resolve. Pricing
+   mirrors TalvioGenerate.mintPaid exactly (dfBasketWei): unit
+   indices are the wallet's count today + 1..qty, each priced at
+   index max(n, 2) — indices 2–5 at 0.00026 BNB, 6–10 at
+   0.001 BNB, hard stop at 10 units per wallet per day.
+   The base count comes from walletDayCount() once a wallet is
+   connected; before that it assumes the free unit is taken (1),
+   exactly as this page has always presented the ladder. The
+   send itself lives in the DOTFIELD chain module below.
    ============================================================ */
 (function(){
-  var total = 2; // units today incl. free
+  var base = 1, baseLive = false, qty = 1;
   var qtyVal = document.getElementById("qtyVal");
   var calcQty = document.getElementById("calcQty");
   var calcTotal = document.getElementById("calcTotal");
   var calcWei = document.getElementById("calcWei");
   var calcHex = document.getElementById("calcHex");
-  var btnQty = document.getElementById("btnQty");
   var bd = document.getElementById("ladderBreakdown");
-  var WEI = 1000000000000000000n;
 
-  function priceForUnit(n){ // n = 1-based unit number today
-    if (n <= 1) return 0;
-    for (var i = 0; i < CONFIG.PAID_LADDER.length; i++) if (n <= CONFIG.PAID_LADDER[i].upTo) return CONFIG.PAID_LADDER[i].priceBnb;
-    return CONFIG.PAID_LADDER[CONFIG.PAID_LADDER.length - 1].priceBnb;
-  }
-  function fmtBnb(x){ return x.toFixed(8).replace(/0+$/, "").replace(/\.$/, ".0"); }
+  function maxQty(){ return Math.max(0, CONFIG.PAID_MAX_PER_DAY - base); }
 
   function render(){
-    qtyVal.textContent = total;
-    var paidUnits = total - 1, totalWei = 0n, rows = "";
-    rows += "<div><span>UNIT 1 TODAY — FREE DAILY CHARGE</span><span>0 BNB</span></div>";
-    var lo = null, hi = null, cnt = 0, sub = 0;
-    function flush(){
-      if (!cnt) return;
-      rows += "<div><span>UNIT" + (cnt > 1 ? "S " + lo + "–" + hi : " " + lo) + " — " + fmtBnb(priceForUnit(lo)) + " BNB EACH</span><span>" + fmtBnb(sub) + " BNB</span></div>";
-      cnt = 0; sub = 0;
+    var mq = maxQty();
+    if (qty > mq) qty = mq;
+    if (mq > 0 && qty < 1) qty = 1;
+    if (mq === 0) qty = 0;
+    qtyVal.textContent = base + qty;
+    var wei = dfBasketWei(base, qty);
+    var rows = "";
+    if (baseLive){
+      rows += "<div><span>YOUR UNITS TODAY SO FAR</span><span>" + base + " / 10</span></div>";
+    } else {
+      rows += "<div><span>UNIT 1 TODAY — FREE DAILY CHARGE (ASSUMED TAKEN · CONNECT FOR YOUR EXACT COUNT)</span><span>0 BNB</span></div>";
     }
-    for (var n = 2; n <= total; n++) {
-      var p = priceForUnit(n);
-      if (cnt && priceForUnit(lo) !== p) flush();
-      if (!cnt) lo = n;
-      hi = n; cnt++; sub += p;
-      totalWei += BigInt(Math.round(p * 1e18));
+    var groups = [], cur = null;
+    for (var i = 1; i <= qty; i++){
+      var idx = base + i, eff = idx < 2 ? 2 : idx;
+      var p = eff <= 5 ? DF_PRICE_LOW : DF_PRICE_HIGH;
+      if (cur && cur.p === p) { cur.hi = idx; cur.n++; }
+      else { cur = { p: p, lo: idx, hi: idx, n: 1 }; groups.push(cur); }
     }
-    flush();
-    calcQty.textContent = paidUnits;
-    var totalBnb = Number(totalWei) / 1e18;
-    calcTotal.textContent = fmtBnb(totalBnb) + " BNB";
-    calcWei.textContent = totalWei.toString();
-    calcHex.textContent = "0x" + totalWei.toString(16);
-    btnQty.textContent = paidUnits + (paidUnits === 1 ? " paid unit" : " paid units");
+    groups.forEach(function(g){
+      rows += "<div><span>UNIT" + (g.n > 1 ? "S " + g.lo + "–" + g.hi : " " + g.lo) + " — " + dfFmtBnb(g.p) + " BNB EACH</span><span>" + dfFmtBnb(g.p * BigInt(g.n)) + " BNB</span></div>";
+    });
+    if (!qty) rows += "<div><span>DAILY WALLET CAP REACHED — 10 UNITS TODAY</span><span>—</span></div>";
     bd.innerHTML = rows;
-    document.getElementById("qtyMinus").disabled = total <= 1;
-    document.getElementById("qtyPlus").disabled = total >= CONFIG.PAID_MAX_PER_DAY;
+    calcQty.textContent = qty;
+    calcTotal.textContent = dfFmtBnb(wei) + " BNB";
+    calcWei.textContent = wei.toString();
+    calcHex.textContent = "0x" + wei.toString(16);
+    document.getElementById("qtyMinus").disabled = qty <= (mq > 0 ? 1 : 0);
+    document.getElementById("qtyPlus").disabled = qty >= mq;
+    if (window.__lanebChanged) window.__lanebChanged();
   }
   document.getElementById("qtyMinus").addEventListener("click", function(){
-    if (total > 1) { total--; render(); }
+    if (qty > 1) { qty--; render(); }
   });
   document.getElementById("qtyPlus").addEventListener("click", function(){
-    if (total < CONFIG.PAID_MAX_PER_DAY) { total++; render(); }
+    if (qty < maxQty()) { qty++; render(); }
   });
+  window.DOTFIELD_LANEB = {
+    setBase: function(n, live){ base = Number(n); baseLive = !!live; render(); },
+    getQty: function(){ return qty; },
+    getBase: function(){ return base; },
+    getWei: function(){ return dfBasketWei(base, qty); },
+    render: render
+  };
   render();
-
-  /* each lane answers its OWN button, in place — the feedback must
-     appear where the visitor is looking, not in the other lane */
-  function standby(el){
-    if (CONFIG.MINT_OPEN) return; // once Field Nº 1 opens, live mode wires web3 here
-    el.classList.add("show");
-    el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
-  }
-  document.getElementById("paidStandbyBtn").addEventListener("click", function(){
-    standby(document.getElementById("standbyMsg"));
-  });
-  document.getElementById("agentStandbyBtn").addEventListener("click", function(){
-    standby(document.getElementById("agentStandbyMsg"));
-  });
 })();
 
 /* ============================================================
@@ -1599,44 +1758,10 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
       unitsToday + " / 250 CELLS FILLED · " + surgeCount + " SURGE (SIMULATION · MOSAIC Nº " + dayNo + " IN PROGRESS)";
   }
 
-  /* anti-bot arithmetic question */
-  var qEq = document.getElementById("qEq");
-  if (qEq) {
-    var answer = 0, solved = false;
-    var qInput = document.getElementById("qInput");
-    var qStatus = document.getElementById("qStatus");
-    var agentBtn = document.getElementById("agentStandbyBtn");
-    function newQuestion(){
-      var ops = ["+", "−", "×"];
-      var op = ops[Math.floor(Math.random() * ops.length)];
-      var a, b;
-      if (op === "×") { a = 2 + Math.floor(Math.random() * 8); b = 2 + Math.floor(Math.random() * 8); answer = a * b; }
-      else if (op === "−") { a = 12 + Math.floor(Math.random() * 40); b = 2 + Math.floor(Math.random() * 10); answer = a - b; }
-      else { a = 7 + Math.floor(Math.random() * 40); b = 3 + Math.floor(Math.random() * 30); answer = a + b; }
-      qEq.innerHTML = a + " <span>" + op + "</span> " + b + " <span>=</span> ?";
-      solved = false;
-      qInput.value = "";
-      qStatus.className = "q-status";
-      qStatus.textContent = "Answer correctly to unlock the simulated free resolve. On-chain, the contract checks the same answer inside mintFree(answer).";
-      agentBtn.disabled = true;
-      agentBtn.textContent = "Free resolve — answer the question first";
-    }
-    document.getElementById("qNew").addEventListener("click", newQuestion);
-    document.getElementById("qCheck").addEventListener("click", function(){
-      if (qInput.value !== "" && parseInt(qInput.value, 10) === answer) {
-        solved = true;
-        qStatus.className = "q-status ok";
-        qStatus.textContent = "✓ CORRECT — questionFor() answered. The contract is deployed, but mint is closed until the owner opens Field Nº 1: the chamber stays in standby.";
-        agentBtn.disabled = false;
-        agentBtn.textContent = "Free resolve — standby (mint closed)";
-      } else {
-        qStatus.className = "q-status bad";
-        qStatus.textContent = "✗ Not the answer the field asked for. Check the equation and try again — bots guess, agents compute.";
-      }
-    });
-    qInput.addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); document.getElementById("qCheck").click(); } });
-    newQuestion();
-  }
+  /* anti-bot arithmetic question — driven live by the DOTFIELD chain
+     module at the end of this script: the question comes from
+     questionFor(connected wallet) and the contract checks the answer
+     inside mintFree(agentId, answer). No local questions remain. */
 
   /* discharge calculator — fixed DOT claim table */
   var dcOut = document.getElementById("dcOut");
@@ -1905,6 +2030,488 @@ wireCopy("copyJson", "mintJson", false);
   });
   build();
   if (!reducedMotion) raf = requestAnimationFrame(draw);
+})();
+
+/* ============================================================
+   DOTFIELD CHAIN MODULE — live mint wiring (2026-11-18).
+   Reads race the public BSC RPCs (no wallet needed); sends go
+   through the visitor's own wallet via window.ethereum
+   (EIP-1193). Hand-rolled ABI codec — see the pure helpers
+   block above CONFIG. No external libraries.
+   State rule: the page is driven by the live mintOpen() read.
+   CONFIG.MINT_OPEN is only the pre-read fallback. While the
+   chain says closed, every send stays disabled and the lanes
+   report the closed state; the moment the owner opens Field
+   Nº 1, the same buttons go live on the next read (~15s).
+   ============================================================ */
+(function(){
+  "use strict";
+  var NFT = CONFIG.CONTRACT_ADDRESS;
+  var RPCS = [
+    "https://bsc-dataseed.binance.org",
+    "https://bsc-dataseed1.defibit.io",
+    "https://bsc-dataseed1.ninicoin.io",
+    "https://bsc-rpc.publicnode.com"
+  ];
+  var S = {
+    read: false, open: null, total: 0n, day: 0n, field: 0n,
+    stats: null, account: null, walletCount: null, passBal: null,
+    passLane: false, question: null, verified: false, busy: false
+  };
+  var dcState = null;
+
+  function $(id){ return document.getElementById(id); }
+  function shortAddr(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }
+  function showMsg(el, kind, html){
+    if (!el) return;
+    el.className = "txmsg show" + (kind ? " " + kind : "");
+    el.innerHTML = html;
+    el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
+  }
+  function hideMsg(el){ if (el) { el.className = "txmsg"; el.innerHTML = ""; } }
+  function txLink(hash){ return "<a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">" + hash.slice(0, 18) + "…</a>"; }
+  function passOk(){ return S.passLane && S.passBal !== null && S.passBal > 0n; }
+
+  /* ---------------- reads: race the public RPCs ---------------- */
+  function rpcBatch(calls, maxKeys){
+    var body = JSON.stringify(calls.map(function(c, i){
+      return { jsonrpc: "2.0", id: i, method: "eth_call", params: [{ to: NFT, data: c.data }, "latest"] };
+    }));
+    var tries = RPCS.map(function(u){
+      return fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: body })
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          if (!Array.isArray(j)) throw new Error("bad batch response");
+          var out = {};
+          j.forEach(function(item){
+            var c = calls[item.id];
+            if (c && typeof item.result === "string") out[c.key] = item.result;
+          });
+          return out;
+        });
+    });
+    return Promise.allSettled(tries).then(function(rs){
+      var merged = {};
+      rs.forEach(function(r){
+        if (r.status !== "fulfilled") return;
+        Object.keys(r.value).forEach(function(k){
+          if (!(k in merged)) { merged[k] = r.value[k]; return; }
+          if (maxKeys && maxKeys.indexOf(k) >= 0){
+            try { if (dfDecUint(r.value[k], 0) > dfDecUint(merged[k], 0)) merged[k] = r.value[k]; } catch (e) {}
+          }
+        });
+      });
+      return merged;
+    });
+  }
+
+  function readState(){
+    var calls = [
+      { key: "open",  data: dfEncodeCall("mintOpen()", [], []) },
+      { key: "total", data: dfEncodeCall("totalMinted()", [], []) },
+      { key: "day",   data: dfEncodeCall("currentDay()", [], []) },
+      { key: "field", data: dfEncodeCall("fieldNumber()", [], []) }
+    ];
+    return rpcBatch(calls, ["total", "day", "field"]).then(function(m){
+      if (m.open !== undefined) S.open = dfDecBool(m.open, 0);
+      if (m.total) S.total = dfDecUint(m.total, 0);
+      if (m.day) S.day = dfDecUint(m.day, 0);
+      if (m.field) S.field = dfDecUint(m.field, 0);
+      S.read = true;
+      var calls2 = [{ key: "stats", data: dfEncodeCall("dayStats(uint256)", ["uint256"], [S.day]) }];
+      if (S.account){
+        calls2.push({ key: "wcount",   data: dfEncodeCall("walletDayCount(uint256,address)", ["uint256", "address"], [S.day, S.account]) });
+        calls2.push({ key: "passbal",  data: dfEncodeCall("passBalance(address)", ["address"], [S.account]) });
+        calls2.push({ key: "lane",     data: dfEncodeCall("passLaneActive()", [], []) });
+        calls2.push({ key: "question", data: dfEncodeCall("questionFor(address)", ["address"], [S.account]) });
+      }
+      return rpcBatch(calls2, ["stats"]).then(function(m2){
+        if (m2.stats) S.stats = { resolved: dfDecUint(m2.stats, 0), freeUsed: dfDecUint(m2.stats, 1), uniqueWallets: dfDecUint(m2.stats, 2) };
+        if (m2.wcount !== undefined) S.walletCount = dfDecUint(m2.wcount, 0);
+        if (m2.passbal !== undefined) S.passBal = dfDecUint(m2.passbal, 0);
+        if (m2.lane !== undefined) S.passLane = dfDecBool(m2.lane, 0);
+        if (m2.question){
+          var a = dfDecUint(m2.question, 0), b = dfDecUint(m2.question, 1), key = a + "+" + b;
+          if (!S.question || S.question.key !== key){ S.question = { a: a, b: b, key: key }; S.verified = false; }
+        }
+        renderAll();
+      });
+    }).catch(function(){ renderAll(); });
+  }
+
+  /* ---------------- wallet ---------------- */
+  function ensureChain(){
+    if (!window.ethereum) return Promise.resolve(false);
+    return window.ethereum.request({ method: "eth_chainId" }).then(function(cid){
+      if (cid === "0x38") return true;
+      return window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] })
+        .then(function(){ return true; })
+        .catch(function(e){
+          if (e && e.code === 4902){
+            return window.ethereum.request({ method: "wallet_addEthereumChain", params: [{
+              chainId: "0x38", chainName: "BNB Smart Chain",
+              nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+              rpcUrls: ["https://bsc-dataseed.binance.org"], blockExplorerUrls: ["https://bscscan.com"]
+            }] }).then(function(){ return true; });
+          }
+          throw e;
+        });
+    });
+  }
+  function connect(){
+    if (!window.ethereum){
+      showMsg($("standbyMsg"), "err", "■ NO WALLET FOUND — this browser has no web3 wallet. Install MetaMask (or another BNB Chain wallet) and reload to resolve from this page.");
+      return Promise.resolve();
+    }
+    return ensureChain()
+      .then(function(){ return window.ethereum.request({ method: "eth_requestAccounts" }); })
+      .then(function(accs){
+        if (accs && accs[0]){
+          S.account = accs[0];
+          S.walletCount = null; S.passBal = null; S.question = null; S.verified = false;
+          renderAll();
+          return readState();
+        }
+      })
+      .catch(function(e){
+        if (e && e.code === 4001) showMsg($("standbyMsg"), "err", "■ CONNECTION REJECTED IN WALLET — nothing was connected.");
+        else showMsg($("standbyMsg"), "err", "■ CONNECTION FAILED — " + ((e && e.message) || e));
+      });
+  }
+
+  /* ---------------- send pipeline ---------------- */
+  var REASONS = [
+    ["mint closed", "Mint is closed — Field Nº 1 has not opened yet. The owner opens it with openMint(); every send reverts until then."],
+    ["wrong answer", "Wrong answer — the contract's question for your wallet expects a different sum. Re-check the equation in Lane A."],
+    ["not your agent id", "That Agent ID does not belong to the connected wallet — the registry says another wallet owns it."],
+    ["free is the first unit only", "The free resolve must be your first unit of the day — this wallet has already resolved today. Paid units in Lane B are still open."],
+    ["free quota exhausted", "Today's free quota (150 units) is used up. Paid units in Lane B remain open."],
+    ["daily cap reached", "Today's field cap (250 units) is reached. The next Field opens at the 12:00 UTC seal."],
+    ["daily wallet cap", "This wallet is at the 10 units/day cap for today."],
+    ["exact payment required", "The contract requires the exact ladder total. The page prices from your on-chain count — the count may have moved; the reads refresh every ~15s, try again."],
+    ["exact pass price", "The contract requires exactly 0.0012 BNB for a DPASS."],
+    ["exact discharge fee", "The contract requires exactly 0.0002 BNB as the discharge fee."],
+    ["already discharged", "This unit has already discharged — each unit claims exactly once."],
+    ["not yet dischargeable", "This unit is not dischargeable yet — its claim opens at its day's seal + 6 hours and never expires."],
+    ["not token owner", "The connected wallet does not own this unit — discharge pays the unit's owner."],
+    ["sold out", "The collection is sold out — all 10,000 units are resolved."],
+    ["pool insufficient", "The claim pool cannot cover this reward right now."],
+    ["qty 0", "Quantity must be at least 1."]
+  ];
+  function mapReason(err){
+    if (err && err.code === 4001) return "You rejected the request in your wallet — nothing was sent.";
+    var raw = dfRevertString(err) || (err && err.message) || String(err);
+    var low = String(raw).toLowerCase();
+    for (var i = 0; i < REASONS.length; i++) if (low.indexOf(REASONS[i][0]) >= 0) return REASONS[i][1];
+    return "The contract reverted: " + raw;
+  }
+  function waitReceipt(hash){
+    var tries = 0;
+    return new Promise(function(resolve){
+      (function poll(){
+        tries++;
+        window.ethereum.request({ method: "eth_getTransactionReceipt", params: [hash] })
+          .then(function(rcpt){
+            if (rcpt) resolve(rcpt);
+            else if (tries < 40) setTimeout(poll, 3000);
+            else resolve(null);
+          })
+          .catch(function(){ if (tries < 40) setTimeout(poll, 3000); else resolve(null); });
+      })();
+    });
+  }
+  function doSend(data, valueWei, msgEl, okFn){
+    if (!window.ethereum || !S.account) return;
+    S.busy = true; renderAll();
+    showMsg(msgEl, "", "■ CHECKING WITH THE CONTRACT… (a simulation first — nothing is sent if the contract would revert)");
+    ensureChain()
+      .then(function(){
+        var tx = { from: S.account, to: NFT, data: data, value: dfWeiToHex(valueWei) };
+        return window.ethereum.request({ method: "eth_call", params: [tx, "latest"] }).then(function(){ return tx; });
+      })
+      .then(function(tx){
+        showMsg(msgEl, "", "■ SENDABLE — approve the transaction in your wallet…");
+        return window.ethereum.request({ method: "eth_sendTransaction", params: [tx] });
+      })
+      .then(function(hash){
+        showMsg(msgEl, "", "■ SENT — waiting for BNB Chain to seal it… tx " + txLink(hash));
+        return waitReceipt(hash).then(function(rcpt){
+          if (rcpt && rcpt.status === "0x1") showMsg(msgEl, "ok", okFn(hash));
+          else if (rcpt) showMsg(msgEl, "err", "■ TRANSACTION FAILED ON-CHAIN — tx " + txLink(hash) + ". Nothing was resolved; only the network fee was spent.");
+          else showMsg(msgEl, "", "■ STILL PENDING — tx " + txLink(hash) + ". Check it on BscScan; the reads on this page refresh automatically.");
+        });
+      })
+      .catch(function(e){ showMsg(msgEl, "err", "■ " + mapReason(e)); })
+      .then(function(){ S.busy = false; readState(); });
+  }
+
+  /* ---------------- renders ---------------- */
+  function renderPill(){
+    var el = $("statusPillState");
+    if (!el || !S.read) return;
+    el.textContent = S.open ? "MINT LIVE · FIELD Nº " + S.field.toString() : "MINT CLOSED";
+  }
+  function renderChainStatus(){
+    var el = $("chainStatus");
+    if (!el) return;
+    if (!S.read){ el.textContent = "■ READING BNB CHAIN…"; return; }
+    if (!S.open){
+      el.innerHTML = "■ LIVE READ · BNB CHAIN — <b style=\"color:#ffb3ad\">MINT CLOSED</b> · TOTAL RESOLVED <b>" +
+        S.total.toString() + " / 10,000</b> · FIELD Nº 1 OPENS ON THE OWNER'S SIGNAL. Connect a wallet — the lanes report the closed state and unlock the moment it opens.";
+    } else {
+      var st = S.stats || { resolved: 0n, freeUsed: 0n, uniqueWallets: 0n };
+      el.innerHTML = "■ LIVE READ · BNB CHAIN — <b style=\"color:#b7e39a\">MINT LIVE · FIELD Nº " + S.field.toString() + "</b> · TODAY <b>" +
+        st.resolved.toString() + " / 250</b> RESOLVED · FREE QUOTA <b>" + st.freeUsed.toString() + " / 150</b> USED · UNIQUE WALLETS <b>" +
+        st.uniqueWallets.toString() + "</b> · TOTAL <b>" + S.total.toString() + " / 10,000</b>.";
+    }
+  }
+  function renderFoot(){
+    var el = $("chamberFootText");
+    if (!el || !S.read) return;
+    var example = " Worked example — a wallet taking its free unit plus 9 paid in one day pays 4 × 0.00026 + 5 × 0.001 = 0.00604 BNB total.";
+    el.textContent = S.open
+      ? "HONEST STATE: CONTRACT LIVE · MINT OPEN — FIELD Nº " + S.field.toString() + ", READ LIVE FROM BNB CHAIN. The lanes on this page send real transactions through your own wallet to the contract at " + NFT + ". The 600,000,000 DOT claim pool is funded." + example
+      : "HONEST STATE: CONTRACT LIVE · MINT CLOSED — READ LIVE FROM BNB CHAIN. This page is wired to the contract at " + NFT + ": connect a wallet and every lane reports the chain's real state, but no funds can move until the owner opens Field Nº 1 — mintOpen is still false and every send reverts until then. The 600,000,000 DOT claim pool is funded." + example;
+  }
+  function renderWallet(){
+    var btn = $("walletConnectBtn"), st = $("walletState");
+    if (!btn || !st) return;
+    if (!window.ethereum){
+      btn.textContent = "No wallet found"; btn.disabled = true;
+      st.textContent = "NO WEB3 WALLET IN THIS BROWSER — install MetaMask (or another BNB Chain wallet) to resolve from this page. The reads on this page stay live either way.";
+      return;
+    }
+    if (S.account){
+      btn.textContent = "Wallet connected"; btn.disabled = true;
+      var extra = "";
+      if (S.passBal !== null) extra += " · DPASS HELD — <b>" + S.passBal.toString() + "</b>";
+      if (S.walletCount !== null) extra += " · YOUR UNITS TODAY — <b>" + S.walletCount.toString() + " / 10</b>";
+      st.innerHTML = "WALLET — <b>" + shortAddr(S.account) + "</b> · BNB CHAIN (56)" + extra;
+    } else {
+      btn.textContent = "Connect wallet"; btn.disabled = false;
+      st.textContent = "NOT CONNECTED — the lanes read BNB Chain live; connect a wallet to resolve, buy a pass or discharge.";
+    }
+  }
+  function renderLaneA(){
+    var btn = $("agentStandbyBtn"), qEq = $("qEq"), qStatus = $("qStatus");
+    if (!btn || !qEq) return;
+    if (!S.account){
+      qEq.innerHTML = "— <span>+</span> — <span>=</span> ?";
+      qStatus.className = "q-status";
+      qStatus.textContent = "Connect a wallet — the contract's own question for your wallet appears here. No local questions: questionFor() asks, and mintFree() checks the same answer on-chain.";
+      btn.disabled = S.busy;
+      btn.textContent = "Connect wallet — free resolve";
+      return;
+    }
+    if (S.question) qEq.innerHTML = S.question.a.toString() + " <span>+</span> " + S.question.b.toString() + " <span>=</span> ?";
+    btn.disabled = S.busy;
+    if (passOk()){
+      qStatus.className = "q-status ok";
+      qStatus.textContent = "✓ DPASS LANE ACTIVE — your pass is the credential: no Agent ID, no question. The resolve below sends mintFree(0, 0); the contract admits the pass directly.";
+      btn.textContent = S.open ? "Resolve free unit — DPASS lane · 0 BNB" : "Free resolve — mint closed";
+    } else if (!S.open){
+      qStatus.className = "q-status";
+      qStatus.textContent = "This is your wallet's question for today, read from the contract (it changes with the day). Mint is closed — verify your answer now if you like; the resolve unlocks the moment Field Nº 1 opens.";
+      btn.textContent = "Free resolve — mint closed";
+    } else if (S.walletCount !== null && S.walletCount > 0n){
+      qStatus.className = "q-status";
+      qStatus.textContent = "This wallet has already resolved today — the free unit is the day's first unit only. Paid units remain open in Lane B; the free charge returns at the next seal.";
+      btn.textContent = "Free unit already taken today";
+    } else if (S.verified){
+      qStatus.className = "q-status ok";
+      qStatus.textContent = "✓ CORRECT — that is the sum questionFor() expects from your wallet today. The contract checks the same answer inside mintFree.";
+      btn.textContent = "Resolve free unit — 0 BNB";
+    } else {
+      qStatus.className = "q-status";
+      qStatus.textContent = "Answer the contract's question above and press VERIFY — then resolve. The contract checks the same sum inside mintFree(agentId, answer).";
+      btn.textContent = "Free resolve — verify your answer first";
+    }
+  }
+  function renderLaneB(){
+    var btn = $("paidStandbyBtn");
+    if (!btn || !window.DOTFIELD_LANEB) return;
+    var qty = window.DOTFIELD_LANEB.getQty();
+    var wei = window.DOTFIELD_LANEB.getWei();
+    btn.disabled = S.busy;
+    if (!S.account) btn.textContent = "Connect wallet — paid resolve";
+    else if (!S.open) btn.textContent = "Resolve — mint closed";
+    else if (qty < 1) btn.textContent = "Daily wallet cap reached — 10 / 10 today";
+    else btn.textContent = "Resolve " + qty + (qty === 1 ? " paid unit" : " paid units") + " — " + dfFmtBnb(wei) + " BNB";
+  }
+  function renderPass(){
+    var btn = $("passBuyBtn"), st = $("pcPassStatus"), mine = $("pcPasses");
+    if (st) st.textContent = !S.read ? "READING CHAIN…" : (S.open ? "SALES OPEN · FIELD Nº " + S.field.toString() + (S.passLane ? " · LANE ACTIVE" : " · LANE WAKES AT FIELD Nº 4") : "MINT CLOSED — SALES NOT OPEN");
+    if (mine) mine.textContent = S.account ? (S.passBal !== null ? S.passBal.toString() + " HELD" : "…") : "CONNECT A WALLET";
+    if (!btn) return;
+    btn.disabled = S.busy;
+    if (!S.account) btn.textContent = "Connect wallet — get a DPASS";
+    else if (!S.open) btn.textContent = "Get a DPASS — mint closed";
+    else btn.textContent = "Get a DPASS — 0.0012 BNB";
+  }
+  function renderAll(){
+    renderPill(); renderChainStatus(); renderFoot(); renderWallet();
+    renderLaneA(); renderLaneB(); renderPass();
+    if (S.account && S.walletCount !== null && window.DOTFIELD_LANEB){
+      if (window.DOTFIELD_LANEB.getBase() !== Number(S.walletCount)) window.DOTFIELD_LANEB.setBase(Number(S.walletCount), true);
+    }
+  }
+  window.__lanebChanged = function(){ renderLaneB(); };
+
+  /* ---------------- Lane A actions ---------------- */
+  var qInput = $("qInput");
+  if ($("qCheck")) $("qCheck").addEventListener("click", function(){
+    if (!S.account){ showMsg($("agentStandbyMsg"), "err", "■ CONNECT FIRST — the question belongs to a wallet. Connect yours and the contract's question for it appears above."); return; }
+    if (!S.question){ showMsg($("agentStandbyMsg"), "err", "■ QUESTION NOT LOADED YET — the reads refresh every ~15s; try again in a moment."); return; }
+    var v = (qInput.value || "").trim();
+    if (/^\d+$/.test(v) && BigInt(v) === S.question.a + S.question.b){
+      S.verified = true;
+      renderLaneA();
+    } else {
+      S.verified = false;
+      var qStatus = $("qStatus");
+      qStatus.className = "q-status bad";
+      qStatus.textContent = "✗ Not the answer the field asked for. Check the equation and try again — bots guess, agents compute.";
+    }
+  });
+  if ($("qNew")) $("qNew").addEventListener("click", function(){
+    S.verified = false;
+    if (qInput) qInput.value = "";
+    readState();
+  });
+  if (qInput) qInput.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); $("qCheck").click(); } });
+  if ($("agentStandbyBtn")) $("agentStandbyBtn").addEventListener("click", function(){
+    var msg = $("agentStandbyMsg");
+    if (S.busy) return;
+    if (!S.account) return connect();
+    if (!S.open) return showMsg(msg, "err", "■ MINT CLOSED — live read: mintOpen is false and Field Nº 1 has not opened. Your question above is real (it comes from questionFor), but mintFree cannot be sent until the owner opens Field Nº 1.");
+    if (passOk()){
+      return doSend(dfEncodeCall("mintFree(uint256,uint256)", ["uint256", "uint256"], [0n, 0n]), 0n, msg, function(hash){
+        return "■ FREE UNIT RESOLVED VIA DPASS — tx " + txLink(hash) + ". The unit joins today's Field and can discharge its DOT from the day's seal +6h.";
+      });
+    }
+    if (S.walletCount !== null && S.walletCount > 0n) return showMsg(msg, "err", "■ ALREADY RESOLVED TODAY — the free unit is the day's first unit only. Lane B (paid) is still open, and the free charge returns at the next seal (12:00 UTC).");
+    if (!S.verified) return showMsg(msg, "err", "■ ANSWER FIRST — type the sum and press VERIFY. The contract checks the same answer inside mintFree, so a wrong sum would only burn network fee.");
+    var idVal = ($("agentIdInput").value || "").trim();
+    if (!/^\d+$/.test(idVal)) return showMsg(msg, "err", "■ AGENT ID REQUIRED — enter the numeric Binance Agent ID that the connected wallet owns.");
+    var ansVal = (qInput.value || "").trim();
+    if (!/^\d+$/.test(ansVal)) return showMsg(msg, "err", "■ ANSWER REQUIRED — type the sum of the contract's question.");
+    doSend(dfEncodeCall("mintFree(uint256,uint256)", ["uint256", "uint256"], [BigInt(idVal), BigInt(ansVal)]), 0n, msg, function(hash){
+      return "■ FREE UNIT RESOLVED — tx " + txLink(hash) + ". The unit joins today's Field; from the day's seal +6h it can discharge its DOT in §08 below.";
+    });
+  });
+
+  /* ---------------- Lane B action ---------------- */
+  if ($("paidStandbyBtn")) $("paidStandbyBtn").addEventListener("click", function(){
+    var msg = $("standbyMsg");
+    if (S.busy) return;
+    if (!S.account) return connect();
+    if (!S.open) return showMsg(msg, "err", "■ MINT CLOSED — live read: mintOpen is false and Field Nº 1 has not opened. The ladder above is priced from your on-chain count, but mintPaid cannot be sent until the owner opens Field Nº 1.");
+    var qty = window.DOTFIELD_LANEB.getQty();
+    if (qty < 1) return showMsg(msg, "err", "■ DAILY WALLET CAP — this wallet already holds 10 units today, the per-day maximum. The ladder resets at the 12:00 UTC seal.");
+    var wei = window.DOTFIELD_LANEB.getWei();
+    doSend(dfEncodeCall("mintPaid(uint256)", ["uint256"], [BigInt(qty)]), wei, msg, function(hash){
+      return "■ " + qty + (qty === 1 ? " UNIT" : " UNITS") + " RESOLVED — tx " + txLink(hash) + ". Paid in full at the ladder price (" + dfFmtBnb(wei) + " BNB). Each unit can discharge its DOT from the day's seal +6h.";
+    });
+  });
+
+  /* ---------------- DPASS action ---------------- */
+  if ($("passBuyBtn")) $("passBuyBtn").addEventListener("click", function(){
+    var msg = $("passStandby");
+    if (S.busy) return;
+    if (!S.account) return connect();
+    if (!S.open) return showMsg(msg, "err", "■ PASS SALES CLOSED — live read: mintOpen is false. DPASS sales open together with Field Nº 1, on the owner's signal; buyPass() reverts until then.");
+    doSend(dfEncodeCall("buyPass()", [], []), DF_PASS_PRICE, msg, function(hash){
+      return "■ DPASS SECURED — tx " + txLink(hash) + ". The pass sits in this wallet's pass balance (non-transferable). Its lane — free resolve and discharge with no Agent ID and no question — activates at Field Nº 4.";
+    });
+  });
+
+  /* ---------------- Discharge (§08) ---------------- */
+  function tierLabel(reward, surge){
+    if (surge) return "SURGE · GOLD CORE";
+    if (reward === 60000n * 1000000000000000000n) return "OVERDRIVE DAY · CORE LV.3";
+    if (reward === 12500n * 1000000000000000000n) return "CHARGED DAY · CORE LV.2";
+    return "SPARK DAY · CORE LV.1";
+  }
+  if ($("dcCheckBtn")) $("dcCheckBtn").addEventListener("click", function(){
+    var msg = $("dcMsg"), out = $("dcLiveOut");
+    var raw = ($("dcTokenId").value || "").trim();
+    if (!/^\d+$/.test(raw)) return showMsg(msg, "err", "■ ENTER A UNIT ID — a whole number, e.g. 1.");
+    var id = BigInt(raw);
+    dcState = null;
+    $("dcSendBtn").disabled = true;
+    showMsg(msg, "", "■ READING THE CONTRACT…");
+    var calls = [
+      { key: "owner",      data: dfEncodeCall("ownerOf(uint256)", ["uint256"], [id]) },
+      { key: "discharged", data: dfEncodeCall("dischargedOf(uint256)", ["uint256"], [id]) },
+      { key: "able",       data: dfEncodeCall("dischargeable(uint256)", ["uint256"], [id]) },
+      { key: "reward",     data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [id]) },
+      { key: "day",        data: dfEncodeCall("unitDay(uint256)", ["uint256"], [id]) },
+      { key: "surge",      data: dfEncodeCall("isSurge(uint256)", ["uint256"], [id]) }
+    ];
+    rpcBatch(calls, []).then(function(m){
+      hideMsg(msg);
+      if (m.owner === undefined){
+        out.innerHTML = "UNIT #" + id.toString() + " — <b>DOES NOT EXIST YET</b><br/>TOTAL RESOLVED SO FAR — <b>" +
+          S.total.toString() + " / 10,000</b>. No unit can discharge before it exists — and mint is " +
+          (S.open ? "open, so the first units are resolving now" : "still closed, so no units exist at all yet") +
+          ". A unit's claim opens at its day's seal +6h and never expires.";
+        return;
+      }
+      var owner = dfDecAddr(m.owner, 0);
+      var reward = m.reward ? dfDecUint(m.reward, 0) : 0n;
+      var able = m.able ? dfDecBool(m.able, 0) : false;
+      var dis = m.discharged ? dfDecBool(m.discharged, 0) : false;
+      var day = m.day ? dfDecUint(m.day, 0) : 0n;
+      var surge = m.surge ? dfDecBool(m.surge, 0) : false;
+      var openTs = Number((day + 1n) * 86400n + 43200n + 21600n);
+      dcState = { id: id, owner: owner, able: able, reward: reward };
+      out.innerHTML =
+        "UNIT #" + id.toString() + " — OWNER <b>" + shortAddr(owner) + "</b><br/>" +
+        "SEALED ON — <b>" + tierLabel(reward, surge) + "</b><br/>" +
+        "CLAIM — <b class='gold'>" + dfFmtDot(reward) + " DOT</b> · FEE 0.0002 BNB<br/>" +
+        (dis
+          ? "STATUS — <b>ALREADY DISCHARGED</b> · EACH UNIT CLAIMS EXACTLY ONCE"
+          : able
+            ? "STATUS — <b>DISCHARGEABLE NOW</b> · CLAIMS NEVER EXPIRE"
+            : "STATUS — <b>SEALED · NOT YET OPEN</b> · OPENS " + new Date(openTs * 1000).toUTCString().toUpperCase() + " · NEVER EXPIRES");
+      $("dcSendBtn").disabled = !(able && S.account && !S.busy);
+    });
+  });
+  if ($("dcSendBtn")) $("dcSendBtn").addEventListener("click", function(){
+    var msg = $("dcMsg");
+    if (S.busy) return;
+    if (!S.account) return connect();
+    if (!dcState) return showMsg(msg, "err", "■ CHECK A UNIT FIRST — enter its ID and press CHECK UNIT so the page can read its state from the contract.");
+    if (dcState.owner.toLowerCase() !== S.account.toLowerCase())
+      return showMsg(msg, "err", "■ NOT YOUR UNIT — the connected wallet (" + shortAddr(S.account) + ") does not own unit #" + dcState.id.toString() + " (" + shortAddr(dcState.owner) + " does). Discharge pays the unit's owner.");
+    if (!dcState.able) return showMsg(msg, "err", "■ NOT DISCHARGEABLE YET — press CHECK UNIT again for its opening time. Claims never expire.");
+    var reward = dcState.reward, id = dcState.id;
+    doSend(dfEncodeCall("discharge(uint256)", ["uint256"], [id]), DF_DISCHARGE_FEE, msg, function(hash){
+      dcState = null;
+      return "■ DISCHARGED — <b>" + dfFmtDot(reward) + " DOT</b> claimed to your wallet for unit #" + id.toString() + " · tx " + txLink(hash) + ".";
+    });
+  });
+
+  /* ---------------- wire up ---------------- */
+  if ($("walletConnectBtn")) $("walletConnectBtn").addEventListener("click", connect);
+  if (window.ethereum){
+    if (window.ethereum.on){
+      window.ethereum.on("accountsChanged", function(accs){
+        S.account = (accs && accs[0]) || null;
+        S.walletCount = null; S.passBal = null; S.question = null; S.verified = false;
+        if (!S.account && window.DOTFIELD_LANEB) window.DOTFIELD_LANEB.setBase(1, false);
+        renderAll();
+        readState();
+      });
+      window.ethereum.on("chainChanged", function(){ readState(); });
+    }
+    window.ethereum.request({ method: "eth_accounts" }).then(function(accs){
+      if (accs && accs[0] && !S.account){ S.account = accs[0]; readState(); }
+    }).catch(function(){});
+  }
+  renderAll();
+  readState();
+  setInterval(readState, 15000);
 })();
 </script>
 </body>
