@@ -1,0 +1,31 @@
+{
+  "name": "Talvio Dot Robot #3701",
+  "description": "A Black Dot Robot from Talvio Generate \u2014 10,000 machines resolved from a single dot field on BNB Chain.",
+  "image": "https://talviogenerate.com/nft/images/3701.webp",
+  "attributes": [
+    {
+      "trait_type": "Class",
+      "value": "Prime"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Wide"
+    },
+    {
+      "trait_type": "Visor",
+      "value": "Cross"
+    },
+    {
+      "trait_type": "Antenna",
+      "value": "Stalk"
+    },
+    {
+      "trait_type": "Core",
+      "value": "Diamond Core"
+    },
+    {
+      "trait_type": "Density",
+      "value": "Standard Grid"
+    }
+  ]
+}
