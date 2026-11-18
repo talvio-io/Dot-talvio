@@ -1,0 +1,37 @@
+name: Decode base64 images
+on:
+  push:
+    paths:
+      - 'b64/**'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: decode-b64
+  cancel-in-progress: false
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode staged images
+        run: |
+          set -euo pipefail
+          found=0
+          while IFS= read -r -d '' f; do
+            rel="${f#b64/}"
+            out="${rel%.txt}.webp"
+            mkdir -p "$(dirname "$out")"
+            base64 -d "$f" > "$out"
+            rm "$f"
+            found=1
+          done < <(find b64 -type f -name '*.txt' -print0)
+          if [ "$found" = "1" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "Decode staged NFT images from base64"
+            git push
+          else
+            echo "No staged base64 files found."
+          fi
