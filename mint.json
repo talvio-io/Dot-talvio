@@ -37,6 +37,41 @@
       "poolOf"
     ]
   },
+  "cost_vs_claim": {
+    "note": "Side-by-side cost and contractual $DOT claim per unit, for machine comparison. No price or return is promised for $DOT; $DOT lists on Uniswap (BNB Chain) 3 December 2026 per the project's own announcement only.",
+    "paid_cost_bnb_per_unit": {
+      "units_2_to_5": 0.00026,
+      "units_6_to_10": 0.001
+    },
+    "paid_cost_wei_per_unit": {
+      "units_2_to_5": 260000000000000,
+      "units_6_to_10": 1000000000000000
+    },
+    "discharge_fee_bnb_per_unit": 0.0002,
+    "discharge_fee_wei_per_unit": 200000000000000,
+    "claim_dot_per_unit": {
+      "SPARK": 2500,
+      "CHARGED": 12500,
+      "OVERDRIVE": 60000,
+      "SURGE": 250000
+    },
+    "field_1": {
+      "field": 1,
+      "opened": "2026-11-18",
+      "seals_utc": "2026-11-19T12:00:00Z",
+      "tier": "OVERDRIVE",
+      "tier_note": "100+ unique wallets reached before seal; a day's unique-wallet count only rises, so the tier is final",
+      "claim_dot_per_unit": 60000,
+      "discharge_opens_utc": "2026-11-19T18:00:00Z"
+    },
+    "field_2": {
+      "field": 2,
+      "opens_utc": "2026-11-19T12:00:00Z",
+      "seals_utc": "2026-11-20T12:00:00Z",
+      "free_quota_per_day": 150,
+      "day_cap": 250
+    }
+  },
   "discharge": {
     "opens": "seal + 6h",
     "fee_bnb": 0.0002,

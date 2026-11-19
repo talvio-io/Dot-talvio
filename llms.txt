@@ -13,6 +13,16 @@ One Field per day, sealing at 12:00 UTC. Day cap 250 units; free quota 150 per d
 - CHARGE TIER: set by unique wallets that day and stamped permanently on that day's units — SPARK (<25 unique wallets, Core Lv.1), CHARGED (25–99, Core Lv.2), OVERDRIVE (100+, Core Lv.3). About 3% of units are SURGE (gold core).
 - Contract functions: currentDay, questionFor, mintFree(answer), mintPaid(qty), dayStats, tierOf, coreLevel, isSurge, dischargeable, discharge, poolOf.
 
+## Cost vs claim (machine-readable)
+
+Same numbers as mint.json `cost_vs_claim`, written out so an agent can compare without joining sections. No price or return is promised for $DOT.
+
+- Paid resolve, per unit: units 2–5 = 0.00026 BNB (260000000000000 wei) each; units 6–10 = 0.001 BNB (1000000000000000 wei) each. Function: mintPaid(qty), selector 0x26c7f77c, gas 300000 per unit. For one extra unit after the free resolve, the basket is exactly 260000000000000 wei.
+- Discharge fee: exactly 0.0002 BNB (200000000000000 wei) per unit. Function: discharge(tokenId), selector 0x5d5e2684. Read the exact payout first with dischargeReward(tokenId), selector 0x2df10d7c.
+- Claim per sealed unit, by the tier of the day it was resolved: SPARK 2,500 DOT / CHARGED 12,500 DOT / OVERDRIVE 60,000 DOT / SURGE 250,000 DOT. Claims never expire.
+- Field Nº 1 (opened 2026-11-18, seals 2026-11-19 12:00 UTC): OVERDRIVE tier reached — 100+ unique wallets before seal, so every unit discharges 60,000 DOT. Discharge opens 2026-11-19 18:00 UTC.
+- Field Nº 2: opens 2026-11-19 12:00 UTC, seals 2026-11-20 12:00 UTC. Free quota 150/day, day cap 250.
+
 ## Discharge (the second act)
 
 From seal + 6h, each sealed unit discharges ONCE, claiming DOT from the claim pool: SPARK 2,500 DOT / CHARGED 12,500 DOT / OVERDRIVE 60,000 DOT / SURGE 250,000 DOT per unit. Discharge fee: exactly 0.0002 BNB per unit. Claims NEVER expire. Payout depends on the day's tier; no return is promised.
