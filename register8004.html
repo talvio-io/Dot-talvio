@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOTFIELD — Registrasi ERC-8004</title>
+<style>
+  body{background:#0a0a0a;color:#e8e2d4;font-family:ui-monospace,Menlo,Consolas,monospace;margin:0;padding:24px;line-height:1.6}
+  main{max-width:640px;margin:0 auto}
+  h1{font-size:20px;letter-spacing:.06em}
+  .card{border:1px solid #333;padding:18px;margin:16px 0;background:#111}
+  button{background:#e8e2d4;color:#0a0a0a;border:0;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;width:100%}
+  button:disabled{opacity:.4;cursor:default}
+  input{width:100%;box-sizing:border-box;background:#0a0a0a;color:#e8e2d4;border:1px solid #444;padding:10px;font:inherit;margin:8px 0}
+  .status{margin-top:12px;font-size:13px;word-break:break-all}
+  .ok{color:#8be08b}.err{color:#ff7a6b}
+  .small{font-size:13px;color:#a49c88}
+  code{color:#d8b84a}
+</style>
+</head>
+<body>
+<main>
+  <h1>DOTFIELD — REGISTRASI ERC-8004</h1>
+  <p class="small">Daftarkan Talvio Generate (DOTFIELD) ke registry identitas agent ERC-8004 di BNB Chain, supaya agent lain bisa menemukan proyek ini secara resmi. Satu kali tanda tangan dari wallet owner kontrak TalvioGenerate (<code>0x85D04D08301a9E9E0Efac0b5Fa9c874E8f546BD2</code>).</p>
+  <div class="card">
+    <p class="small">Registry: <code>0x8004A169FB4a3325136EB29fA0ceB6D2e539a432</code><br>agent.json sudah live: <code>https://talviogenerate.com/agent.json</code></p>
+    <button id="connect">1. Hubungkan wallet owner</button>
+    <div id="walletStatus" class="status"></div>
+  </div>
+  <div class="card">
+    <label for="agentURI">Agent URI</label>
+    <input id="agentURI" value="https://talviogenerate.com/agent.json" autocomplete="off">
+    <button id="register8004" disabled>2. Daftar ERC-8004 &amp; sign</button>
+    <div id="reg8004Status" class="status"></div>
+  </div>
+  <p class="small">Setelah berhasil, kirim nomor Agent ID / hash transaksi ke Muse — agent.json akan diperbarui (registrations + active: true) dan diverifikasi.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script>
+const REG8004 = '0x8004A169FB4a3325136EB29fA0ceB6D2e539a432';
+const $ = id => document.getElementById(id);
+let signer = null;
+function show(id, msg, cls){ const el = $(id); el.textContent = msg; el.className = 'status ' + (cls || ''); }
+async function connect(){
+  if (!window.ethereum) return show('walletStatus', 'Wallet tidak ditemukan. Buka halaman ini dari browser wallet (Binance Wallet / MetaMask / Trust Wallet).', 'err');
+  try {
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send('eth_requestAccounts', []);
+    signer = await provider.getSigner();
+    show('walletStatus', 'Terhubung: ' + await signer.getAddress(), 'ok');
+    $('register8004').disabled = false;
+  } catch (e) { show('walletStatus', 'Gagal: ' + (e.shortMessage || e.message), 'err'); }
+}
+async function register8004(){
+  if (!signer) return show('reg8004Status', 'Hubungkan wallet dulu (langkah 1).', 'err');
+  const uri = $('agentURI').value.trim();
+  if (!uri) return show('reg8004Status', 'Agent URI kosong.', 'err');
+  try {
+    show('reg8004Status', 'Menyiapkan transaksi registrasi…');
+    const reg = new ethers.Contract(REG8004, ['function register(string agentURI) returns (uint256)'], signer);
+    const t = await reg.register(uri);
+    show('reg8004Status', 'Transaksi terkirim, menunggu konfirmasi…');
+    const r = await t.wait();
+    let idTxt = '';
+    const topic = ethers.id('Registered(uint256,string,address)');
+    for (const lg of r.logs) {
+      if (lg.address.toLowerCase() === REG8004.toLowerCase() && lg.topics[0] === topic) {
+        idTxt = ' Agent ID ERC-8004 Anda: ' + parseInt(lg.topics[1], 16) + '.';
+        break;
+      }
+    }
+    show('reg8004Status', 'Registrasi ERC-8004 BERHASIL.' + idTxt + ' Tx: ' + t.hash, 'ok');
+  } catch (e) { show('reg8004Status', 'Registrasi gagal: ' + (e.shortMessage || e.message), 'err'); }
+}
+$('connect').onclick = connect;
+$('register8004').onclick = register8004;
+</script>
+</body>
+</html>
