@@ -409,6 +409,9 @@
   .cp-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);width:0%}
   .cp-bar.free i{background:var(--bone)}
   .cp-sim{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--gold);border:1px dashed #4a3d00;padding:8px 10px;margin-top:12px;line-height:1.7}
+  .cp-action{font-family:var(--mono);font-size:11px;letter-spacing:.09em;line-height:1.7;margin-top:12px;padding:9px 11px;border:1px solid var(--line-soft);color:var(--bone)}
+  .cp-action.gone{border-color:var(--signal);color:var(--signal)}
+  .cp-action.full{border-color:var(--gold);color:var(--gold)}
 
   /* ---------- question widget / ladder ---------- */
   .qbox{border:1px solid var(--line);background:var(--ink-2);padding:16px;margin-bottom:16px}
@@ -628,6 +631,7 @@
           <div class="cp-row"><span>CHARGE TIER NOW</span><span id="cdTier" style="color:var(--gold)">—</span></div>
           <div class="cp-row"><span>TOTAL RESOLVED</span><span id="cdTotal">— / 10,000 · MINT LIVE</span></div>
           <div class="cp-sim">CONTRACT LIVE ON BNB CHAIN. Every count in this panel — units today, free quota, unique wallets, charge tier, total resolved — is read live from the TalvioGenerate contract and refreshed about every 15 seconds; nothing here is simulated. Field Nº 1 opened on 18 November 2026, and a new Field seals every day at 12:00 UTC.</div>
+          <div class="cp-action" id="cdAction" hidden></div>
         </div>
       </div>
       <div class="hero-cta">
@@ -1489,6 +1493,12 @@ function dfLiveModel(open, total, field, resolved, freeUsed, wallets){
     freeText: freeUsed + " / 150",
     freePct: freeUsed / 150 * 100,
     freeLeft: 150 - freeUsed,
+    actionState: !open ? "closed" : (resolved >= 250 ? "full" : (freeUsed >= 150 ? "gone" : "open")),
+    actionText: !open ? "" : (resolved >= 250
+      ? "TODAY'S FIELD IS FULL \u2014 250 / 250 UNITS. THE NEXT FIELD OPENS AT THE 12:00 UTC SEAL."
+      : (freeUsed >= 150
+        ? "FREE QUOTA GONE \u2014 THE PAID LADDER IS STILL OPEN. PAID UNITS SEAL INTO TODAY'S MOSAIC AND DISCHARGE EXACTLY THE SAME $DOT PER UNIT."
+        : "FREE QUOTA OPEN \u2014 " + (150 - freeUsed) + " OF 150 LEFT TODAY. ONE FREE RESOLVE PER WALLET WITH AN AGENT ID; THE PAID LADDER RUNS BESIDE IT.")),
     walletsText: String(wallets),
     tierText: t.name + " · CORE LV." + t.coreLevel,
     totalText: total + " / 10,000 · " + (open ? "MINT LIVE" : "MINT NOT LIVE"),
@@ -1962,6 +1972,11 @@ var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
       document.getElementById("cdWallets").textContent = m.walletsText;
       document.getElementById("cdTier").textContent = m.tierText;
       document.getElementById("cdTotal").textContent = m.totalText;
+      var ca = document.getElementById("cdAction");
+      if (ca) {
+        if (m.actionText) { ca.hidden = false; ca.textContent = m.actionText; ca.className = "cp-action " + m.actionState; }
+        else { ca.hidden = true; }
+      }
     }
     var gw = document.getElementById("gaugeWallets");
     if (gw) {
