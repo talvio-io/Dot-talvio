@@ -33,6 +33,11 @@
     <button id="register8004" disabled>2. Daftar ERC-8004 &amp; sign</button>
     <div id="reg8004Status" class="status"></div>
   </div>
+  <div class="card">
+    <p class="small"><b>Perbaikan wallet:</b> Agent ID <code>419968</code> saat ini terdaftar dari wallet Kryntar (<code>0xeC924b50da12043f0fd573d816D31Dfed781e73a</code>). Pindahkan ke wallet owner TalvioGenerate (<code>0x85D04D08301a9E9E0Efac0b5Fa9c874E8f546BD2</code>) dengan satu transfer — hubungkan wallet Kryntar di langkah 1, lalu klik tombol ini.</p>
+    <button id="transfer8004" disabled>3. Pindahkan Agent ID 419968 ke wallet owner Talvio</button>
+    <div id="transferStatus" class="status"></div>
+  </div>
   <p class="small">Setelah berhasil, kirim nomor Agent ID / hash transaksi ke Muse — agent.json akan diperbarui (registrations + active: true) dan diverifikasi.</p>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
@@ -50,6 +55,7 @@ async function connect(){
     signer = await provider.getSigner();
     show('walletStatus', 'Terhubung: ' + await signer.getAddress(), 'ok');
     $('register8004').disabled = false;
+    $('transfer8004').disabled = false;
   } catch (e) { show('walletStatus', 'Gagal: ' + (e.shortMessage || e.message), 'err'); }
 }
 async function register8004(){
@@ -73,8 +79,25 @@ async function register8004(){
     show('reg8004Status', 'Registrasi ERC-8004 BERHASIL.' + idTxt + ' Tx: ' + t.hash, 'ok');
   } catch (e) { show('reg8004Status', 'Registrasi gagal: ' + (e.shortMessage || e.message), 'err'); }
 }
+async function transfer8004(){
+  if (!signer) return show('transferStatus', 'Hubungkan wallet dulu (langkah 1).', 'err');
+  const TO = '0x85D04D08301a9E9E0Efac0b5Fa9c874E8f546BD2';
+  try {
+    const from = await signer.getAddress();
+    if (from.toLowerCase() !== '0xeC924b50da12043f0fd573d816D31Dfed781e73a') {
+      return show('transferStatus', 'Wallet terhubung bukan pemegang Agent ID saat ini. Hubungkan wallet 0xeC924b…1e73a.', 'err');
+    }
+    show('transferStatus', 'Menyiapkan transfer Agent ID 419968…');
+    const reg = new ethers.Contract(REG8004, ['function transferFrom(address from, address to, uint256 tokenId)'], signer);
+    const t = await reg.transferFrom(from, TO, 419968);
+    show('transferStatus', 'Transaksi terkirim, menunggu konfirmasi…');
+    await t.wait();
+    show('transferStatus', 'Transfer BERHASIL. Agent ID 419968 sekarang milik wallet owner Talvio. Tx: ' + t.hash, 'ok');
+  } catch (e) { show('transferStatus', 'Transfer gagal: ' + (e.shortMessage || e.message), 'err'); }
+}
 $('connect').onclick = connect;
 $('register8004').onclick = register8004;
+$('transfer8004').onclick = transfer8004;
 </script>
 </body>
 </html>
