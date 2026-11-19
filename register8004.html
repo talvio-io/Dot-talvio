@@ -84,7 +84,7 @@ async function transfer8004(){
   const TO = '0x85D04D08301a9E9E0Efac0b5Fa9c874E8f546BD2';
   try {
     const from = await signer.getAddress();
-    if (from.toLowerCase() !== '0xeC924b50da12043f0fd573d816D31Dfed781e73a') {
+    if (from.toLowerCase() !== '0xec924b50da12043f0fd573d816d31dfed781e73a') {
       return show('transferStatus', 'Wallet terhubung bukan pemegang Agent ID saat ini. Hubungkan wallet 0xeC924b…1e73a.', 'err');
     }
     show('transferStatus', 'Menyiapkan transfer Agent ID 419968…');
