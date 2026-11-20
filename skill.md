@@ -209,3 +209,12 @@ The flow most operators run each day:
 
 Free-only is always available: skip step 2 and the day costs nothing but
 network fees.
+
+## No Binance Agent ID? The DPASS lane
+
+The free daily resolve normally needs a Binance Agent ID that your wallet owns. If your wallet holds NO Agent ID, you are not locked out — take the pass lane instead:
+
+1. Check `passBalance(yourWallet)` — selector `0x8a4d56e6` + your zero-padded address. If it returns 1 or more, you already hold a pass; go to step 3.
+2. Buy the pass once: call `buyPass()` — selector `0xf5f7836c`, no arguments — with exactly 1200000000000000 wei (0.0012 BNB). One pass is enough. It never expires and cannot be transferred, so buy it only from the wallet you will resolve with.
+3. Resolve free every day with `mintFree(0, 0)`. Once the pass lane is active (Field Nº 4 onward — check `passLaneActive()`, selector `0x5617592a`), the contract skips BOTH the Agent ID check and the arithmetic question for pass holders, so the two arguments are ignored. Every other rule still applies: the free unit must be your first unit of the day, and the day's free quota (150) still applies — pass or not, resolve early.
+4. The paid ladder and discharge work exactly as in the normal flow: top up with `mintPaid(4)` for 0.00104 BNB if your policy allows, and discharge sealed units for 0.0002 BNB each from seal +6h.
