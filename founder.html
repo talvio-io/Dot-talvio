@@ -40,6 +40,12 @@
   .perk .t{color:var(--gold);font-size:13px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
   .perk .d{color:var(--mute);font-size:13px;line-height:1.7}
   .foot{color:var(--mute);font-size:12px;line-height:1.8;margin-top:26px}
+  .agentbox{border:1px solid var(--goldd);padding:20px;margin:22px 0 0}
+  .agentbox .t{color:var(--gold);font-size:13px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
+  .agentbox .d{color:var(--mute);font-size:13px;line-height:1.7}
+  .agentbox .d b{color:var(--bone)}
+  .cmd{background:#12100a;border:1px solid var(--line);padding:14px;font-size:13px;line-height:1.7;color:var(--bone);word-break:break-all;margin-top:12px;white-space:pre-wrap}
+  #copyBtn{background:none;border:1px solid var(--goldd);color:var(--gold);padding:9px 18px;font-family:inherit;font-size:12px;letter-spacing:.1em;cursor:pointer;margin-top:12px}
   @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.perks{grid-template-columns:1fr}}
 </style>
 </head>
@@ -76,6 +82,14 @@
     <div class="perk"><div class="t">500, fixed forever</div><div class="d">Supply and price are constants in the contract. No second run, no price change, no owner mint.</div></div>
     <div class="perk"><div class="t">The Founders wall</div><div class="d">Founder numbers are struck in order, Nº 001 to Nº 500. Early numbers are gone for good once taken.</div></div>
     <div class="perk"><div class="t">One dot</div><div class="d">The crown is drawn in DOTFIELD's own dot language — the same dots that resolve the daily field.</div></div>
+  </div>
+
+  <div class="agentbox">
+    <div class="t">Agents — one line</div>
+    <p class="d">Two doors, one crown. Humans mint with the button above. <b>Agents mint directly</b> — no Agent ID needed, any BNB wallet works. Give your agent this one line:</p>
+    <div class="cmd" id="agentCmd">…</div>
+    <button id="copyBtn">COPY THE LINE</button>
+    <p class="d" style="margin-top:12px">Raw call: <span id="agentRaw">…</span></p>
   </div>
 
   <p class="foot">Contract: <span id="contractLine">—</span><br>
@@ -149,6 +163,19 @@ $("mintBtn").onclick = async () => {
     $("status").innerHTML = '<span class="err">' + (e.message || e) + '</span>';
   }
 };
+function fillAgent(){
+  if (FOUNDER_ADDR.startsWith("0x")) {
+    $("agentCmd").textContent = "Mint 1 DOTFIELD Founder NFT: call mint(1) on " + FOUNDER_ADDR + " (BNB Chain), value exactly 0.002 BNB. Max 10 per wallet. Each NFT carries a 200,000 $DOT airdrop at the 3 December listing.";
+    $("agentRaw").textContent = 'cast send ' + FOUNDER_ADDR + ' "mint(uint256)" 1 --value 0.002ether --rpc-url https://bsc-dataseed.binance.org · selector 0xa0712d68 · check mintOpen() first';
+  } else {
+    $("agentCmd").textContent = "The Founder contract lands at launch — this line fills itself in with the mint command the moment the contract is live.";
+    $("agentRaw").textContent = "mint(uint256) · selector 0xa0712d68 · 0.002 BNB per NFT · max 10 per wallet";
+  }
+}
+$("copyBtn").onclick = async () => {
+  try { await navigator.clipboard.writeText($("agentCmd").textContent); $("copyBtn").textContent = "COPIED"; setTimeout(() => $("copyBtn").textContent = "COPY THE LINE", 1600); } catch(e) {}
+};
+fillAgent();
 setQty(1);
 readState();
 setInterval(readState, 30000);
