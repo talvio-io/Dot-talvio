@@ -23,6 +23,17 @@
   .hero img{width:100%;display:block}
   .film{border:1px solid var(--goldd);padding:6px;margin:0 0 22px}
   .film video{width:100%;display:block;background:#000}
+  .countbox{border:1px solid var(--goldd);padding:16px 20px;margin:0 0 22px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .countbox .n{font-size:34px;font-weight:800;color:var(--gold)}
+  .countbox .u{color:var(--mute);font-size:12px;letter-spacing:.2em}
+  .countbox .note{color:var(--mute);font-size:12px;line-height:1.7;width:100%}
+  .wallbox{border:1px solid var(--line);padding:20px;margin:0 0 22px}
+  .wallhead{font-size:14px;line-height:1.7;color:var(--bone)}
+  .wallhead .g{color:var(--gold)}
+  .wallgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{border:1px solid var(--line);padding:7px 10px;font-size:11px;color:var(--mute)}
+  .chip b{color:var(--gold);font-weight:700}
+  .wallempty{color:var(--mute);font-size:13px;line-height:1.7;margin-top:10px}
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0}
   .stat{background:var(--bg);padding:14px 12px}
   .stat .k{color:var(--mute);font-size:10px;letter-spacing:.25em;text-transform:uppercase}
@@ -59,6 +70,14 @@
 
   <div class="hero"><img src="founder/images/1.jpg" alt="DOTFIELD Founder Nº 001"></div>
 
+  <div class="countbox">
+    <span class="n" id="cdD">—</span><span class="u">DAYS</span>
+    <span class="n" id="cdH">—</span><span class="u">HRS</span>
+    <span class="n" id="cdM">—</span><span class="u">MIN</span>
+    <span class="n" id="cdS">—</span><span class="u">SEC</span>
+    <span class="note">until $DOT lists on 3 December — the moment every Founder is paid <b style="color:var(--bone)">200,000 DOT per NFT</b>. Free grind pays 60,000 DOT a day. The crown pays 200,000 at once.</span>
+  </div>
+
   <div class="stats">
     <div class="stat"><div class="k">Minted</div><div class="v" id="stMinted">—</div></div>
     <div class="stat"><div class="k">Remaining</div><div class="v" id="stRemain">—</div></div>
@@ -89,6 +108,13 @@
     <div class="perk"><div class="t">One dot</div><div class="d">The crown is drawn in DOTFIELD's own dot language — the same dots that resolve the daily field.</div></div>
   </div>
 
+  <div class="kicker" style="margin:26px 0 10px">The Founders Wall · read live from the chain</div>
+  <div class="wallbox">
+    <div class="wallhead" id="wallHead">Reading the wall…</div>
+    <div class="wallgrid" id="wallGrid"></div>
+    <div class="wallempty" id="wallEmpty" style="display:none">The wall is empty. <b style="color:var(--gold)">Nº 001 is still unclaimed</b> — the first name on this wall is the first wallet that mints.</div>
+  </div>
+
   <div class="agentbox">
     <div class="t">Agents — one line</div>
     <p class="d">Two doors, one crown. Humans mint with the button above. <b>Agents mint directly</b> — no Agent ID needed, any BNB wallet works. Give your agent this one line:</p>
@@ -104,7 +130,7 @@
 
 <script>
 const FOUNDER_ADDR = "0x45008ee978a3b09fbbf1839919c0cc20e9dded5d"; // replaced with the deployed address before publish
-const SEL = { totalMinted:"0xa2309ff8", remaining:"0x55234ec0", mintOpen:"0x24bbd049", mintedPerWallet:"0x3a602b4d", mint:"0xa0712d68" };
+const SEL = { totalMinted:"0xa2309ff8", remaining:"0x55234ec0", mintOpen:"0x24bbd049", mintedPerWallet:"0x3a602b4d", mint:"0xa0712d68", ownerOf:"0x6352211e" };
 const PRICE_WEI = 2000000000000000n; // 0.002 BNB
 const RPCS = ["https://bsc-dataseed1.defibit.io", "https://bsc-dataseed1.ninicoin.io", "https://bsc-rpc.publicnode.com", "https://bsc-mainnet.public.blastapi.io", "https://bsc-dataseed.binance.org"];
 let qty = 1, account = null, inj = null, open = false, left = 0;
@@ -221,10 +247,54 @@ function fillAgent(){
 $("copyBtn").onclick = async () => {
   try { await navigator.clipboard.writeText($("agentCmd").textContent); $("copyBtn").textContent = "COPIED"; setTimeout(() => $("copyBtn").textContent = "COPY THE LINE", 1600); } catch(e) {}
 };
+(function countdown(){
+  const T = Date.UTC(2026, 11, 3, 12, 0, 0);
+  const pad = n => String(n).padStart(2, "0");
+  function tick(){
+    let s = Math.max(0, Math.floor((T - Date.now()) / 1000));
+    $("cdD").textContent = Math.floor(s / 86400);
+    $("cdH").textContent = pad(Math.floor(s % 86400 / 3600));
+    $("cdM").textContent = pad(Math.floor(s % 3600 / 60));
+    $("cdS").textContent = pad(s % 60);
+  }
+  tick(); setInterval(tick, 1000);
+})();
+async function loadWall(){
+  if (!FOUNDER_ADDR.startsWith("0x")) return;
+  try {
+    const tm = parseInt(await rpcRead(FOUNDER_ADDR, SEL.totalMinted), 16);
+    if (tm === 0) {
+      $("wallHead").innerHTML = '<span class="g">0 founders so far.</span> 500 numbers waiting.';
+      $("wallEmpty").style.display = "block";
+      $("wallGrid").innerHTML = "";
+      return;
+    }
+    $("wallEmpty").style.display = "none";
+    const owners = [];
+    for (let base = 1; base <= tm; base += 50) {
+      const batch = [];
+      for (let i = base; i <= Math.min(tm, base + 49); i++) {
+        batch.push(rpcRead(FOUNDER_ADDR, SEL.ownerOf + i.toString(16).padStart(64, "0")).catch(() => null));
+      }
+      owners.push(...await Promise.all(batch));
+    }
+    const counts = {};
+    owners.forEach(o => { if (o) { const a = "0x" + o.slice(-40); counts[a] = (counts[a] || 0) + 1; } });
+    const wallets = Object.keys(counts).length;
+    $("wallHead").innerHTML = '<span class="g">' + tm + ' founder' + (tm > 1 ? 's' : '') + '</span> · ' + wallets + ' wallet' + (wallets > 1 ? 's' : '') + ' · ' + (tm * 200000).toLocaleString("en-US") + ' DOT reserved for the 3 December drop';
+    $("wallGrid").innerHTML = owners.map((o, idx) => {
+      if (!o) return "";
+      const a = "0x" + o.slice(-40);
+      return '<span class="chip"><b>Nº ' + String(idx + 1).padStart(3, "0") + '</b> · ' + a.slice(0, 6) + "…" + a.slice(-4) + '</span>';
+    }).join("");
+  } catch (e) { /* keep last wall on read errors */ }
+}
 fillAgent();
 setQty(1);
 readState();
+loadWall();
 setInterval(readState, 30000);
+setInterval(loadWall, 60000);
 </script>
 </body>
 </html>
