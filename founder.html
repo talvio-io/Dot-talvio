@@ -106,7 +106,7 @@
 const FOUNDER_ADDR = "0x45008ee978a3b09fbbf1839919c0cc20e9dded5d"; // replaced with the deployed address before publish
 const SEL = { totalMinted:"0xa2309ff8", remaining:"0x55234ec0", mintOpen:"0x24bbd049", mintedPerWallet:"0x3a602b4d", mint:"0xa0712d68" };
 const PRICE_WEI = 2000000000000000n; // 0.002 BNB
-const BSC = "https://bsc-dataseed.binance.org";
+const RPCS = ["https://bsc-dataseed1.defibit.io", "https://bsc-dataseed1.ninicoin.io", "https://bsc-rpc.publicnode.com", "https://bsc-mainnet.public.blastapi.io", "https://bsc-dataseed.binance.org"];
 let qty = 1, account = null, inj = null, open = false, left = 0;
 
 const $ = id => document.getElementById(id);
@@ -120,28 +120,46 @@ $("qMinus").onclick = () => setQty(qty - 1);
 $("qPlus").onclick = () => setQty(qty + 1);
 
 async function rpcRead(to, data){
-  const r = await fetch(BSC, { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }) });
-  const j = await r.json();
-  return j.result;
+  let lastErr = null;
+  for (const url of RPCS) {
+    try {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctl.signal,
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }) });
+      clearTimeout(timer);
+      const j = await r.json();
+      if (j && j.result) return j.result;
+      lastErr = new Error("empty result");
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error("all RPCs failed");
 }
 async function readState(){
   if (!FOUNDER_ADDR.startsWith("0x")) { $("status").textContent = "Mint opens soon."; $("mintBtn").disabled = true; return; }
   $("contractLine").innerHTML = '<a href="https://bscscan.com/address/' + FOUNDER_ADDR + '" target="_blank" rel="noopener">' + FOUNDER_ADDR + '</a>';
-  try {
-    const tm = parseInt(await rpcRead(FOUNDER_ADDR, SEL.totalMinted), 16);
-    const rem = parseInt(await rpcRead(FOUNDER_ADDR, SEL.remaining), 16);
-    const mo = parseInt(await rpcRead(FOUNDER_ADDR, SEL.mintOpen), 16) === 1;
-    $("stMinted").textContent = tm + " / 500";
-    $("stRemain").textContent = rem;
-    open = mo; left = rem;
+  const res = await Promise.allSettled([
+    rpcRead(FOUNDER_ADDR, SEL.totalMinted),
+    rpcRead(FOUNDER_ADDR, SEL.remaining),
+    rpcRead(FOUNDER_ADDR, SEL.mintOpen)
+  ]);
+  const tmR = res[0], remR = res[1], moR = res[2];
+  let tm = null;
+  if (tmR.status === "fulfilled") { tm = parseInt(tmR.value, 16); $("stMinted").textContent = tm + " / 500"; }
+  if (remR.status === "fulfilled") { left = parseInt(remR.value, 16); $("stRemain").textContent = left; }
+  if (moR.status === "fulfilled") {
+    open = parseInt(moR.value, 16) === 1;
     $("status").innerHTML = open
-      ? (left > 0 ? '<span class="ok">Mint is open.</span> Numbers are struck in order — the next mint takes Nº ' + String(tm + 1).padStart(3, "0") + '.'
+      ? (left > 0 ? '<span class="ok">Mint is open.</span>' + (tm !== null ? ' Numbers are struck in order — the next mint takes Nº ' + String(tm + 1).padStart(3, "0") + '.' : '')
                   : '<span class="err">Sold out.</span> All 500 founders are struck.')
       : "Mint is not open yet.";
     $("mintBtn").disabled = !open || left === 0;
     $("mintBtn").textContent = account ? "MINT FOUNDER" : "CONNECT & MINT";
-  } catch (e) { /* keep last state on read errors */ }
+  } else if ($("status").textContent.indexOf("Reading") === 0) {
+    $("status").textContent = (tm !== null)
+      ? "Live numbers above — still reading mint status, retrying…"
+      : "Could not reach BNB Chain — check your connection; this page retries automatically.";
+  }
 }
 function getInjected(){
   if (window.ethereum) {
