@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOTFIELD Founder — 500 only · talviogenerate.com</title>
+<meta name="description" content="The DOTFIELD Founder edition: 500 dot-crown NFTs at 0.002 BNB. Each carries a 200,000 $DOT airdrop at the 3 December listing.">
+<meta property="og:title" content="DOTFIELD Founder — 500 only">
+<meta property="og:description" content="0.002 BNB · each Founder carries 200,000 $DOT at listing · One dot. Ten thousand machines.">
+<meta property="og:image" content="https://talviogenerate.com/founder/images/1.jpg">
+<style>
+  :root{--bg:#0a0810;--bone:#e9e2d3;--gold:#ffcf4a;--goldd:#d4a420;--mute:#8f897c;--red:#ff473c;--line:#2a2517}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--bone);font-family:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;padding:28px 18px 60px}
+  .wrap{max-width:880px;margin:0 auto}
+  a{color:var(--gold)}
+  .kicker{color:var(--mute);letter-spacing:.35em;font-size:11px;text-transform:uppercase}
+  h1{font-size:clamp(38px,8vw,72px);line-height:.95;margin:10px 0 6px;font-weight:800}
+  h1 .g{color:var(--gold)}
+  .sub{color:var(--mute);font-size:14px;line-height:1.7;max-width:560px}
+  .sub b{color:var(--bone)}
+  .hero{margin:26px 0 8px;border:1px solid var(--goldd);padding:6px}
+  .hero img{width:100%;display:block}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0}
+  .stat{background:var(--bg);padding:14px 12px}
+  .stat .k{color:var(--mute);font-size:10px;letter-spacing:.25em;text-transform:uppercase}
+  .stat .v{font-size:22px;margin-top:6px;color:var(--bone)}
+  .stat .v.gold{color:var(--gold)}
+  .mintbox{border:1px solid var(--line);padding:20px;margin:8px 0 22px}
+  .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .qty{display:flex;align-items:center;gap:0;border:1px solid var(--line)}
+  .qty button{width:44px;height:44px;background:none;border:none;color:var(--gold);font-size:22px;cursor:pointer;font-family:inherit}
+  .qty .n{width:52px;text-align:center;font-size:20px}
+  #mintBtn{background:var(--gold);color:#0a0810;border:none;padding:15px 34px;font-family:inherit;font-weight:800;font-size:16px;letter-spacing:.08em;cursor:pointer}
+  #mintBtn:disabled{background:#3a3524;color:var(--mute);cursor:not-allowed}
+  #status{color:var(--mute);font-size:13px;margin-top:14px;line-height:1.7;word-break:break-all}
+  #status .ok{color:var(--gold)} #status .err{color:var(--red)}
+  .perks{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+  .perk{background:var(--bg);padding:16px}
+  .perk .t{color:var(--gold);font-size:13px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+  .perk .d{color:var(--mute);font-size:13px;line-height:1.7}
+  .foot{color:var(--mute);font-size:12px;line-height:1.8;margin-top:26px}
+  @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}.perks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">DOTFIELD · Founder Edition · BNB Chain</div>
+  <h1>THE DOT<br><span class="g">CROWN.</span></h1>
+  <p class="sub">Five hundred founders, no more. The crown is struck once, for the wallets that were here before the listing. <b>Each Founder NFT carries a 200,000 $DOT airdrop</b>, paid to the holder of record when $DOT lists on 3 December.</p>
+
+  <div class="hero"><img src="founder/images/1.jpg" alt="DOTFIELD Founder Nº 001"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Minted</div><div class="v" id="stMinted">—</div></div>
+    <div class="stat"><div class="k">Remaining</div><div class="v" id="stRemain">—</div></div>
+    <div class="stat"><div class="k">Price</div><div class="v gold">0.002 BNB</div></div>
+    <div class="stat"><div class="k">Airdrop / NFT</div><div class="v gold">200,000 DOT</div></div>
+  </div>
+
+  <div class="mintbox">
+    <div class="row">
+      <div class="qty">
+        <button id="qMinus" aria-label="minus">−</button>
+        <div class="n" id="qVal">1</div>
+        <button id="qPlus" aria-label="plus">+</button>
+      </div>
+      <button id="mintBtn">CONNECT &amp; MINT</button>
+      <div style="color:var(--mute);font-size:13px">Total: <span id="qTotal" style="color:var(--bone)">0.002 BNB</span> · max 10 per wallet</div>
+    </div>
+    <div id="status">Reading the contract…</div>
+  </div>
+
+  <div class="perks">
+    <div class="perk"><div class="t">200,000 $DOT</div><div class="d">Every Founder NFT = 200,000 $DOT at the 3 December listing, sent to the wallet holding it. Hold 10, receive 2,000,000.</div></div>
+    <div class="perk"><div class="t">500, fixed forever</div><div class="d">Supply and price are constants in the contract. No second run, no price change, no owner mint.</div></div>
+    <div class="perk"><div class="t">The Founders wall</div><div class="d">Founder numbers are struck in order, Nº 001 to Nº 500. Early numbers are gone for good once taken.</div></div>
+    <div class="perk"><div class="t">One dot</div><div class="d">The crown is drawn in DOTFIELD's own dot language — the same dots that resolve the daily field.</div></div>
+  </div>
+
+  <p class="foot">Contract: <span id="contractLine">—</span><br>
+  $DOT: 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a · DOTFIELD field contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C<br>
+  One dot. Ten thousand machines.</p>
+</div>
+
+<script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+<script>
+const FOUNDER_ADDR = "DEPLOY_FIRST"; // replaced with the deployed address before publish
+const ABI = [
+  "function totalMinted() view returns (uint256)",
+  "function remaining() view returns (uint256)",
+  "function mintOpen() view returns (bool)",
+  "function mintedPerWallet(address) view returns (uint256)",
+  "function mint(uint256 qty) payable"
+];
+const PRICE = ethers.utils.parseEther("0.002");
+const BSC = "https://bsc-dataseed.binance.org";
+let qty = 1, signer = null, contract = null, open = false, left = 0;
+
+const $ = id => document.getElementById(id);
+function setQty(q){
+  qty = Math.max(1, Math.min(10, q));
+  $("qVal").textContent = qty;
+  $("qTotal").textContent = ethers.utils.formatEther(PRICE.mul(qty)) + " BNB";
+}
+$("qMinus").onclick = () => setQty(qty - 1);
+$("qPlus").onclick = () => setQty(qty + 1);
+
+async function readState(){
+  if (!FOUNDER_ADDR.startsWith("0x")) { $("status").textContent = "Mint opens soon."; $("mintBtn").disabled = true; return; }
+  $("contractLine").innerHTML = '<a href="https://bscscan.com/address/' + FOUNDER_ADDR + '" target="_blank" rel="noopener">' + FOUNDER_ADDR + '</a>';
+  const ro = new ethers.Contract(FOUNDER_ADDR, ABI, new ethers.providers.JsonRpcProvider(BSC));
+  const [tm, rem, mo] = await Promise.all([ro.totalMinted(), ro.remaining(), ro.mintOpen()]);
+  $("stMinted").textContent = tm.toString() + " / 500";
+  $("stRemain").textContent = rem.toString();
+  open = mo; left = rem.toNumber();
+  $("status").innerHTML = open
+    ? (left > 0 ? '<span class="ok">Mint is open.</span> Numbers are struck in order — the next mint takes Nº ' + String(tm.toNumber() + 1).padStart(3, "0") + '.'
+                : '<span class="err">Sold out.</span> All 500 founders are struck.')
+    : "Mint is not open yet.";
+  $("mintBtn").disabled = !open || left === 0;
+  $("mintBtn").textContent = signer ? "MINT FOUNDER" : "CONNECT & MINT";
+}
+async function ensureSigner(){
+  if (signer) return;
+  if (!window.ethereum) throw new Error("No wallet found — open this page in your wallet browser.");
+  const prov = new ethers.providers.Web3Provider(window.ethereum);
+  await prov.send("eth_requestAccounts", []);
+  const net = await prov.getNetwork();
+  if (net.chainId !== 56) {
+    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
+  }
+  signer = prov.getSigner();
+  contract = new ethers.Contract(FOUNDER_ADDR, ABI, signer);
+}
+$("mintBtn").onclick = async () => {
+  try {
+    await ensureSigner();
+    if (!open) { $("status").textContent = "Mint is not open yet."; return; }
+    const mine = await contract.mintedPerWallet(await signer.getAddress());
+    if (mine.toNumber() + qty > 10) { $("status").innerHTML = '<span class="err">Wallet cap: you already hold ' + mine.toString() + ' of max 10.</span>'; return; }
+    $("status").textContent = "Confirm in your wallet…";
+    const tx = await contract.mint(qty, { value: PRICE.mul(qty) });
+    $("status").textContent = "Sent: " + tx.hash + " — waiting for confirmation…";
+    await tx.wait();
+    $("status").innerHTML = '<span class="ok">Struck. You are a Founder.</span> Your 200,000 $DOT per NFT lands at the 3 December listing.';
+    readState();
+  } catch (e) {
+    $("status").innerHTML = '<span class="err">' + (e.message || e) + '</span>';
+  }
+};
+setQty(1);
+readState();
+setInterval(readState, 30000);
+</script>
+</body>
+</html>

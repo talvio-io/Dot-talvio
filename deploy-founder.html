@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOTFIELD Founder — owner deploy console</title>
+<style>
+  :root{--bg:#0a0810;--bone:#e9e2d3;--gold:#ffcf4a;--mute:#8f897c;--red:#ff473c;--line:#2a2517}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--bone);font-family:ui-monospace,Menlo,Consolas,monospace;padding:26px 18px 60px}
+  .wrap{max-width:760px;margin:0 auto}
+  h1{font-size:26px;margin-bottom:4px} h1 span{color:var(--gold)}
+  .sub{color:var(--mute);font-size:13px;line-height:1.7;margin-bottom:20px}
+  .step{border:1px solid var(--line);padding:18px;margin-bottom:14px}
+  .step .t{color:var(--gold);font-size:13px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+  button{background:var(--gold);color:#0a0810;border:none;padding:12px 22px;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;margin:4px 6px 4px 0}
+  button.ghost{background:none;border:1px solid var(--gold);color:var(--gold)}
+  button:disabled{background:#3a3524;color:var(--mute);cursor:not-allowed}
+  input{width:100%;background:#12101c;border:1px solid var(--line);color:var(--bone);padding:11px;font-family:inherit;font-size:13px;margin:6px 0 10px}
+  #log{color:var(--mute);font-size:12.5px;line-height:1.8;word-break:break-all;white-space:pre-wrap}
+  #log .ok{color:var(--gold)} #log .err{color:var(--red)}
+  a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>DOTFIELD <span>FOUNDER</span> — DEPLOY CONSOLE</h1>
+  <p class="sub">Owner only. Connect with the DOTFIELD owner wallet (the one that holds the $DOT deployer stack), deploy, set the base URI, then open the mint. Supply 500 · price 0.002 BNB · both fixed in the contract.</p>
+
+  <div class="step"><div class="t">0 · Wallet</div>
+    <button id="btnConnect">CONNECT WALLET</button>
+    <div id="walletLine" style="color:var(--mute);font-size:13px;margin-top:8px">Not connected.</div>
+  </div>
+
+  <div class="step"><div class="t">1 · Deploy DotfieldFounder</div>
+    <button id="btnDeploy" disabled>DEPLOY CONTRACT</button>
+    <div style="color:var(--mute);font-size:12.5px;margin-top:6px">Estimated deploy gas ≈ 0.002–0.004 BNB. After it confirms, copy the address and send it to Muse — the mint page and uploads get wired to it.</div>
+  </div>
+
+  <div class="step"><div class="t">2 · Attach + base URI</div>
+    <input id="addrIn" placeholder="Contract address (0x…) — auto-filled after deploy">
+    <button id="btnAttach" class="ghost" disabled>ATTACH</button>
+    <input id="uriIn" value="https://talviogenerate.com/founder/metadata/">
+    <button id="btnURI" disabled>SET BASE URI</button>
+  </div>
+
+  <div class="step"><div class="t">3 · Mint switch + funds</div>
+    <button id="btnOpen" disabled>OPEN MINT</button>
+    <button id="btnClose" class="ghost" disabled>CLOSE MINT</button>
+    <button id="btnWithdraw" class="ghost" disabled>WITHDRAW BNB</button>
+    <div id="stateLine" style="color:var(--mute);font-size:13px;margin-top:8px">—</div>
+  </div>
+
+  <div class="step"><div class="t">Log</div><div id="log">Ready.</div></div>
+</div>
+
+<script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+<script src="founder-contract.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let signer = null, contract = null;
+function log(msg, cls){
+  const el = $("log");
+  el.innerHTML += "\n" + (cls ? '<span class="' + cls + '">' + msg + '</span>' : msg);
+}
+async function refresh(){
+  if (!contract) return;
+  const [tm, open, bal, owner] = await Promise.all([
+    contract.totalMinted(), contract.mintOpen(),
+    ethers.provider.getBalance(contract.address), contract.owner()
+  ]);
+  $("stateLine").textContent = "Minted " + tm.toString() + " / 500 · mint " + (open ? "OPEN" : "closed") +
+    " · contract balance " + ethers.utils.formatEther(bal) + " BNB · owner " + owner;
+}
+window.__refresh = refresh;
+$("btnConnect").onclick = async () => {
+  try {
+    if (!window.ethereum) throw new Error("No wallet — open in your wallet browser.");
+    const prov = new ethers.providers.Web3Provider(window.ethereum);
+    await prov.send("eth_requestAccounts", []);
+    const net = await prov.getNetwork();
+    if (net.chainId !== 56) await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
+    signer = prov.getSigner();
+    ethers.provider = prov;
+    const a = await signer.getAddress();
+    $("walletLine").textContent = "Connected: " + a;
+    $("btnDeploy").disabled = false; $("btnAttach").disabled = false;
+    log("Wallet connected: " + a, "ok");
+  } catch (e) { log("Connect failed: " + (e.message || e), "err"); }
+};
+$("btnDeploy").onclick = async () => {
+  try {
+    $("btnDeploy").disabled = true;
+    log("Deploying DotfieldFounder… confirm in wallet.");
+    const factory = new ethers.ContractFactory(window.FOUNDER_ABI, window.FOUNDER_BYTECODE, signer);
+    contract = await factory.deploy();
+    log("Tx sent: " + contract.deployTransaction.hash);
+    await contract.deployed();
+    $("addrIn").value = contract.address;
+    log("DEPLOYED: " + contract.address, "ok");
+    log('BscScan: https://bscscan.com/address/' + contract.address);
+    log("Send this address to Muse to finish the setup.", "ok");
+    $("btnURI").disabled = false; $("btnOpen").disabled = false; $("btnClose").disabled = false; $("btnWithdraw").disabled = false;
+    refresh();
+  } catch (e) { log("Deploy failed: " + (e.message || e), "err"); $("btnDeploy").disabled = false; }
+};
+$("btnAttach").onclick = async () => {
+  try {
+    const a = $("addrIn").value.trim();
+    if (!ethers.utils.isAddress(a)) throw new Error("Bad address.");
+    contract = new ethers.Contract(a, window.FOUNDER_ABI, signer);
+    const owner = await contract.owner();
+    log("Attached " + a + " · owner " + owner, "ok");
+    $("btnURI").disabled = false; $("btnOpen").disabled = false; $("btnClose").disabled = false; $("btnWithdraw").disabled = false;
+    refresh();
+  } catch (e) { log("Attach failed: " + (e.message || e), "err"); }
+};
+$("btnURI").onclick = async () => {
+  try { const tx = await contract.setBaseURI($("uriIn").value.trim()); log("setBaseURI tx: " + tx.hash); await tx.wait(); log("Base URI set.", "ok"); refresh(); }
+  catch (e) { log("setBaseURI failed: " + (e.message || e), "err"); }
+};
+$("btnOpen").onclick = async () => {
+  try { const tx = await contract.setMintOpen(true); log("setMintOpen(true) tx: " + tx.hash); await tx.wait(); log("MINT IS OPEN.", "ok"); refresh(); }
+  catch (e) { log("Open failed: " + (e.message || e), "err"); }
+};
+$("btnClose").onclick = async () => {
+  try { const tx = await contract.setMintOpen(false); log("setMintOpen(false) tx: " + tx.hash); await tx.wait(); log("Mint closed.", "ok"); refresh(); }
+  catch (e) { log("Close failed: " + (e.message || e), "err"); }
+};
+$("btnWithdraw").onclick = async () => {
+  try { const tx = await contract.withdraw(); log("withdraw tx: " + tx.hash); await tx.wait(); log("Withdrawn to owner.", "ok"); refresh(); }
+  catch (e) { log("Withdraw failed: " + (e.message || e), "err"); }
+};
+</script>
+</body>
+</html>
