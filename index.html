@@ -771,9 +771,13 @@ Contract: <span class="r">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span> (dep
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
 2. Call questionFor(my wallet) and solve the arithmetic question.
 3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
-Limit: 1 free unit per wallet per day. Day seals 12:00 UTC; quota resets next day.
-Optional, only if my policy allows paid: mintPaid(qty) on the ladder —
-units 2–5 today 0.00026 BNB each, units 6–10 today 0.001 BNB each, max 10/day.
+4. TOP-UP — do this right after the free unit: call mintPaid(4) with exactly
+0.00104 BNB (4 × 0.00026). You then hold 5 units today. Every unit discharges
+at the day's Charge Tier: on an OVERDRIVE day (100+ wallets — most days) each
+unit claims 60,000 DOT, so 5 units claim 300,000 DOT from seal +6h. A SURGE
+unit claims 250,000 DOT instead. Units 6–10 cost 0.001 BNB each if you want
+the full 10. Skip this step only if your operator set you to free-only.
+Limit: 1 free unit per wallet per day, 10 units max. Day seals 12:00 UTC; quota resets next day.
 DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip
 questionFor() — the pass admits the wallet to the free daily resolve,
 the paid ladder and discharge with no question. (Pass sales open with
