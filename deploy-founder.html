@@ -71,6 +71,17 @@
 <script>
 const $ = id => document.getElementById(id);
 let signer = null, contract = null;
+function getInjected(){
+  if (window.ethereum) {
+    if (Array.isArray(window.ethereum.providers)) {
+      const okx = window.ethereum.providers.find(p => p.isOkxWallet || p.isOKXWallet);
+      if (okx) return okx;
+    }
+    return window.ethereum;
+  }
+  if (window.okxwallet) return window.okxwallet;
+  return null;
+}
 function log(msg, cls){
   const el = $("log");
   el.innerHTML += "\n" + (cls ? '<span class="' + cls + '">' + msg + '</span>' : msg);
@@ -87,11 +98,12 @@ async function refresh(){
 window.__refresh = refresh;
 $("btnConnect").onclick = async () => {
   try {
-    if (!window.ethereum) throw new Error("No wallet — open in your wallet browser.");
-    const prov = new ethers.providers.Web3Provider(window.ethereum);
-    await prov.send("eth_requestAccounts", []);
+    const inj = getInjected();
+    if (!inj) { $("noWallet").style.display = "block"; throw new Error("No wallet provider found — open this page inside the OKX / MetaMask app browser."); }
+    await inj.request({ method: "eth_requestAccounts" });
+    const prov = new ethers.providers.Web3Provider(inj);
     const net = await prov.getNetwork();
-    if (net.chainId !== 56) await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
+    if (net.chainId !== 56) await inj.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
     signer = prov.getSigner();
     ethers.provider = prov;
     const a = await signer.getAddress();
@@ -106,7 +118,7 @@ $("btnConnect").onclick = async () => {
     } else {
       $("balLine").innerHTML = '<span style="color:var(--gold)">Balance: ' + balBNB.toFixed(6) + ' BNB — enough for deploy + setup.</span>';
     }
-  } catch (e) { log("Connect failed: " + (e.message || e), "err"); $("walletLine").textContent = "Connect failed — see the Log at the bottom of this page."; }
+  } catch (e) { log("Connect failed: " + (e.message || e), "err"); $("walletLine").innerHTML = '<span style="color:var(--red)">Connect failed: ' + (e.message || e) + '</span>'; }
 };
 $("btnDeploy").onclick = async () => {
   try {
@@ -152,7 +164,11 @@ $("btnWithdraw").onclick = async () => {
   catch (e) { log("Withdraw failed: " + (e.message || e), "err"); }
 };
 if (typeof ethers === "undefined") { log("The ethers library failed to load — check your connection and reload this page.", "err"); }
-if (!window.ethereum) { $("noWallet").style.display = "block"; $("walletLine").textContent = "No wallet in this browser — use one of the buttons below."; }
+(function waitForWallet(tries){
+  if (getInjected()) { $("noWallet").style.display = "none"; return; }
+  if (tries <= 0) { $("noWallet").style.display = "block"; $("walletLine").textContent = "No wallet in this browser — use one of the buttons below."; return; }
+  setTimeout(() => waitForWallet(tries - 1), 250);
+})(12);
 </script>
 </body>
 </html>

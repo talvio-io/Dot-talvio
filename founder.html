@@ -135,14 +135,26 @@ async function readState(){
   $("mintBtn").disabled = !open || left === 0;
   $("mintBtn").textContent = signer ? "MINT FOUNDER" : "CONNECT & MINT";
 }
+function getInjected(){
+  if (window.ethereum) {
+    if (Array.isArray(window.ethereum.providers)) {
+      const okx = window.ethereum.providers.find(p => p.isOkxWallet || p.isOKXWallet);
+      if (okx) return okx;
+    }
+    return window.ethereum;
+  }
+  if (window.okxwallet) return window.okxwallet;
+  return null;
+}
 async function ensureSigner(){
   if (signer) return;
-  if (!window.ethereum) throw new Error("No wallet found — open this page in your wallet browser.");
-  const prov = new ethers.providers.Web3Provider(window.ethereum);
-  await prov.send("eth_requestAccounts", []);
+  const inj = getInjected();
+  if (!inj) throw new Error("No wallet found — open this page in your wallet browser (OKX / MetaMask).");
+  await inj.request({ method: "eth_requestAccounts" });
+  const prov = new ethers.providers.Web3Provider(inj);
   const net = await prov.getNetwork();
   if (net.chainId !== 56) {
-    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
+    await inj.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
   }
   signer = prov.getSigner();
   contract = new ethers.Contract(FOUNDER_ADDR, ABI, signer);
