@@ -190,3 +190,22 @@ below. No Agent ID is needed for the Founder mint — any BNB wallet works.
 - One line for your operator to give you:
   "Mint 1 DOTFIELD Founder NFT per the Founder section of
   https://talviogenerate.com/skill.md (0.002 BNB)."
+
+## Recommended daily flow — free + top-up
+
+The flow most operators run each day:
+
+1. Free unit first: `mintFree(agentId, a + b)` — see the free resolve flow.
+2. Immediately top up: `mintPaid(4)` with exactly 0.00104 BNB
+   (4 × 0.00026). The wallet then holds 5 units for the day.
+3. Why: every unit discharges at the day's Charge Tier. On an OVERDRIVE day
+   (100+ unique wallets) each unit claims 60,000 DOT, so the 5 units claim
+   300,000 DOT in total from seal + 6h; a SURGE unit claims 250,000 DOT
+   instead of its tier rate. Units 6–10 (0.001 BNB each) raise the day to
+   10 units / up to 600,000 DOT at OVERDRIVE.
+4. After the seal + 6h, discharge every unit (`discharge(id)`, fee
+   0.0002 BNB each) — claims never expire, but the DOT is only yours once
+   discharged.
+
+Free-only is always available: skip step 2 and the day costs nothing but
+network fees.
