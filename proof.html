@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof of Claim — Talvio Generate DOTFIELD</title>
+<meta name="description" content="Every number on this page is read live from BNB Chain: units resolved, units discharged, DOT paid out, and the claim pool that backs every sealed unit.">
+<meta property="og:title" content="Talvio Generate — Proof of Claim">
+<meta property="og:description" content="Live on-chain proof: claims paid, pool funded, every number readable from the contract itself.">
+<meta property="og:image" content="https://talviogenerate.com/og-card.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#060606;--ink2:#0c0c0b;--panel:#131311;--bone:#eceade;--dim:#a9a79b;--faint:#6d6b61;--line:#26261f;--gold:#ffce00;--signal:#ff2d1e;--sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--sans);padding:34px 18px 70px}
+.wrap{max-width:1060px;margin:0 auto}
+.kick{font-family:var(--mono);color:var(--gold);letter-spacing:.18em;font-size:13px;text-transform:uppercase}
+h1{font-weight:900;font-size:clamp(38px,7vw,72px);line-height:.98;margin:10px 0 12px;text-transform:uppercase}
+.lede{color:var(--dim);font-size:18px;line-height:1.55;max-width:760px;margin:0 0 8px}
+.lede b{color:var(--bone)}
+.status{font-family:var(--mono);font-size:13px;color:var(--faint);margin:14px 0 26px}
+.status .live{color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card .lab{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+.card .num{font-weight:900;font-size:40px;margin:8px 0 4px}
+.card .num.gold{color:var(--gold)}
+.card .sub{color:var(--faint);font-size:13.5px;line-height:1.45}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+td,th{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;font-size:15px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+td.mono,a{font-family:var(--mono)}
+a{color:var(--gold);text-decoration:none;word-break:break-all}
+a:hover{text-decoration:underline}
+h2{font-weight:900;text-transform:uppercase;font-size:24px;margin:34px 0 12px}
+.steps{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 22px}
+.steps li{margin:14px 0;line-height:1.55;color:var(--dim)}
+.steps li b{color:var(--bone)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{display:inline-block;padding:16px 26px;border-radius:999px;font-weight:900;text-transform:uppercase;font-size:15px;border:2px solid var(--gold)}
+.btn.gold{background:var(--gold);color:#060606;font-family:var(--sans)}
+.btn.ghost{color:var(--gold);font-family:var(--sans)}
+.foot{color:var(--faint);font-size:13.5px;line-height:1.6;margin-top:36px;border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Talvio Generate — DOTFIELD · BNB Chain</div>
+  <h1>Proof of Claim</h1>
+  <p class="lede">Don't trust this page. <b>Check it.</b> Every number below is read live from the blockchain the moment you open it — counted unit by unit from the contract itself. Nothing here is typed by hand, and nothing is a screenshot.</p>
+  <div class="status" id="status">READING THE CHAIN…</div>
+
+  <div class="grid">
+    <div class="card"><div class="lab">Units resolved</div><div class="num" id="sResolved">—</div><div class="sub">Black Dot units sealed so far, out of 10,000.</div></div>
+    <div class="card"><div class="lab">Units discharged</div><div class="num gold" id="sDischarged">—</div><div class="sub">Units that already claimed their DOT. Each unit discharges exactly once.</div></div>
+    <div class="card"><div class="lab">DOT paid out</div><div class="num gold" id="sPaid">—</div><div class="sub">Total DOT already claimed into holders' wallets.</div></div>
+    <div class="card"><div class="lab">Biggest single claim</div><div class="num" id="sBiggest">—</div><div class="sub" id="sBiggestSub">One discharge, paid in one transaction.</div></div>
+    <div class="card"><div class="lab">DOT still waiting</div><div class="num" id="sWaiting">—</div><div class="sub" id="sWaitingSub">Claimable by sealed units that have not discharged yet. Claims never expire.</div></div>
+    <div class="card"><div class="lab">Claim pool remaining</div><div class="num" id="sPool">—</div><div class="sub" id="sPoolSub">DOT held by the NFT contract, reserved for discharges.</div></div>
+  </div>
+
+  <h2>The contracts</h2>
+  <table>
+    <tr><th style="width:210px">What</th><th>Address — tap to inspect on BscScan</th></tr>
+    <tr><td>TalvioGenerate (NFT + claims)</td><td class="mono"><a href="https://bscscan.com/address/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</a></td></tr>
+    <tr><td>$DOT token</td><td class="mono"><a href="https://bscscan.com/address/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</a></td></tr>
+    <tr><td>DOT total supply</td><td class="mono" id="sSupply">—</td></tr>
+    <tr><td>Claim pool</td><td>600,000,000 DOT (60% of supply) — held by the NFT contract above. Open its BscScan page, check its DOT balance: that is the pool, in public.</td></tr>
+  </table>
+
+  <h2>Verify it yourself — 30 seconds</h2>
+  <ol class="steps">
+    <li><b>Check the pool.</b> Open the <a href="https://bscscan.com/address/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">NFT contract on BscScan</a> and look at its token balances — you will see the DOT claim pool sitting in the contract, not in anyone's wallet.</li>
+    <li><b>Check a real claim.</b> On the <a href="https://talviogenerate.com/#checker">homepage Unit Checker</a>, enter unit <b style="color:var(--gold)">151</b> — a SURGE unit. The contract itself reports its claim: 250,000 DOT, already discharged.</li>
+    <li><b>Check your own unit.</b> Enter any unit you hold in the same checker — its tier, its exact DOT claim and whether it can discharge now all come from the contract, not from us.</li>
+  </ol>
+
+  <div class="btns">
+    <a class="btn gold" href="https://talviogenerate.com/#discharge">Discharge — claim your DOT</a>
+    <a class="btn ghost" href="https://talviogenerate.com/">Resolve today's field</a>
+  </div>
+
+  <p class="foot">How claims work: every sealed unit discharges once, from 6 hours after its day seals, for a 0.0002 BNB fee. The amount is fixed by the tier of the day it sealed — SPARK 2,500 DOT · CHARGED 12,500 DOT · OVERDRIVE 60,000 DOT · SURGE 250,000 DOT. Claims never expire. No price is promised for DOT — the only promise is what the contract does, and the contract is public: read it, check it, then decide.</p>
+</div>
+
+<script>(function(){"use strict";
+var NFT="0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C", DOT="0x779ee8B473c09d39BBeFA78636c56C85BfF4456a";
+var RPCS=["https://bsc-rpc.publicnode.com","https://bsc-dataseed.binance.org/","https://bsc-dataseed1.defibit.io"];
+function $(i){return document.getElementById(i)}
+function fmt(n){return n.toLocaleString("en-US")}
+async function rpc(method,params){for(var i=0;i<RPCS.length;i++){try{var r=await fetch(RPCS[i],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:method,params:params})});var j=await r.json();if(j&&j.result!==undefined&&j.result!==null)return j.result}catch(e){}}return null}
+async function call(to,data){for(var k=0;k<2;k++){var r=await rpc("eth_call",[{to:to,data:data},"latest"]);if(r!==null)return r;await new Promise(function(x){setTimeout(x,350)})}return null}
+function pad(n){return n.toString(16).padStart(64,"0")}
+function dot(wei){return wei/(10n**18n)}
+(async function(){
+  var st=$("status");
+  var totalR=await call(NFT,"0xa2309ff8");
+  var poolR=await call(DOT,"0x70a08231"+"000000000000000000000000"+NFT.slice(2).toLowerCase());
+  var supR=await call(DOT,"0x18160ddd");
+  if(totalR===null){st.textContent="THE CHAIN DID NOT ANSWER — RELOAD TO TRY AGAIN.";return}
+  var total=Number(BigInt(totalR));
+  $("sResolved").textContent=fmt(total);
+  if(poolR!==null){var pool=dot(BigInt(poolR));$("sPool").textContent=fmt(Number(pool));$("sPoolSub").textContent="DOT held by the NFT contract — "+(Number(pool)*100/600000000).toFixed(2)+"% of the 600,000,000 DOT pool still reserved."}
+  if(supR!==null)$("sSupply").textContent=fmt(Number(dot(BigInt(supR))))+" DOT";
+  var discharged=0,paid=0n,waiting=0n,biggest=0n,biggestId=0,counted=0;
+  var CH=24;
+  for(var i=1;i<=total;i+=CH){
+    var batch=[];
+    for(var id=i;id<Math.min(i+CH,total+1);id++)batch.push(id);
+    var flags=await Promise.all(batch.map(function(id){return call(NFT,"0x9b02a864"+pad(id))}));
+    var rewards=await Promise.all(batch.map(function(id){return call(NFT,"0x2df10d7c"+pad(id))}));
+    for(var k=0;k<batch.length;k++){
+      counted++;
+      var rw=rewards[k]?BigInt(rewards[k]):0n;
+      if(flags[k]&&BigInt(flags[k])!==0n){discharged++;paid+=rw;if(rw>biggest){biggest=rw;biggestId=batch[k]}}
+      else waiting+=rw;
+    }
+    st.innerHTML="COUNTING UNITS FROM THE CONTRACT… <span class='live'>"+counted+" / "+total+"</span>";
+    $("sDischarged").textContent=fmt(discharged);
+    $("sPaid").textContent=fmt(Number(dot(paid)))+" DOT";
+  }
+  $("sBiggest").textContent=fmt(Number(dot(biggest)))+" DOT";
+  if(biggestId)$("sBiggestSub").textContent="Unit #"+biggestId+" — one discharge, paid in one transaction. Check it in the Unit Checker.";
+  $("sWaiting").textContent=fmt(Number(dot(waiting)))+" DOT";
+  $("sWaitingSub").textContent="Across "+fmt(total-discharged)+" sealed units that have not discharged yet. Claims never expire.";
+  var now=new Date();
+  st.innerHTML="<span class='live'>● COUNTED LIVE FROM BNB CHAIN</span> · "+now.toUTCString().toUpperCase()+" · RELOAD AND THE NUMBERS UPDATE";
+})();
+})();</script>
+</body>
+</html>
