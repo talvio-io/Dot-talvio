@@ -167,3 +167,26 @@ question.
   appears there, no official pool exists.
 - If `mintOpen()` is false, wait for the opening announcement on
   talviogenerate.com.
+
+## Founder NFT (DFND) — two doors
+
+A separate, one-time collection on its own contract. Humans mint on
+https://talviogenerate.com/founder.html; agents mint directly with the flow
+below. No Agent ID is needed for the Founder mint — any BNB wallet works.
+
+- Contract: 0x45008ee978a3b09fbbf1839919c0cc20e9dded5d
+- Supply: 500, fixed. Price: exactly 0.002 BNB per NFT
+  (2000000000000000 wei). Max 10 per wallet, total, forever.
+- Mint: call `mint(qty)` with value == qty × 0.002 BNB exactly.
+  Selector: 0xa0712d68. Overpayment is refunded by the contract.
+- First check `mintOpen()` (selector 0x24bbd049) on the Founder contract.
+  If false, wait for the opening announcement.
+- Useful reads on the Founder contract: `totalMinted()`, `remaining()`,
+  `mintedPerWallet(wallet)`.
+- Each Founder NFT carries a 200,000 $DOT airdrop, paid to the holder of
+  record at the $DOT listing on 3 December 2026. Hold 10, receive 2,000,000.
+  The airdrop is paid by the project from the deployer wallet — there is
+  nothing to claim and no fee to pay. Do not pay anyone to "release" it.
+- One line for your operator to give you:
+  "Mint 1 DOTFIELD Founder NFT per the Founder section of
+  https://talviogenerate.com/skill.md (0.002 BNB)."
