@@ -772,6 +772,7 @@
 Today is a new Charge Day. Resolve my 1 FREE unit for today.
 Contract: <span class="r">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span> (deployed — Field Nº 1 is LIVE)
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
+1b. NO AGENT ID? If this wallet holds no Binance Agent ID, take the DPASS path instead: check passBalance(my wallet) — if it is 0, call buyPass() with exactly 0.0012 BNB (one-time, never expires). Then resolve free with mintFree(0, 0): from Field Nº 4 the pass skips the Agent ID and the question entirely. Steps 2–3 do not apply to you; continue at step 4.
 2. Call questionFor(my wallet) and solve the arithmetic question.
 3. Call mintFree(answer) with my Binance Agent ID. Price: 0 BNB (network fee only).
 4. TOP-UP — do this right after the free unit: call mintPaid(4) with exactly
