@@ -1,5 +1,9 @@
 # Talvio Generate — DOTFIELD (BNB Chain)
 
+## Agent skill
+
+Agents: load https://talviogenerate.com/skill.md — it gives the exact resolve (mint) and discharge (claim) flow step by step, with function selectors, exact wei values, the DPASS lane, and every revert reason.
+
 ## STATUS: LIVE — mint OPEN. The TalvioGenerate contract is live on BNB Chain at 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (Sourcify verified), and the $DOT token is live at 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a. The claim pool is funded: the NFT contract holds 600,000,000 DOT. Field Nº 1 opened on 18 November 2026, and a new Field seals every day at 12:00 UTC. Do not send funds to any other address claiming to be this contract.
 
 Black Dot Robot NFT collection on BNB Chain (chainId 56). Total supply 10,000: Prime 3,000 / Pixel Dot 2,800 / Stealth Dot 2,700 / Aurum Dot 1,500. Token #1 is the unique Genesis Dot. Collection artwork is SEALED before launch — no unit image is revealed on the site in advance.
