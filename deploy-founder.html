@@ -66,11 +66,11 @@
   <div class="step"><div class="t">Log</div><div id="log">Ready.</div></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers.js/5.7.2/ethers.umd.min.js"></script>
 <script src="founder-contract.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-let signer = null, contract = null;
+const SEL = { setBaseURI:"0x55f804b3", setMintOpen:"0xf8004d31", withdraw:"0x3ccfd60b", totalMinted:"0xa2309ff8", mintOpen:"0x24bbd049", owner:"0x8da5cb5b" };
+let inj = null, account = null, contractAddr = null;
 function getInjected(){
   if (window.ethereum) {
     if (Array.isArray(window.ethereum.providers)) {
@@ -86,32 +86,57 @@ function log(msg, cls){
   const el = $("log");
   el.innerHTML += "\n" + (cls ? '<span class="' + cls + '">' + msg + '</span>' : msg);
 }
+function fmtBNB(weiHex){
+  const w = BigInt(weiHex);
+  const whole = w / 1000000000000000000n;
+  const frac = (w % 1000000000000000000n).toString().padStart(18, "0").slice(0, 6).replace(/0+$/, "");
+  return frac ? whole.toString() + "." + frac : whole.toString();
+}
+async function callView(addr, data){
+  return inj.request({ method: "eth_call", params: [{ to: addr, data }, "latest"] });
+}
+async function waitReceipt(hash){
+  for (let i = 0; i < 40; i++) {
+    const r = await inj.request({ method: "eth_getTransactionReceipt", params: [hash] });
+    if (r) {
+      if (r.status === "0x0") throw new Error("Transaction failed on-chain: " + hash);
+      return r;
+    }
+    await new Promise(res => setTimeout(res, 3000));
+  }
+  throw new Error("Timed out waiting for confirmation: " + hash);
+}
+async function sendTx(tx){
+  const hash = await inj.request({ method: "eth_sendTransaction", params: [tx] });
+  log("Tx sent: " + hash);
+  await waitReceipt(hash);
+  return hash;
+}
 async function refresh(){
-  if (!contract) return;
-  const [tm, open, bal, owner] = await Promise.all([
-    contract.totalMinted(), contract.mintOpen(),
-    ethers.provider.getBalance(contract.address), contract.owner()
-  ]);
-  $("stateLine").textContent = "Minted " + tm.toString() + " / 500 · mint " + (open ? "OPEN" : "closed") +
-    " · contract balance " + ethers.utils.formatEther(bal) + " BNB · owner " + owner;
+  if (!contractAddr || !inj) return;
+  try {
+    const tm = parseInt(await callView(contractAddr, SEL.totalMinted), 16);
+    const open = parseInt(await callView(contractAddr, SEL.mintOpen), 16) === 1;
+    const bal = await inj.request({ method: "eth_getBalance", params: [contractAddr, "latest"] });
+    const ownerRaw = await callView(contractAddr, SEL.owner);
+    const owner = "0x" + ownerRaw.slice(-40);
+    $("stateLine").textContent = "Minted " + tm + " / 500 · mint " + (open ? "OPEN" : "closed") + " · contract balance " + fmtBNB(bal) + " BNB · owner " + owner;
+  } catch (e) { log("State read failed: " + (e.message || e), "err"); }
 }
 window.__refresh = refresh;
 $("btnConnect").onclick = async () => {
   try {
-    const inj = getInjected();
+    inj = getInjected();
     if (!inj) { $("noWallet").style.display = "block"; throw new Error("No wallet provider found — open this page inside the OKX / MetaMask app browser."); }
-    await inj.request({ method: "eth_requestAccounts" });
-    const prov = new ethers.providers.Web3Provider(inj);
-    const net = await prov.getNetwork();
-    if (net.chainId !== 56) await inj.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] });
-    signer = prov.getSigner();
-    ethers.provider = prov;
-    const a = await signer.getAddress();
-    $("walletLine").textContent = "Connected: " + a;
+    const accounts = await inj.request({ method: "eth_requestAccounts" });
+    account = accounts[0];
+    const chain = await inj.request({ method: "eth_chainId" });
+    if (chain !== "0x38") { await inj.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }); }
+    $("walletLine").textContent = "Connected: " + account;
     $("btnDeploy").disabled = false; $("btnAttach").disabled = false;
-    log("Wallet connected: " + a, "ok");
-    const bal = await prov.getBalance(a);
-    const balBNB = parseFloat(ethers.utils.formatEther(bal));
+    log("Wallet connected: " + account, "ok");
+    const balHex = await inj.request({ method: "eth_getBalance", params: [account, "latest"] });
+    const balBNB = Number(BigInt(balHex)) / 1e18;
     if (balBNB < 0.005) {
       $("balLine").innerHTML = '<span style="color:var(--red)">Balance: ' + balBNB.toFixed(6) + ' BNB — too low. Deploy gas alone is ≈ 0.002–0.004 BNB, and set base URI + open mint need more. Top up this wallet to at least 0.005 BNB first (0.01 BNB is safe).</span>';
       log("Balance too low for deploy: " + balBNB.toFixed(6) + " BNB. Top up first.", "err");
@@ -122,15 +147,16 @@ $("btnConnect").onclick = async () => {
 };
 $("btnDeploy").onclick = async () => {
   try {
+    if (!window.FOUNDER_BYTECODE) throw new Error("Contract data failed to load — reload this page.");
     $("btnDeploy").disabled = true;
     log("Deploying DotfieldFounder… confirm in wallet.");
-    const factory = new ethers.ContractFactory(window.FOUNDER_ABI, window.FOUNDER_BYTECODE, signer);
-    contract = await factory.deploy();
-    log("Tx sent: " + contract.deployTransaction.hash);
-    await contract.deployed();
-    $("addrIn").value = contract.address;
-    log("DEPLOYED: " + contract.address, "ok");
-    log('BscScan: https://bscscan.com/address/' + contract.address);
+    const hash = await inj.request({ method: "eth_sendTransaction", params: [{ from: account, data: window.FOUNDER_BYTECODE }] });
+    log("Tx sent: " + hash);
+    const receipt = await waitReceipt(hash);
+    contractAddr = receipt.contractAddress;
+    $("addrIn").value = contractAddr;
+    log("DEPLOYED: " + contractAddr, "ok");
+    log("BscScan: https://bscscan.com/address/" + contractAddr);
     log("Send this address to Muse to finish the setup.", "ok");
     $("btnURI").disabled = false; $("btnOpen").disabled = false; $("btnClose").disabled = false; $("btnWithdraw").disabled = false;
     refresh();
@@ -139,31 +165,40 @@ $("btnDeploy").onclick = async () => {
 $("btnAttach").onclick = async () => {
   try {
     const a = $("addrIn").value.trim();
-    if (!ethers.utils.isAddress(a)) throw new Error("Bad address.");
-    contract = new ethers.Contract(a, window.FOUNDER_ABI, signer);
-    const owner = await contract.owner();
+    if (!/^0x[0-9a-fA-F]{40}$/.test(a)) throw new Error("Bad address.");
+    const ownerRaw = await callView(a, SEL.owner);
+    const owner = "0x" + ownerRaw.slice(-40);
+    contractAddr = a;
     log("Attached " + a + " · owner " + owner, "ok");
     $("btnURI").disabled = false; $("btnOpen").disabled = false; $("btnClose").disabled = false; $("btnWithdraw").disabled = false;
     refresh();
   } catch (e) { log("Attach failed: " + (e.message || e), "err"); }
 };
+function encString(s){
+  const bytes = new TextEncoder().encode(s);
+  let hex = "";
+  for (const b of bytes) hex += b.toString(16).padStart(2, "0");
+  const off = (32).toString(16).padStart(64, "0");
+  const len = bytes.length.toString(16).padStart(64, "0");
+  const padded = hex.padEnd(Math.ceil(bytes.length / 32) * 64, "0");
+  return off + len + padded;
+}
 $("btnURI").onclick = async () => {
-  try { const tx = await contract.setBaseURI($("uriIn").value.trim()); log("setBaseURI tx: " + tx.hash); await tx.wait(); log("Base URI set.", "ok"); refresh(); }
+  try { await sendTx({ from: account, to: contractAddr, data: SEL.setBaseURI + encString($("uriIn").value.trim()) }); log("Base URI set.", "ok"); refresh(); }
   catch (e) { log("setBaseURI failed: " + (e.message || e), "err"); }
 };
 $("btnOpen").onclick = async () => {
-  try { const tx = await contract.setMintOpen(true); log("setMintOpen(true) tx: " + tx.hash); await tx.wait(); log("MINT IS OPEN.", "ok"); refresh(); }
+  try { await sendTx({ from: account, to: contractAddr, data: SEL.setMintOpen + (1).toString(16).padStart(64, "0") }); log("MINT IS OPEN.", "ok"); refresh(); }
   catch (e) { log("Open failed: " + (e.message || e), "err"); }
 };
 $("btnClose").onclick = async () => {
-  try { const tx = await contract.setMintOpen(false); log("setMintOpen(false) tx: " + tx.hash); await tx.wait(); log("Mint closed.", "ok"); refresh(); }
+  try { await sendTx({ from: account, to: contractAddr, data: SEL.setMintOpen + (0).toString(16).padStart(64, "0") }); log("Mint closed.", "ok"); refresh(); }
   catch (e) { log("Close failed: " + (e.message || e), "err"); }
 };
 $("btnWithdraw").onclick = async () => {
-  try { const tx = await contract.withdraw(); log("withdraw tx: " + tx.hash); await tx.wait(); log("Withdrawn to owner.", "ok"); refresh(); }
+  try { await sendTx({ from: account, to: contractAddr, data: SEL.withdraw }); log("Withdrawn to owner.", "ok"); refresh(); }
   catch (e) { log("Withdraw failed: " + (e.message || e), "err"); }
 };
-if (typeof ethers === "undefined") { log("The ethers library failed to load — check your connection and reload this page.", "err"); }
 (function waitForWallet(tries){
   if (getInjected()) { $("noWallet").style.display = "none"; return; }
   if (tries <= 0) { $("noWallet").style.display = "block"; $("walletLine").textContent = "No wallet in this browser — use one of the buttons below."; return; }
