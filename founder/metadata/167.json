@@ -1,0 +1,19 @@
+{
+  "name": "DOTFIELD Founder #167",
+  "description": "DOTFIELD Founder edition \u2014 one of only 500. The crown of the first machines: a dot-grid crown with gold light-ray spires over the field. Each Founder NFT carries a 200,000 $DOT airdrop, paid to the holder of record at the $DOT listing on 3 December. One dot. Ten thousand machines.",
+  "image": "https://talviogenerate.com/founder/images/167.jpg",
+  "attributes": [
+    {
+      "trait_type": "Series",
+      "value": "Founder"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "167 / 500"
+    },
+    {
+      "trait_type": "Airdrop",
+      "value": "200,000 DOT"
+    }
+  ]
+}
