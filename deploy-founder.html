@@ -20,6 +20,9 @@
   #log{color:var(--mute);font-size:12.5px;line-height:1.8;word-break:break-all;white-space:pre-wrap}
   #log .ok{color:var(--gold)} #log .err{color:var(--red)}
   a{color:var(--gold)}
+  a.btn{display:inline-block;background:var(--gold);color:#0a0810;padding:12px 22px;font-weight:800;font-size:14px;text-decoration:none;margin:4px 6px 4px 0}
+  a.btn.ghost2{background:none;border:1px solid var(--gold);color:var(--gold)}
+  .warn{color:var(--red);font-size:13px;line-height:1.7;margin-top:8px}
 </style>
 </head>
 <body>
@@ -30,6 +33,15 @@
   <div class="step"><div class="t">0 · Wallet</div>
     <button id="btnConnect">CONNECT WALLET</button>
     <div id="walletLine" style="color:var(--mute);font-size:13px;margin-top:8px">Not connected.</div>
+    <div id="noWallet" style="display:none">
+      <div class="warn">No wallet found in this browser. This page only works inside your wallet app's own browser — a normal Chrome tab cannot sign anything.</div>
+      <div style="margin-top:10px">
+        <a class="btn" href="https://metamask.app.link/dapp/talviogenerate.com/deploy-founder.html">OPEN IN METAMASK</a>
+        <a class="btn ghost2" href="okx://wallet/dapp/url?dappUrl=https%3A%2F%2Ftalviogenerate.com%2Fdeploy-founder.html">OPEN IN OKX</a>
+      </div>
+      <div style="color:var(--mute);font-size:12.5px;line-height:1.7;margin-top:8px">Or open your wallet app (OKX / MetaMask) → Browser → type talviogenerate.com/deploy-founder.html there.</div>
+    </div>
+    <div id="balLine" style="font-size:13px;margin-top:6px;line-height:1.7"></div>
   </div>
 
   <div class="step"><div class="t">1 · Deploy DotfieldFounder</div>
@@ -54,7 +66,7 @@
   <div class="step"><div class="t">Log</div><div id="log">Ready.</div></div>
 </div>
 
-<script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers.js/5.7.2/ethers.umd.min.js"></script>
 <script src="founder-contract.js"></script>
 <script>
 const $ = id => document.getElementById(id);
@@ -86,7 +98,15 @@ $("btnConnect").onclick = async () => {
     $("walletLine").textContent = "Connected: " + a;
     $("btnDeploy").disabled = false; $("btnAttach").disabled = false;
     log("Wallet connected: " + a, "ok");
-  } catch (e) { log("Connect failed: " + (e.message || e), "err"); }
+    const bal = await prov.getBalance(a);
+    const balBNB = parseFloat(ethers.utils.formatEther(bal));
+    if (balBNB < 0.005) {
+      $("balLine").innerHTML = '<span style="color:var(--red)">Balance: ' + balBNB.toFixed(6) + ' BNB — too low. Deploy gas alone is ≈ 0.002–0.004 BNB, and set base URI + open mint need more. Top up this wallet to at least 0.005 BNB first (0.01 BNB is safe).</span>';
+      log("Balance too low for deploy: " + balBNB.toFixed(6) + " BNB. Top up first.", "err");
+    } else {
+      $("balLine").innerHTML = '<span style="color:var(--gold)">Balance: ' + balBNB.toFixed(6) + ' BNB — enough for deploy + setup.</span>';
+    }
+  } catch (e) { log("Connect failed: " + (e.message || e), "err"); $("walletLine").textContent = "Connect failed — see the Log at the bottom of this page."; }
 };
 $("btnDeploy").onclick = async () => {
   try {
@@ -131,6 +151,8 @@ $("btnWithdraw").onclick = async () => {
   try { const tx = await contract.withdraw(); log("withdraw tx: " + tx.hash); await tx.wait(); log("Withdrawn to owner.", "ok"); refresh(); }
   catch (e) { log("Withdraw failed: " + (e.message || e), "err"); }
 };
+if (typeof ethers === "undefined") { log("The ethers library failed to load — check your connection and reload this page.", "err"); }
+if (!window.ethereum) { $("noWallet").style.display = "block"; $("walletLine").textContent = "No wallet in this browser — use one of the buttons below."; }
 </script>
 </body>
 </html>
