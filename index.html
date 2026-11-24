@@ -783,8 +783,19 @@
               <button class="copy-btn" id="copyPrompt" type="button">COPY</button>
             </div>
             <pre id="agentPrompt"><span class="c">// DOTFIELD CHARGE DAY · talviogenerate.com · BNB Chain</span>
-Today is a new Charge Day. Resolve my 1 FREE unit for today.
+Today is a new Charge Day. FIRST claim my DOT, THEN resolve my 1 FREE unit.
 Contract: <span class="r">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span> (deployed — Field Nº 1 is LIVE)
+0. DISCHARGE SWEEP — do this FIRST, every run, before minting. Yesterday's unit
+is claimable by now (its claim opened at yesterday's seal +6h). Scan
+totalMinted() IDs 1..N: keep units where ownerOf(id) is my wallet, skip
+dischargedOf(id) = true, skip dischargeable(id) = false (still waiting —
+note its dischargeReward(id) for the report). For every remaining unit call
+discharge(id) with exactly 0.0002 BNB (200000000000000 wei). DISCHARGE IS A
+CLAIM, NOT A PURCHASE — it is authorized even if I set you to free-only for
+minting; the free-only rule skips Step 4 (paid top-up), never this sweep.
+If my BNB balance cannot cover the sweep fees + gas, discharge what you can
+and report "OPERATOR: TOP UP CLAIM BUFFER" with the shortfall — do not skip
+silently. (Operators: keep ~0.005 BNB in the wallet = ~25 claim fees.)
 1. Call currentDay() and dayStats() — confirm the day is open and free quota remains.
 1b. NO AGENT ID? If this wallet holds no Binance Agent ID, take the DPASS path instead: check passBalance(my wallet) — if it is 0, call buyPass() with exactly 0.0012 BNB (one-time, never expires). Then resolve free with mintFree(0, 0): from Field Nº 4 the pass skips the Agent ID and the question entirely. Steps 2–3 do not apply to you; continue at step 4.
 2. Call questionFor(my wallet) and solve the arithmetic question.
@@ -800,7 +811,11 @@ DPASS path: if my wallet holds a DPASS instead of an Agent ID, skip
 questionFor() — the pass admits the wallet to the free daily resolve,
 the paid ladder and discharge with no question. (Pass sales open with
 Field Nº 1 at 0.0012 BNB; the pass lane activates at Field Nº 4.)
-Report back the transaction hash, my unit ID, its Mosaic position and the day's tier.</pre>
+Report back: DOT claimed in the sweep (total + per unit, with tx hashes), DOT
+still waiting (sealed, not yet open), my wallet's total DOT balance, then the
+mint result — transaction hash, my unit ID, its Mosaic position and the day's
+tier. $DOT lists 3 December 2026, 21:00 UTC: DOT still sealed in units at
+listing cannot trade — the sweep is what puts it in my wallet.</pre>
           </div>
           <button class="btn btn-ghost" type="button" id="agentStandbyBtn" style="width:100%" disabled>Free resolve — answer the question first</button>
           <div class="txmsg" id="agentStandbyMsg" role="status"></div>
@@ -3009,7 +3024,7 @@ wireCopy("copyJson", "mintJson", false);
         claimRender();
         return;
       }
-      var slice = ids.slice(pos, pos + 40); pos += slice.length;
+      var slice = ids.slice(pos, pos + 20); pos += slice.length;
       var calls = [];
       slice.forEach(function(id){
         var b = BigInt(id);
@@ -3019,6 +3034,23 @@ wireCopy("copyJson", "mintJson", false);
         calls.push({ key: "r" + id, data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [b]) });
       });
       rpcBatch(calls, []).then(function(m){
+        var missing = slice.filter(function(id){ return m["o" + id] === undefined; });
+        if (missing.length && missing.length < slice.length){
+          var retry = [];
+          missing.forEach(function(id){
+            var b = BigInt(id);
+            retry.push({ key: "o" + id, data: dfEncodeCall("ownerOf(uint256)", ["uint256"], [b]) });
+            retry.push({ key: "d" + id, data: dfEncodeCall("dischargedOf(uint256)", ["uint256"], [b]) });
+            retry.push({ key: "a" + id, data: dfEncodeCall("dischargeable(uint256)", ["uint256"], [b]) });
+            retry.push({ key: "r" + id, data: dfEncodeCall("dischargeReward(uint256)", ["uint256"], [b]) });
+          });
+          return rpcBatch(retry, []).then(function(m2){
+            Object.keys(m2).forEach(function(k){ m[k] = m2[k]; });
+            return m;
+          }).catch(function(){ return m; });
+        }
+        return m;
+      }).then(function(m){
         slice.forEach(function(id){
           if (m["o" + id] === undefined) return;
           if (dfDecAddr(m["o" + id], 0).toLowerCase() !== addr.toLowerCase()) return;
