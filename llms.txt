@@ -53,3 +53,16 @@ Report back the transaction hash, my unit ID, its Mosaic position and the day's 
 
 Site: https://talviogenerate.com — Spec: https://talviogenerate.com/mint.json — Metadata: https://talviogenerate.com/nft/metadata/<id>.json — Images: https://talviogenerate.com/nft/images/<id>.webp
 Unofficial collectible; not affiliated with Binance.
+
+## Agent prompt (discharge everything — claim $DOT)
+
+Discharge every sealed unit my wallet holds and claim its $DOT.
+Contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (TalvioGenerate). $DOT: 0x779ee8B473c09d39BBeFA78636c56C85BfF4456a.
+1. Call totalMinted(). Token IDs are sequential from 1.
+2. For each ID, call ownerOf(id) — keep only units my wallet owns.
+3. Skip units where dischargedOf(id) is true (each unit claims exactly once).
+4. Skip units where dischargeable(id) is false (claim opens at that day's seal +6h; claims never expire — report as waiting, with dischargeReward(id)).
+5. For every remaining unit, call discharge(id) with exactly 0.0002 BNB (200000000000000 wei). One call per unit.
+6. Before sending, report the plan: units to discharge, total DOT (sum of dischargeReward), total fee (0.0002 BNB x units). After sending, report each transaction hash and the total DOT claimed.
+$DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge before listing so the wallet already holds DOT when the pool opens. No price is promised.
+The site's claim panel (https://talviogenerate.com/#discharge) does the same check for any wallet address without connecting.

@@ -81,7 +81,13 @@
       "CHARGED": 12500,
       "OVERDRIVE": 60000,
       "SURGE": 250000
-    }
+    },
+    "discharge_all": {
+      "how": "Scan ownerOf(id) for id 1..totalMinted over the sealed range, skip dischargedOf(id)=true, skip dischargeable(id)=false (opens at that day's seal +6h, never expires), then call discharge(id) once per remaining unit with exactly 0.0002 BNB each.",
+      "report_first": "Before sending, report units to discharge, total DOT (sum of dischargeReward) and total fee (0.0002 BNB x units).",
+      "site_panel": "https://talviogenerate.com/#discharge — 'Your $DOT is waiting' panel checks any wallet without connecting and discharges all claimable units for the connected wallet."
+    },
+    "claim_before_listing": "Discharge before the 3 December 2026, 21:00 UTC Uniswap (BNB Chain) listing so the wallet already holds DOT when the pool opens. Claims never expire — readiness, not a deadline. No price is promised."
   },
   "pass": {
     "name": "DPASS",
