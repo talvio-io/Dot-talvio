@@ -1208,6 +1208,103 @@ $DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge be
         <div class="cb-row"><span>$DOT CONTRACT —</span><span class="cb-addr" id="dotAddrText">0x779ee8B473c09d39BBeFA78636c56C85BfF4456a</span><button class="copy-btn" id="copyDotAddr" type="button">COPY</button><a class="cb-btn" href="https://bscscan.com/token/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">VERIFY ON BSCSCAN ↗</a></div>
         <div class="cb-row"><span>TALVIOGENERATE NFT —</span><span class="cb-addr" id="nftAddrText">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C</span><button class="copy-btn" id="copyNftAddr" type="button">COPY</button><a class="cb-btn" href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">VERIFY ON BSCSCAN ↗</a></div>
       </div>
+      <div class="coin-panel">
+        <div class="coin-head"><span>THE COIN — $DOT MARKET</span><span id="coinState">PRE-LISTING · READS LIVE FROM BNB CHAIN</span></div>
+        <div class="coin-stats">
+          <div class="coin-cell"><div class="coin-lab">TOTAL SUPPLY</div><div class="coin-num" id="coinSupply">—</div><div class="coin-sub">DOT · FIXED AT DEPLOY</div></div>
+          <div class="coin-cell"><div class="coin-lab">CLAIMED SO FAR</div><div class="coin-num" id="coinClaimed">—</div><div class="coin-sub">DOT DISCHARGED INTO HOLDER WALLETS</div></div>
+          <div class="coin-cell"><div class="coin-lab">STILL SEALED</div><div class="coin-num" id="coinSealed">—</div><div class="coin-sub">DOT WAITING IN THE CLAIM POOL</div></div>
+          <div class="coin-cell"><div class="coin-lab">PRICE</div><div class="coin-num" id="coinPrice">—</div><div class="coin-sub" id="coinPriceSub">NO MARKET UNTIL THE POOL OPENS</div></div>
+        </div>
+        <div class="coin-chart" id="coinChart"><div class="coin-chart-off" id="coinChartOff">THE CHART GOES LIVE WITH THE POOL<br/><span id="coinCd">OPENS 3 DECEMBER 2026 · 21:00 UTC</span></div></div>
+        <div class="coin-actions">
+          <a class="btn btn-solid coin-trade is-off" id="coinTradeBtn" aria-disabled="true">TRADE $DOT — OPENS 3 DEC · 21:00 UTC</a>
+          <span class="coin-note">One official pool, announced on this page first. Anything trading under the $DOT name before the pair is posted here is not it.</span>
+        </div>
+      </div>
+      <style>
+        .coin-panel{border:1px solid var(--line);margin-top:26px;background:#050505}
+        .coin-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--bone)}
+        .coin-head #coinState{color:var(--gold)}
+        .coin-stats{display:grid;grid-template-columns:repeat(4,1fr)}
+        .coin-cell{padding:16px;border-right:1px solid var(--line)}
+        .coin-cell:last-child{border-right:0}
+        .coin-lab{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--bone-dim)}
+        .coin-num{font-family:var(--mono);font-size:21px;color:var(--bone);margin-top:7px;word-break:break-all}
+        .coin-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bone-dim);margin-top:6px;line-height:1.6}
+        .coin-chart{border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;min-height:118px}
+        .coin-chart iframe{width:100%;height:430px;border:0;display:block}
+        .coin-chart-off{padding:32px 18px;text-align:center;letter-spacing:.12em;color:var(--bone-dim);font-family:var(--mono);font-size:13px;line-height:2}
+        .coin-chart-off #coinCd{color:var(--gold)}
+        .coin-actions{display:flex;gap:18px;align-items:center;padding:16px;border-top:1px solid var(--line);flex-wrap:wrap}
+        .coin-trade.is-off{opacity:.5;pointer-events:none}
+        .coin-note{color:var(--bone-dim);font-size:13px;line-height:1.6;max-width:540px}
+        @media (max-width:760px){.coin-stats{grid-template-columns:repeat(2,1fr)}.coin-cell{border-bottom:1px solid var(--line)}}
+      </style>
+      <script>
+      (function(){
+        var DOT="0x779ee8B473c09d39BBeFA78636c56C85BfF4456a";
+        var NFT="0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C";
+        var PAIR=""; /* At listing: paste the official pair address here — chart, price and the trade button go live by themselves. */
+        var LIST_TS=Date.UTC(2026,11,3,21,0,0);
+        var RPCS=["https://bsc-dataseed.binance.org","https://bsc-dataseed1.defibit.io","https://bsc-dataseed2.defibit.io","https://bsc.publicnode.com"];
+        function $(id){return document.getElementById(id)}
+        function fmt(n){return Math.round(n).toLocaleString("en-US")}
+        function rpc(to,data){
+          var body=JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to:to,data:data},"latest"]});
+          var chain=Promise.reject();
+          RPCS.forEach(function(u){
+            chain=chain.catch(function(){
+              return fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:body})
+                .then(function(r){return r.json()})
+                .then(function(j){if(!j.result)throw new Error("rpc");return j.result});
+            });
+          });
+          return chain;
+        }
+        function reads(){
+          rpc(DOT,"0x18160ddd").then(function(h){ $("coinSupply").textContent=fmt(Number(BigInt(h))/1e18); }).catch(function(){});
+          rpc(DOT,"0x70a08231000000000000000000000000"+NFT.slice(2).toLowerCase()).then(function(h){
+            var rem=Number(BigInt(h))/1e18;
+            $("coinClaimed").textContent=fmt(600000000-rem);
+            $("coinSealed").textContent=fmt(rem);
+          }).catch(function(){});
+        }
+        function p2(n){return String(n).padStart(2,"0")}
+        function tick(){
+          var el=$("coinCd"); if(!el) return;
+          var s=Math.max(0,Math.floor((LIST_TS-Date.now())/1000));
+          if(PAIR){ el.textContent="POOL LIVE — CHART AND PRICE READ FROM THE PAIR"; return; }
+          if(s<=0){ el.textContent="POOL OPENING — THE OFFICIAL PAIR IS ANNOUNCED HERE FIRST"; return; }
+          el.textContent="OPENS IN "+Math.floor(s/86400)+"D "+p2(Math.floor(s%86400/3600))+"H "+p2(Math.floor(s%3600/60))+"M "+p2(s%60)+"S · 3 DECEMBER 2026 · 21:00 UTC";
+        }
+        function market(){
+          if(!PAIR) return;
+          $("coinState").textContent="LIVE · UNISWAP (BNB CHAIN)";
+          var chart=$("coinChart");
+          chart.innerHTML='<iframe title="$DOT price chart" src="https://dexscreener.com/bsc/'+PAIR.toLowerCase()+'?embed=1&theme=dark&trades=0&info=0" loading="lazy"></iframe>';
+          var btn=$("coinTradeBtn");
+          btn.href="https://app.uniswap.org/swap?chain=bnb&outputCurrency="+DOT;
+          btn.target="_blank"; btn.rel="noopener";
+          btn.textContent="TRADE $DOT ON UNISWAP ↗";
+          btn.classList.remove("is-off"); btn.removeAttribute("aria-disabled");
+          function price(){
+            fetch("https://api.dexscreener.com/latest/dex/pairs/bsc/"+PAIR.toLowerCase())
+              .then(function(r){return r.json()})
+              .then(function(j){
+                var p=j&&j.pair; if(!p) return;
+                $("coinPrice").textContent="$"+Number(p.priceUsd).toFixed(8).replace(/0+$/,"").replace(/\.$/,".0");
+                var ch=p.priceChange&&typeof p.priceChange.h24==="number"?p.priceChange.h24:0;
+                $("coinPriceSub").textContent="24H "+(ch>=0?"+":"")+ch.toFixed(2)+"% · LIQUIDITY $"+fmt(Number(p.liquidity&&p.liquidity.usd||0))+" · VIA DEXSCREENER";
+              }).catch(function(){});
+          }
+          price(); setInterval(price,30000);
+        }
+        reads(); setInterval(reads,45000);
+        tick(); setInterval(tick,1000);
+        market();
+      })();
+      </script>
     </div>
   </div>
 </section>
