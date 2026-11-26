@@ -46,8 +46,14 @@
   </div>
 
   <div class="card">
-    <h2>STEP 2 — CREATE THE VRF SUBSCRIPTION (CHAINLINK)</h2>
-    <p class="muted">Open the Chainlink VRF Subscription Manager at <a href="https://vrf.chain.link" target="_blank" rel="noopener">vrf.chain.link</a>, switch to BNB Chain, and create a subscription. Fund it with <b>BNB</b> (this arena pays VRF in native BNB — start with ±0.2 BNB; each draw costs a few thousandths). Then add the deployed DotArena address above as a <b>consumer</b> of the subscription, and copy the Subscription ID.</p>
+    <h2>STEP 2 — VRF SUBSCRIPTION (SIGN-ONLY, PREPARED FOR YOU)</h2>
+    <p class="muted">No forms, no Chainlink website needed — each button below is a prepared transaction on the VRF coordinator; you only sign it in your wallet, in order. The subscription pays for every draw in native BNB.</p>
+    <button id="createSubBtn" type="button" disabled>2A · CREATE SUBSCRIPTION — SIGN</button>
+    <label>FUND AMOUNT (BNB)</label>
+    <input id="fundAmt" value="0.2"/>
+    <button id="fundSubBtn" type="button" class="ghost" disabled>2B · FUND SUBSCRIPTION — SIGN</button>
+    <button id="addConsumerBtn" type="button" class="ghost" disabled>2C · ADD ARENA AS CONSUMER — SIGN</button>
+    <div class="muted" id="subLine">Subscription: not created yet in this session. (If you already created one at vrf.chain.link, just paste its ID in Step 3 instead.)</div>
   </div>
 
   <div class="card">
@@ -69,6 +75,9 @@
   <div id="log">Log ready.</div>
 </div>
 <script>
+const COORD = "0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9";
+const COORD_ABI = ["function createSubscription() returns (uint256 subId)","function fundSubscriptionWithNative(uint256 subId) payable","function addConsumer(uint256 subId, address consumer)","function getSubscription(uint256 subId) view returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address owner, address[] consumers)"];
+let mySubId = null;
 const ABI = [
   {
     "inputs": [
@@ -1042,6 +1051,11 @@ $("connectBtn").onclick = async () => {
   wireArena();
 };
 function wireArena(){
+  if (signer){
+    $("createSubBtn").disabled = false;
+    $("fundSubBtn").disabled = false;
+    $("addConsumerBtn").disabled = false;
+  }
   const a = $("arenaAddr").value.trim();
   if (signer && ethers.isAddress(a)){
     arena = new ethers.Contract(a, ABI, signer);
@@ -1088,6 +1102,55 @@ $("openBtn").onclick = async () => {
     log("ARENA OPEN — round 1 is running. Tx: " + tx.hash);
     refreshStatus();
   } catch(e){ log("openArena failed: " + (e.shortMessage || e.message)); }
+};
+function coordRW(){ return new ethers.Contract(COORD, COORD_ABI, signer); }
+async function refreshSub(){
+  try {
+    if (!mySubId) return;
+    const s = await coordRW().getSubscription(mySubId);
+    $("subLine").innerHTML = "Subscription: <span class='ok'>" + mySubId.toString() + "</span> · native balance " + ethers.formatEther(s.nativeBalance) + " BNB · consumers: " + s.consumers.join(", ");
+  } catch(e){ /* view may lag; ignore */ }
+}
+$("createSubBtn").onclick = async () => {
+  try {
+    log("Creating the VRF subscription — sign in your wallet…");
+    const tx = await coordRW().createSubscription();
+    const rc = await tx.wait();
+    const topic = ethers.id("SubscriptionCreated(uint256,address)");
+    const hit = rc.logs.find(l => l.address.toLowerCase() === COORD.toLowerCase() && l.topics[0] === topic);
+    if (!hit){ log("Created (tx " + tx.hash + ") but the Subscription ID was not found in the receipt — paste it manually in Step 3."); return; }
+    mySubId = BigInt(hit.topics[1]);
+    $("subId").value = mySubId.toString();
+    $("subLine").innerHTML = "Subscription: <span class='ok'>" + mySubId.toString() + "</span> · created, not funded yet. ID auto-filled into Step 3.";
+    log("SUBSCRIPTION CREATED: " + mySubId.toString() + " · tx " + tx.hash);
+  } catch(e){ log("createSubscription failed: " + (e.shortMessage || e.message)); }
+};
+$("fundSubBtn").onclick = async () => {
+  try {
+    const sub = mySubId || ($("subId").value.trim() ? BigInt($("subId").value.trim()) : null);
+    if (!sub){ log("Create the subscription first (2A), or paste an existing ID in Step 3."); return; }
+    mySubId = sub;
+    const amt = $("fundAmt").value.trim() || "0.2";
+    log("Funding subscription " + sub.toString() + " with " + amt + " BNB — sign in your wallet…");
+    const tx = await coordRW().fundSubscriptionWithNative(sub, {value: ethers.parseEther(amt)});
+    await tx.wait();
+    log("SUBSCRIPTION FUNDED. Tx: " + tx.hash);
+    refreshSub();
+  } catch(e){ log("fundSubscription failed: " + (e.shortMessage || e.message)); }
+};
+$("addConsumerBtn").onclick = async () => {
+  try {
+    const sub = mySubId || ($("subId").value.trim() ? BigInt($("subId").value.trim()) : null);
+    const a = $("arenaAddr").value.trim();
+    if (!sub){ log("Create the subscription first (2A), or paste an existing ID in Step 3."); return; }
+    if (!ethers.isAddress(a)){ log("The arena address is missing — deploy first (Step 1) or paste it in Step 3."); return; }
+    mySubId = sub;
+    log("Adding the arena as consumer — sign in your wallet…");
+    const tx = await coordRW().addConsumer(sub, a);
+    await tx.wait();
+    log("ARENA ADDED AS CONSUMER. Tx: " + tx.hash);
+    refreshSub();
+  } catch(e){ log("addConsumer failed: " + (e.shortMessage || e.message)); }
 };
 async function refreshStatus(){
   try {
