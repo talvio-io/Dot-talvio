@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DOTFIELD ARENA — Owner Deploy</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+  body{background:#000;color:#e9e2d3;font-family:ui-monospace,Menlo,Consolas,monospace;margin:0;padding:24px;line-height:1.6}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:20px;letter-spacing:.12em;color:#ffcf4a}
+  h2{font-size:14px;letter-spacing:.12em;color:#ffcf4a;margin-top:34px}
+  .muted{color:#8f897c;font-size:13px}
+  .card{border:1px solid #2c2c2c;padding:16px;margin-top:14px;background:#050505}
+  label{display:block;font-size:12px;letter-spacing:.1em;color:#8f897c;margin-top:12px}
+  input{width:100%;box-sizing:border-box;background:#000;border:1px solid #2c2c2c;color:#e9e2d3;font-family:inherit;font-size:14px;padding:10px;margin-top:5px}
+  button{background:#ffcf4a;color:#000;border:0;font-family:inherit;font-weight:700;letter-spacing:.08em;padding:12px 18px;margin-top:14px;cursor:pointer;width:100%}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button.ghost{background:#000;color:#ffcf4a;border:1px solid #ffcf4a}
+  #log{white-space:pre-wrap;word-break:break-all;background:#050505;border:1px solid #2c2c2c;padding:14px;margin-top:16px;font-size:12.5px;min-height:120px}
+  a{color:#ffcf4a}
+  .ok{color:#7dd87d}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>DOTFIELD ARENA — OWNER DEPLOY</h1>
+  <p class="muted">Standalone owner page, not linked from the site. Deploys the compiled DotArena bytecode embedded in this page. The deploying wallet becomes the owner. The owner can tune tiers, round length and the VRF configuration — the owner can never move staked DOT or change a settlement.</p>
+
+  <div class="card">
+    <h2>STEP 0 — CONNECT OWNER WALLET</h2>
+    <button id="connectBtn" type="button">CONNECT WALLET</button>
+    <div class="muted" id="walletLine">Not connected.</div>
+  </div>
+
+  <div class="card">
+    <h2>STEP 1 — DEPLOY DOTARENA</h2>
+    <label>$DOT TOKEN (constructor)</label>
+    <input id="dotAddr" value="0x779ee8B473c09d39BBeFA78636c56C85BfF4456a"/>
+    <label>CHAINLINK VRF v2.5 COORDINATOR — BNB CHAIN MAINNET (constructor)</label>
+    <input id="coordAddr" value="0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9"/>
+    <label>KEY HASH — 200 GWEI LANE (constructor)</label>
+    <input id="keyHash" value="0x130dba50ad435d4ecc214aad0d5820474137bd68e7e77724144f27c3c377d3d4"/>
+    <button id="deployBtn" type="button" disabled>DEPLOY DOTARENA</button>
+    <div class="muted" id="deployLine">Contract address will appear here.</div>
+  </div>
+
+  <div class="card">
+    <h2>STEP 2 — CREATE THE VRF SUBSCRIPTION (CHAINLINK)</h2>
+    <p class="muted">Open the Chainlink VRF Subscription Manager at <a href="https://vrf.chain.link" target="_blank" rel="noopener">vrf.chain.link</a>, switch to BNB Chain, and create a subscription. Fund it with <b>BNB</b> (this arena pays VRF in native BNB — start with ±0.2 BNB; each draw costs a few thousandths). Then add the deployed DotArena address above as a <b>consumer</b> of the subscription, and copy the Subscription ID.</p>
+  </div>
+
+  <div class="card">
+    <h2>STEP 3 — SET THE SUBSCRIPTION ON THE CONTRACT</h2>
+    <label>ARENA CONTRACT</label>
+    <input id="arenaAddr" placeholder="0x… (filled automatically after deploy)"/>
+    <label>SUBSCRIPTION ID (from vrf.chain.link)</label>
+    <input id="subId" placeholder="e.g. 123456789…"/>
+    <button id="configBtn" type="button" class="ghost" disabled>SET VRF CONFIG</button>
+  </div>
+
+  <div class="card">
+    <h2>STEP 4 — OPEN THE ARENA</h2>
+    <p class="muted">Opening starts round 1 immediately (180-second rounds, back to back). Make sure the subscription is funded before you open.</p>
+    <button id="openBtn" type="button" class="ghost" disabled>OPEN ARENA</button>
+    <div class="muted" id="statusLine">Status: —</div>
+  </div>
+
+  <div id="log">Log ready.</div>
+</div>
+<script>
+const ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "dotToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "coordinator",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "keyHash_",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArenaClosed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArenaOpened",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      }
+    ],
+    "name": "DrawRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalRefunded",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundCancelled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "secondsLength",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundLengthUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalRefunded",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundRefunded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "killedRoom",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "burned",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "distributed",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundSettled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "room",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "tierIndex",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "fromBalance",
+        "type": "bool"
+      }
+    ],
+    "name": "Staked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "tiers",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "TiersUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "coordinator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "keyHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "subscriptionId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "callbackGasLimit",
+        "type": "uint32"
+      }
+    ],
+    "name": "VrfConfigUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdrawn",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "BPS_DENOM",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BURN_BPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEAD",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_CALLBACK_GAS",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_PLAYERS_PER_ROUND",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "REFUND_WINDOW",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ROOMS",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "arenaOpen",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "balances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "callbackGasLimit",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelRound",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeArena",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "currentRoundId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dot",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentRound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "killedRoom",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStaked",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[8]",
+        "name": "roomTotals",
+        "type": "uint256[8]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "playerCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      }
+    ],
+    "name": "getPlayerTotal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getRound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "killedRoom",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalStaked",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[8]",
+        "name": "roomTotals",
+        "type": "uint256[8]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "playerCount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "room",
+        "type": "uint8"
+      }
+    ],
+    "name": "getStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTiers",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "keyHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "openArena",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "randomWords",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "rawFulfillRandomWords",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "requestConfirmations",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "requestDraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "roundActive",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "roundLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "secondsLength",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRoundLength",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "newTiers",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "setTiers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "coordinator",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "keyHash_",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "callbackGas",
+        "type": "uint32"
+      }
+    ],
+    "name": "setVrfConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "room",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "tierIndex",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "fromBalance",
+        "type": "bool"
+      }
+    ],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "subscriptionId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "tiers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalBurned",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vrfCoordinator",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+const BYTECODE = "0x60a06040526005805465ffffffffffff19166403001e848017905560b460065534801561002a575f5ffd5b506040516124b93803806124b983398101604081905261004991610284565b338061006f57604051631e4fbdf760e01b81525f60048201526024015b60405180910390fd5b610078816101bd565b50600180556001600160a01b0383166100bb5760405162461bcd60e51b81526020600482015260056024820152640646f743d360dc1b6044820152606401610066565b6001600160a01b0382166101015760405162461bcd60e51b815260206004820152600d60248201526c0636f6f7264696e61746f723d3609c1b6044820152606401610066565b6001600160a01b038381166080908152600280546001600160a01b0319169285169290921790915560038290556040805160e081018252683635c9adc5dea00000815268878678326eac900000602082015269010f0cf064dd592000009181019190915269021e19e0c9bab2400000606082015269054b40b1f852bda0000091810191909152690a968163f0a57b40000060a082015269152d02c7e14af680000060c08201526101b4906007908161020c565b505050506102bd565b5f80546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b828054828255905f5260205f20908101928215610245579160200282015b8281111561024557825182559160200191906001019061022a565b50610251929150610255565b5090565b5b80821115610251575f8155600101610256565b80516001600160a01b038116811461027f575f5ffd5b919050565b5f5f5f60608486031215610296575f5ffd5b61029f84610269565b92506102ad60208501610269565b9150604084015190509250925092565b6080516121cf6102ea5f395f81816102d00152818161078b0152818161158c01526118c501526121cf5ff3fe608060405234801561000f575f5ffd5b5060043610610234575f3560e01c806378aafea211610135578063a37a9fc0116100b4578063d89135cd11610079578063d89135cd146104d1578063de170570146104da578063e3ef23f9146104ef578063f2fde38b14610502578063fa9cbab014610515575f5ffd5b8063a37a9fc01461047c578063a3e56fa814610485578063a57848b614610498578063af5bd4b2146104a0578063b0fb162f146104a8575f5ffd5b80638b649b94116100fa5780638b649b94146104185780638da5cb5b146104215780638f1327c0146104315780639cbe5efd14610457578063a32bf59714610460575f5ffd5b806378aafea2146103cf57806382b670e4146103d757806384e1ae96146103ea57806386a594d0146103fd57806387d993d614610405575f5ffd5b806327e235e3116101c15780636637e38c116101865780636637e38c14610379578063681312f5146103825780636d9809a01461039557806370a082311461039f578063715018a6146103c7575f5ffd5b806327e235e3146103175780632e1a7d4d146103365780633a000a6c146103495780635acf31441461036357806361728f3914610370575f5ffd5b80631153b5f3116102075780631153b5f3146102a557806314b1e0e4146102ae5780631fe543e3146102b65780632311d39c146102cb57806324f74697146102f2575f5ffd5b8063027471b014610238578063039af9eb1461025a57806303fd2a451461027b57806309c1ba2e1461029c575b5f5ffd5b600a546102459060ff1681565b60405190151581526020015b60405180910390f35b61026d610268366004611ce3565b610528565b604051908152602001610251565b61028461dead81565b6040516001600160a01b039091168152602001610251565b61026d60045481565b61026d610e1081565b61026d60c881565b6102c96102c4366004611d42565b610547565b005b6102847f000000000000000000000000000000000000000000000000000000000000000081565b6005546103029063ffffffff1681565b60405163ffffffff9091168152602001610251565b61026d610325366004611da5565b60116020525f908152604090205481565b6102c9610344366004611ce3565b6106c8565b610351600881565b60405160ff9091168152602001610251565b6008546102459060ff1681565b61026d60035481565b61026d61271081565b6102c9610390366004611ce3565b6107f3565b610302622625a081565b61026d6103ad366004611da5565b6001600160a01b03165f9081526011602052604090205490565b6102c9610888565b6102c961089b565b6102c96103e5366004611dc5565b610974565b61026d6103f8366004611e04565b610afb565b6102c9610b24565b61026d610413366004611e3e565b610c5c565b61026d60065481565b5f546001600160a01b0316610284565b61044461043f366004611ce3565b610c9b565b6040516102519796959493929190611e99565b61026d60095481565b610468610d2e565b604051610251989796959493929190611ee0565b61026d6101f481565b600254610284906001600160a01b031681565b6102c9610dca565b6102c9610fe3565b6005546104be90640100000000900461ffff1681565b60405161ffff9091168152602001610251565b61026d600b5481565b6104e261101f565b6040516102519190611f30565b6102c96104fd366004611f72565b611075565b6102c9610510366004611da5565b6111af565b6102c9610523366004611fbf565b6111e9565b60078181548110610537575f80fd5b5f91825260209091200154905081565b6002546001600160a01b031633146105995760405162461bcd60e51b815260206004820152601060248201526f37b7363c9031b7b7b93234b730ba37b960811b60448201526064015b60405180910390fd5b600a5460ff166105bb5760405162461bcd60e51b815260040161059090612007565b6009545f908152600c60205260409020600281015460ff166001146106145760405162461bcd60e51b815260206004820152600f60248201526e6e6f20647261772070656e64696e6760881b6044820152606401610590565b8060030154841461065a5760405162461bcd60e51b815260206004820152601060248201526f0e4cae2eacae6e840dad2e6dac2e8c6d60831b6044820152606401610590565b60018210156106965760405162461bcd60e51b81526020600482015260086024820152676e6f20776f72647360c01b6044820152606401610590565b6106c281600885855f816106ac576106ac612029565b905060200201356106bd9190612051565b6116d0565b50505050565b6106d061196d565b5f811161070a5760405162461bcd60e51b81526020600482015260086024820152670616d6f756e743d360c41b6044820152606401610590565b335f9081526011602052604090205481111561075a5760405162461bcd60e51b815260206004820152600f60248201526e62616c616e636520746f6f206c6f7760881b6044820152606401610590565b335f9081526011602052604081208054839290610778908490612078565b909155506107b290506001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000163383611997565b60405181815233907f7084f5476618d8e60b11ef0d7d3f06914655adb8793e28ff7f018d4c76d505d59060200160405180910390a26107f060018055565b50565b6107fb6119f6565b6078811015801561080e5750610e108111155b61084d5760405162461bcd60e51b815260206004820152601060248201526f06c656e677468203132302e2e333630360841b6044820152606401610590565b60068190556040518181527f0dda1b13511589b984802f00820c6c578e933c1ad97e6c37cfb5cfebb997239f9060200160405180910390a150565b6108906119f6565b6108995f611a22565b565b6108a36119f6565b6004545f036108eb5760405162461bcd60e51b81526020600482015260146024820152731cdd589cd8dc9a5c1d1a5bdb881b9bdd081cd95d60621b6044820152606401610590565b60085460ff161561092d5760405162461bcd60e51b815260206004820152600c60248201526b30b63932b0b23c9037b832b760a11b6044820152606401610590565b6008805460ff191660011790556040517fccb75c2981e41a103479725c2af23071851792be993f44e43dbb07da1c609d2c905f90a1600a5460ff1661089957610899611a71565b61097c6119f6565b6001811080159061098e575060108111155b6109cb5760405162461bcd60e51b815260206004820152600e60248201526d189859081d1a595c8818dbdd5b9d60921b6044820152606401610590565b5f5b81811015610ab0575f8383838181106109e8576109e8612029565b9050602002013511610a255760405162461bcd60e51b81526020600482015260066024820152650746965723d360d41b6044820152606401610590565b8015610aa8578282610a38600184612078565b818110610a4757610a47612029565b90506020020135838383818110610a6057610a60612029565b9050602002013511610aa85760405162461bcd60e51b81526020600482015260116024820152701d1a595c9cc81b5d5cdd08185cd8d95b99607a1b6044820152606401610590565b6001016109cd565b50610abd60078383611c67565b507fe0fb520658d55c7cad928e0eb0d97b2c8b74648f5d3a3966062460167836e0dd8282604051610aef92919061208b565b60405180910390a15050565b5f828152600e602090815260408083206001600160a01b03851684529091529020545b92915050565b600a5460ff16610b465760405162461bcd60e51b815260040161059090612007565b6009545f908152600c60205260408120600281015490919060ff16158015610b7e5750610e108260010154610b7b91906120c2565b42115b60028301549091505f9060ff166001148015610baa5750610e108360040154610ba791906120c2565b42115b90508180610bb55750805b610bf55760405162461bcd60e51b81526020600482015260116024820152701c9bdd5b99081b9bdd08195e1c1a5c9959607a1b6044820152606401610590565b610bfe83611b2d565b60028301805460ff1916600417905560095460058401546040517f392fcf1e3627793dc153feb861f66451c925fa12c027044233166cd28f481d8591610c479190815260200190565b60405180910390a2610c57611a71565b505050565b5f838152600d602090815260408083206001600160a01b0386168452909152812060ff831660088110610c9157610c91612029565b0154949350505050565b5f5f5f5f5f610ca8611cb0565b5f878152600c60205260408082208054600182015460028301546005840154600e85015486516101008082019889905296979596949560ff808616969095049094169360068901929190839060089082845b815481526020019060010190808311610cfa5750505050509150975097509750975097509750975050919395979092949650565b5f5f5f5f5f5f610d3c611cb0565b6009545f818152600c60205260408082208054600182015460028301546005840154600e8501548651610100808201988990529899969896979596949560ff808616969095049094169360068a01929190839060089082845b815481526020019060010190808311610d95575050505050915098509850985098509850985098509850509091929394959697565b600a5460ff16610dec5760405162461bcd60e51b815260040161059090612007565b6009545f908152600c60205260409020600281015460ff1615610e4a5760405162461bcd60e51b8152602060048201526016602482015275191c985dc8185b1c9958591e481c995c5d595cdd195960521b6044820152606401610590565b8060010154421015610e935760405162461bcd60e51b815260206004820152601260248201527139ba30b5b4b7339039ba34b6361037b832b760711b6044820152606401610590565b60408051600160248083018290528351808403909101815260449092018352602080830180516001600160e01b031663125fa26760e31b179052600254845160c0810186526003548152600480549382019390935260055461ffff6401000000008204168288015263ffffffff166060820152608081019390935260a083018490529351634d8e1c2f60e11b815292935f936001600160a01b0390911692639b1c385e92610f4192016120d5565b6020604051808303815f875af1158015610f5d573d5f5f3e3d5ffd5b505050506040513d601f19601f82011682018060405250810190610f819190612158565b60028401805460ff1916600117905560038401819055426004850155600954604051919250907fa87d18931b669b94d135986745ba30491257a77c255767cdd6796f697c1172f190610fd69084815260200190565b60405180910390a2505050565b610feb6119f6565b6008805460ff191690556040517f842a9ba4cd5ac877a36d774820f88f569daa2e9e024f276cbaab7f171067721f905f90a1565b6060600780548060200260200160405190810160405280929190818152602001828054801561106b57602002820191905f5260205f20905b815481526020019060010190808311611057575b5050505050905090565b61107d6119f6565b6001600160a01b0384166110c35760405162461bcd60e51b815260206004820152600d60248201526c0636f6f7264696e61746f723d3609c1b6044820152606401610590565b620186a08163ffffffff16101580156110e55750622625a063ffffffff821611155b6111245760405162461bcd60e51b815260206004820152601060248201526f6261642063616c6c6261636b2067617360801b6044820152606401610590565b600280546001600160a01b0319166001600160a01b038616908117909155600384905560048390556005805463ffffffff191663ffffffff84169081179091556040805192835260208301869052820184905260608201527f1fee4f169e167dab5f8045224834057d3798fb885e33f126a1f38c152cff7cc69060800160405180910390a150505050565b6111b76119f6565b6001600160a01b0381166111e057604051631e4fbdf760e01b81525f6004820152602401610590565b6107f081611a22565b6111f161196d565b600a5460ff168015611205575060085460ff165b6112405760405162461bcd60e51b815260206004820152600c60248201526b185c995b984818db1bdcd95960a21b6044820152606401610590565b6009545f908152600c60205260409020600281015460ff16156112965760405162461bcd60e51b815260206004820152600e60248201526d3937bab732103737ba1037b832b760911b6044820152606401610590565b806001015442106112da5760405162461bcd60e51b815260206004820152600e60248201526d1cdd185ada5b99c818db1bdcd95960921b6044820152606401610590565b600860ff8516106113185760405162461bcd60e51b815260206004820152600860248201526762616420726f6f6d60c01b6044820152606401610590565b60075460ff8416106113575760405162461bcd60e51b81526020600482015260086024820152673130b2103a34b2b960c11b6044820152606401610590565b5f60078460ff168154811061136e5761136e612029565b5f9182526020808320909101546009548352600f8252604080842033855290925290822090925060ff8716600881106113a9576113a9612029565b015490508015806113c657506113c360ff861660016120c2565b81145b6114065760405162461bcd60e51b81526020600482015260116024820152706f6e6520746965722070657220726f6f6d60781b6044820152606401610590565b805f0361144d5761141b60ff861660016120c2565b6009545f908152600f60209081526040808320338452909152902060ff88166008811061144a5761144a612029565b01555b6009545f90815260106020908152604080832033845290915290205460ff1661150057600e83015460c8116114b15760405162461bcd60e51b815260206004820152600a6024820152691c9bdd5b9908199d5b1b60b21b6044820152606401610590565b6009545f90815260106020908152604080832033808552908352908320805460ff19166001908117909155600e8701805491820181558452919092200180546001600160a01b03191690911790555b831561157f57335f908152601160205260409020548211156115565760405162461bcd60e51b815260206004820152600f60248201526e62616c616e636520746f6f206c6f7760881b6044820152606401610590565b335f9081526011602052604081208054849290611574908490612078565b909155506115b49050565b6115b46001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016333085611bc2565b6009545f908152600d602090815260408083203384529091529020829060ff8816600881106115e5576115e5612029565b015f8282546115f491906120c2565b90915550506009545f908152600e60209081526040808320338452909152812080548492906116249084906120c2565b909155508290506006840160ff88166008811061164357611643612029565b015f82825461165291906120c2565b9250508190555081836005015f82825461166c91906120c2565b90915550506009546040805160ff808a1682528816602082015290810184905285151560608201523391907fbf3c734d434701cc9aefb08c2d76fbdab911adb456cd1f2490214786931d12b29060800160405180910390a3505050610c5760018055565b60028201805461ff00191661010060ff8416908102919091179091555f9060068401906008811061170357611703612029565b015490505f8184600501546117189190612078565b9050811580611725575080155b1561178c5761173384611b2d565b60028401805460ff1916600317905560095460058501546040517f799819fa5a51b1d91e60bb39c0fa0c5f3859104dbe9d25b95498ad5a27f1e2db9161177c9190815260200190565b60405180910390a26106c2611a71565b5f61271061179c6101f48561216f565b6117a69190612186565b90505f6117b38285612078565b600e8701549091505f5b818110156118b1575f88600e0182815481106117db576117db612029565b5f9182526020808320909101546009548352600d825260408084206001600160a01b039092168085529190925290822090925060ff8a166008811061182257611822612029565b01546009545f908152600e602090815260408083206001600160a01b03871684529091529020546118539190612078565b905080156118a75786611866868361216f565b6118709190612186565b61187a90826120c2565b6001600160a01b0383165f90815260116020526040812080549091906118a19084906120c2565b90915550505b50506001016117bd565b508215611905576118ee6001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001661dead85611997565b82600b5f8282546118ff91906120c2565b90915550505b6002878101805460ff191690911790556009546040805160ff89168152602081018690529081018490527f722d83c8cff8d01d419e809b3428f5549038f9082a00493801301bdf1f319fa49060600160405180910390a2611964611a71565b50505050505050565b60026001540361199057604051633ee5aeb560e01b815260040160405180910390fd5b6002600155565b6040516001600160a01b03838116602483015260448201839052610c5791859182169063a9059cbb906064015b604051602081830303815290604052915060e01b6020820180516001600160e01b038381831617835250505050611bfb565b5f546001600160a01b031633146108995760405163118cdaa760e01b8152336004820152602401610590565b5f80546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b60085460ff16611a8757600a805460ff19169055565b600160095f828254611a9991906120c2565b90915550506009545f908152600c6020526040902042808255600654611abe916120c2565b600180830191825560028301805460ff19908116909155600a805490911690911790556009548254915460405191927fa359b664a68acd8839e42112eb50eff3408165e15074fde89ddb58a0db2e691d92611b229290918252602082015260400190565b60405180910390a250565b600e8101545f5b81811015610c57575f83600e018281548110611b5257611b52612029565b5f9182526020808320909101546009548352600e825260408084206001600160a01b03909216808552919092529120549091508015611bb8576001600160a01b0382165f9081526011602052604081208054839290611bb29084906120c2565b90915550505b5050600101611b34565b6040516001600160a01b0384811660248301528381166044830152606482018390526106c29186918216906323b872dd906084016119c4565b5f5f60205f8451602086015f885af180611c1a576040513d5f823e3d81fd5b50505f513d91508115611c31578060011415611c3e565b6001600160a01b0384163b155b156106c257604051635274afe760e01b81526001600160a01b0385166004820152602401610590565b828054828255905f5260205f20908101928215611ca0579160200282015b82811115611ca0578235825591602001919060010190611c85565b50611cac929150611ccf565b5090565b6040518061010001604052806008906020820280368337509192915050565b5b80821115611cac575f8155600101611cd0565b5f60208284031215611cf3575f5ffd5b5035919050565b5f5f83601f840112611d0a575f5ffd5b50813567ffffffffffffffff811115611d21575f5ffd5b6020830191508360208260051b8501011115611d3b575f5ffd5b9250929050565b5f5f5f60408486031215611d54575f5ffd5b83359250602084013567ffffffffffffffff811115611d71575f5ffd5b611d7d86828701611cfa565b9497909650939450505050565b80356001600160a01b0381168114611da0575f5ffd5b919050565b5f60208284031215611db5575f5ffd5b611dbe82611d8a565b9392505050565b5f5f60208385031215611dd6575f5ffd5b823567ffffffffffffffff811115611dec575f5ffd5b611df885828601611cfa565b90969095509350505050565b5f5f60408385031215611e15575f5ffd5b82359150611e2560208401611d8a565b90509250929050565b803560ff81168114611da0575f5ffd5b5f5f5f60608486031215611e50575f5ffd5b83359250611e6060208501611d8a565b9150611e6e60408501611e2e565b90509250925092565b805f5b60088110156106c2578151845260209384019390910190600101611e7a565b8781526020810187905260ff868116604083015285166060820152608081018490526101c08101611ecd60a0830185611e77565b826101a083015298975050505050505050565b5f6101e08201905089825288602083015287604083015260ff8716606083015260ff861660808301528460a0830152611f1c60c0830185611e77565b826101c08301529998505050505050505050565b602080825282518282018190525f918401906040840190835b81811015611f67578351835260209384019390920191600101611f49565b509095945050505050565b5f5f5f5f60808587031215611f85575f5ffd5b611f8e85611d8a565b93506020850135925060408501359150606085013563ffffffff81168114611fb4575f5ffd5b939692955090935050565b5f5f5f60608486031215611fd1575f5ffd5b611fda84611e2e565b9250611fe860208501611e2e565b915060408401358015158114611ffc575f5ffd5b809150509250925092565b6020808252600890820152671b9bc81c9bdd5b9960c21b604082015260600190565b634e487b7160e01b5f52603260045260245ffd5b634e487b7160e01b5f52601260045260245ffd5b5f8261205f5761205f61203d565b500690565b634e487b7160e01b5f52601160045260245ffd5b81810381811115610b1e57610b1e612064565b602080825281018290525f6001600160fb1b038311156120a9575f5ffd5b8260051b80856040850137919091016040019392505050565b80820180821115610b1e57610b1e612064565b60208152815160208201526020820151604082015261ffff604083015116606082015263ffffffff606083015116608082015263ffffffff60808301511660a08201525f60a083015160c08084015280518060e0850152806020830161010086015e5f6101008286010152610100601f19601f8301168501019250505092915050565b5f60208284031215612168575f5ffd5b5051919050565b8082028115828204841417610b1e57610b1e612064565b5f826121945761219461203d565b50049056fea264697066735822122082a8486903f19b582458d2a98cc54f73d74c2900e4f4e8e012a9d7c38779147f64736f6c634300081c0033";
+const $ = id => document.getElementById(id);
+let provider, signer, arena = null;
+function log(m){ $("log").textContent += "\n" + m; }
+function short(a){ return a.slice(0,6) + "…" + a.slice(-4); }
+
+async function ensureBSC(){
+  const net = await provider.getNetwork();
+  if (net.chainId !== 56n){
+    log("Switching to BNB Chain (56)…");
+    await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:"0x38"}]});
+  }
+}
+$("connectBtn").onclick = async () => {
+  if (!window.ethereum){ log("No wallet found in this browser."); return; }
+  provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  await ensureBSC();
+  signer = await provider.getSigner();
+  const a = await signer.getAddress();
+  $("walletLine").innerHTML = "Connected: <span class='ok'>" + a + "</span> · balance " + ethers.formatEther(await provider.getBalance(a)) + " BNB";
+  $("deployBtn").disabled = false;
+  log("Wallet connected: " + a);
+  wireArena();
+};
+function wireArena(){
+  const a = $("arenaAddr").value.trim();
+  if (signer && ethers.isAddress(a)){
+    arena = new ethers.Contract(a, ABI, signer);
+    $("configBtn").disabled = false;
+    $("openBtn").disabled = false;
+    refreshStatus();
+  }
+}
+$("arenaAddr").addEventListener("change", wireArena);
+$("deployBtn").onclick = async () => {
+  try {
+    const dot = $("dotAddr").value.trim(), coord = $("coordAddr").value.trim(), kh = $("keyHash").value.trim();
+    if (!ethers.isAddress(dot) || !ethers.isAddress(coord) || !/^0x[0-9a-fA-F]{64}$/.test(kh)){ log("Check the constructor fields."); return; }
+    log("Deploying DotArena…");
+    const factory = new ethers.ContractFactory(ABI, BYTECODE, signer);
+    const c = await factory.deploy(dot, coord, kh);
+    await c.waitForDeployment();
+    const addr = await c.getAddress();
+    $("arenaAddr").value = addr;
+    $("deployLine").innerHTML = "Deployed: <span class='ok'>" + addr + "</span> · <a target='_blank' rel='noopener' href='https://bscscan.com/address/" + addr + "'>BscScan ↗</a>";
+    log("DEPLOYED: " + addr);
+    log("Send this address back to Muse to wire arena.html + llms-arena.txt and verify the contract on Sourcify.");
+    wireArena();
+  } catch(e){ log("Deploy failed: " + (e.shortMessage || e.message)); }
+};
+$("configBtn").onclick = async () => {
+  try {
+    wireArena();
+    const sub = $("subId").value.trim();
+    if (!sub){ log("Paste the Subscription ID first."); return; }
+    log("Calling setVrfConfig…");
+    const tx = await arena.setVrfConfig($("coordAddr").value.trim(), $("keyHash").value.trim(), BigInt(sub), 2000000);
+    await tx.wait();
+    log("VRF config set. Tx: " + tx.hash);
+    refreshStatus();
+  } catch(e){ log("setVrfConfig failed: " + (e.shortMessage || e.message)); }
+};
+$("openBtn").onclick = async () => {
+  try {
+    wireArena();
+    log("Calling openArena…");
+    const tx = await arena.openArena();
+    await tx.wait();
+    log("ARENA OPEN — round 1 is running. Tx: " + tx.hash);
+    refreshStatus();
+  } catch(e){ log("openArena failed: " + (e.shortMessage || e.message)); }
+};
+async function refreshStatus(){
+  try {
+    if (!arena) return;
+    const open = await arena.arenaOpen();
+    const sub = await arena.subscriptionId();
+    const cr = await arena.getCurrentRound();
+    $("statusLine").textContent = "Status: arenaOpen=" + open + " · subscriptionId=" + sub.toString() + " · currentRound=" + cr.roundId.toString() + " · totalBurned=" + ethers.formatEther(await arena.totalBurned()) + " DOT";
+  } catch(e){ /* read may fail before config; ignore */ }
+}
+</script>
+</body>
+</html>
