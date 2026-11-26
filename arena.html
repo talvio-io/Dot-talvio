@@ -101,12 +101,23 @@
   </div>
 
   <div class="panel">
+    <h2>KEEP THE ARENA RUNNING — COMMUNITY DRAW FUND</h2>
+    <div class="note">Every draw is paid in BNB from a shared Chainlink VRF subscription. That subscription is open: <b>any wallet can top it up</b>, and a top-up can only ever pay for draws. Subscription balance now: <b id="fundBal">—</b>. Top-ups are donations that keep the rounds turning — they grant no stake, no odds and no claim, and only the subscription's owner can manage or cancel it.</div>
+    <div class="row">
+      <input id="fundAmt" type="number" min="0" step="any" value="0.01"/>
+      <button id="fundBtn" type="button" class="ghost" disabled>TOP UP THE DRAW FUND (BNB)</button>
+    </div>
+    <div id="fundmsg" role="status"></div>
+  </div>
+
+  <div class="panel">
     <h2>THE RULES</h2>
     <div class="rules">
       <p><b>Rooms &amp; rounds.</b> Eight rooms. A round runs 180 seconds of staking, back to back. Stake $DOT on one or more rooms, one stake tier per room: <span id="rulesTiers">1,000 · 2,500 · 5,000 · 10,000 · 25,000 · 50,000 · 100,000 DOT</span>.</p>
       <p><b>The draw.</b> After staking closes, anyone can request the draw. Chainlink VRF — verifiable randomness, no human hand in it — sends the killer into exactly one room, every room at equal odds.</p>
       <p><b>Settlement.</b> The stakes in the killed room are shared by the stakers of the other rooms, pro rata to their stakes, and <b>5% of the killed room's stakes are burned</b> to the dead address. Payout per survivor: <b>stake + stake × 95% × K ÷ S</b>, where K is the killed room's total and S is everyone else's. If the killed room is empty, or every stake sits in it, the round refunds everyone in full and nothing burns.</p>
       <p><b>Refunds.</b> If nobody requests the draw within 1 hour of the close, or VRF does not answer within 1 hour of the request, anyone can cancel the round and every stake is refunded to in-game balances in full.</p>
+      <p><b>The draw fund.</b> Draws are paid from a Chainlink VRF subscription that anyone can top up — see the community draw fund panel above. A top-up is a donation to keep the game running: it buys no stake, no odds and no claim on the subscription.</p>
       <p><b>The honest line.</b> This is a game of chance with negative expected value: on average a round costs 0.625% of a stake (a 1-in-8 chance of being in the killed room × the 5% burn). Over time, players as a whole lose and the burn is what the game takes. Stake only what you can afford to lose.</p>
       <p><b>Agents.</b> The arena is agent-playable. Machine-readable rules, function signatures and error notes live in <a href="/llms-arena.txt">llms-arena.txt</a>. Wallets holding a Binance Agent ID play as agents; every other wallet plays as a human — the game treats both identically.</p>
       <p><b>The contract.</b> <span id="rulesContract">DotArena — <a href="https://bscscan.com/address/0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104" target="_blank" rel="noopener">0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104 ↗</a>.</span> The owner can tune tiers and round length for future rounds and manage the VRF configuration. The owner cannot move staked funds, change a settlement, or withdraw DOT from the contract — there is no such function.</p>
@@ -1102,6 +1113,22 @@ $("srcBalance").onclick = () => { srcBalance = true; $("srcBalance").classList.a
 const RPCS = ["https://bsc-dataseed.binance.org","https://bsc-dataseed1.defibit.io","https://bsc-dataseed2.defibit.io","https://bsc.publicnode.com"];
 function readProvider(){ return new ethers.JsonRpcProvider(RPCS[Math.floor(Math.random()*RPCS.length)], 56); }
 
+const COORD = "0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9";
+const COORD_ABI = ["function fundSubscriptionWithNative(uint256 subId) payable","function getSubscription(uint256 subId) view returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address owner, address[] consumers)"];
+let subIdCache = null;
+async function refreshFund(){
+  try {
+    if (subIdCache === null) {
+      const mini = new ethers.Contract(ARENA, ["function subscriptionId() view returns (uint256)"], readProvider());
+      subIdCache = await mini.subscriptionId();
+    }
+    if (subIdCache === 0n) return;
+    const co = new ethers.Contract(COORD, COORD_ABI, readProvider());
+    const s = await co.getSubscription(subIdCache);
+    $("fundBal").textContent = ethers.formatEther(s.nativeBalance) + " BNB";
+  } catch(e) { /* keep last shown */ }
+}
+
 async function refresh(){
   if (!ARENA) return;
   try {
@@ -1140,8 +1167,9 @@ async function refresh(){
       const dotRO = new ethers.Contract(DOT, ERC20_ABI, readProvider());
       $("stMyDot").textContent = fmt(await dotRO.balanceOf(me)) + " DOT";
       for (let i = 0; i < 8; i++) myStakes[i] = await arenaRO.getStake(cur.id, me, i);
-      $("stakeBtn").disabled = false; $("wdBtn").disabled = false; $("wdMax").disabled = false;
+      $("stakeBtn").disabled = false; $("wdBtn").disabled = false; $("wdMax").disabled = false; $("fundBtn").disabled = false;
     }
+    refreshFund();
     $("drawBtn").disabled = !(me && cur.state === 0 && nowS >= cur.end);
     $("cancelBtn").disabled = !(me && (cur.state === 0 || cur.state === 1) && nowS >= cur.end);
   } catch(e) { /* keep last good values */ }
@@ -1192,6 +1220,20 @@ $("cancelBtn").onclick = async () => {
   if (!arenaRW) return;
   try { msg("Cancelling the round…"); const tx = await arenaRW.cancelRound(); await tx.wait(); msg("Round cancelled — all stakes refunded to in-game balances. Tx: " + tx.hash); refresh(); }
   catch(e){ msg("Cancel failed (the refund window may not have passed yet): " + (e.shortMessage || e.reason || e.message)); }
+};
+$("fundBtn").onclick = async () => {
+  if (!signer) return;
+  try {
+    if (subIdCache === null || subIdCache === 0n) { $("fundmsg").textContent = "Still reading the subscription ID — try again in a few seconds."; return; }
+    const v = $("fundAmt").value.trim();
+    if (!v || Number(v) <= 0) { $("fundmsg").textContent = "Enter a BNB amount."; return; }
+    $("fundmsg").textContent = "Sending your top-up to the draw fund — sign in your wallet…";
+    const co = new ethers.Contract(COORD, COORD_ABI, signer);
+    const tx = await co.fundSubscriptionWithNative(subIdCache, {value: ethers.parseEther(v)});
+    await tx.wait();
+    $("fundmsg").textContent = "Thank you — the draw fund is topped up. Tx: " + tx.hash;
+    refreshFund();
+  } catch(e){ $("fundmsg").textContent = "Top-up failed: " + (e.shortMessage || e.reason || e.message); }
 };
 $("wdMax").onclick = () => { $("wdAmt").value = ethers.formatEther(myBal); };
 $("wdBtn").onclick = async () => {
