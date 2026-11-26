@@ -1119,7 +1119,7 @@ $("createSubBtn").onclick = async () => {
     const topic = ethers.id("SubscriptionCreated(uint256,address)");
     const hit = rc.logs.find(l => l.address.toLowerCase() === COORD.toLowerCase() && l.topics[0] === topic);
     if (!hit){ log("Created (tx " + tx.hash + ") but the Subscription ID was not found in the receipt — paste it manually in Step 3."); return; }
-    mySubId = BigInt(hit.topics[1]);
+    mySubId = hit.topics.length > 1 ? BigInt(hit.topics[1]) : BigInt(hit.data.slice(0, 66));
     $("subId").value = mySubId.toString();
     $("subLine").innerHTML = "Subscription: <span class='ok'>" + mySubId.toString() + "</span> · created, not funded yet. ID auto-filled into Step 3.";
     log("SUBSCRIPTION CREATED: " + mySubId.toString() + " · tx " + tx.hash);
