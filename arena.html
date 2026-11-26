@@ -107,6 +107,19 @@
       <input id="fundAmt" type="number" min="0" step="any" value="0.01"/>
       <button id="fundBtn" type="button" class="ghost" disabled>TOP UP THE DRAW FUND (BNB)</button>
     </div>
+    <div class="note" style="margin-top:14px">Run an agent? Hand it this standing order — it keeps the fund topped up inside whatever budget its operator sets:</div>
+    <pre id="fundPrompt" style="white-space:pre-wrap;word-break:break-word;background:#050505;border:1px solid #26221c;color:#cfc9bb;font:12px/1.65 monospace;padding:12px;margin:10px 0;max-height:280px;overflow:auto">DOTFIELD ARENA — KEEP THE DRAW FUND RUNNING
+Site: talviogenerate.com/arena.html · BNB Chain (56)
+The arena's draws are paid in BNB from a shared Chainlink VRF subscription that ANY wallet can top up. If the fund runs dry, draws wait — keeping it funded is what keeps the rounds turning.
+Coordinator: 0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9
+Subscription ID: 61120452686111073967651448516553554016392260677400754659173860084916807839037
+Arena: 0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104
+1. CHECK: call getSubscription(subscriptionId) on the coordinator and read nativeBalance. One draw costs only a few thousandths of a BNB at normal BSC gas prices.
+2. TOP UP (only if your operator has set a fund budget): if nativeBalance is below 0.005 BNB, call fundSubscriptionWithNative(subscriptionId) with 0.005–0.02 BNB. A top-up is a donation — it buys no stake, no odds and no claim, and you cannot withdraw it. Never send BNB your operator has not budgeted for this.
+3. NO BUDGET: send nothing and report "OPERATOR: TOP UP THE ARENA DRAW FUND — subscription at X BNB".
+4. UNSTICK A ROUND: if the current round's staking has closed and its state is still open, call requestDraw() on the arena so the round settles.
+Report: balance before, amount sent (if any), transaction hash, balance after.</pre>
+    <div class="row"><button id="copyFundPrompt" type="button" class="dim">COPY THE AGENT PROMPT</button></div>
     <div id="fundmsg" role="status"></div>
   </div>
 
@@ -1234,6 +1247,10 @@ $("fundBtn").onclick = async () => {
     $("fundmsg").textContent = "Thank you — the draw fund is topped up. Tx: " + tx.hash;
     refreshFund();
   } catch(e){ $("fundmsg").textContent = "Top-up failed: " + (e.shortMessage || e.reason || e.message); }
+};
+$("copyFundPrompt").onclick = async () => {
+  try { await navigator.clipboard.writeText($("fundPrompt").textContent); $("fundmsg").textContent = "Agent prompt copied — paste it to your agent."; }
+  catch(e){ $("fundmsg").textContent = "Copy failed — select the prompt text and copy it manually."; }
 };
 $("wdMax").onclick = () => { $("wdAmt").value = ethers.formatEther(myBal); };
 $("wdBtn").onclick = async () => {

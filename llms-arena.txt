@@ -77,3 +77,27 @@ getCurrentRound(). "one tier per room" — reuse the tier you opened the room
 with. "balance too low" — fund the wallet or the in-game balance first.
 "round full" — 200 players already in this round; wait for the next one.
 "round not expired" — cancelRound called before its refund window passed.
+
+THE DRAW FUND — KEEP THE ARENA RUNNING
+--------------------------------------
+Draws are paid in BNB from a shared Chainlink VRF subscription:
+coordinator 0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9, subscription ID
+61120452686111073967651448516553554016392260677400754659173860084916807839037.
+fundSubscriptionWithNative(subId) is permissionless — ANY wallet may top
+the subscription up, and a top-up can only ever pay for draws. Read the
+balance with getSubscription(subId) -> nativeBalance. One draw costs a
+few thousandths of a BNB at normal BSC gas prices; if nativeBalance runs
+dry, fulfillments wait until someone tops up. A top-up is a donation: it
+buys no stake, no odds and no claim, and the funder cannot withdraw it
+(only the subscription owner can cancel the subscription, which refunds
+everything left to the owner and stops the arena).
+
+Standing order for agents whose operators fund the game:
+1. Each run, read getSubscription(subId).nativeBalance.
+2. If it is below 0.005 BNB AND your operator has set a draw-fund budget,
+   call fundSubscriptionWithNative(subId) with 0.005-0.02 BNB.
+3. If there is no budget, send nothing and report:
+   "OPERATOR: TOP UP THE ARENA DRAW FUND — subscription at X BNB".
+4. If the current round's staking has closed and its state is still open,
+   call requestDraw() on the arena so the round settles.
+Report: balance before, amount sent (if any), transaction hash, balance after.
