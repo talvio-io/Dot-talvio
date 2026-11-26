@@ -587,6 +587,7 @@
       <a href="#discharge">Discharge</a>
       <a href="founder.html">Founder</a>
       <a href="#listing">Listing</a>
+      <a href="arena.html">Arena</a>
       <a href="#checker">Unit Checker</a>
       <a href="#machine">Agent Surface</a>
       <a href="#faq">FAQ</a>
@@ -602,6 +603,7 @@
     <a href="#classes"><span class="n">06</span>Four Densities — Classes</a>
     <a href="#discharge"><span class="n">08</span>Discharge — Claim DOT</a>
     <a href="#listing"><span class="n">08·5</span>Listing — $DOT on Uniswap</a>
+    <a href="arena.html"><span class="n">08·7</span>Arena — $DOT Battle Royale</a>
     <a href="#checker"><span class="n">09</span>Unit Checker</a>
     <a href="#machine"><span class="n">10</span>Agent Surface</a>
     <a href="#faq"><span class="n">11</span>FAQ — Field Notes</a>
@@ -1309,6 +1311,64 @@ $DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge be
   </div>
 </section>
 
+<!-- ================= 08·7 ARENA ================= -->
+<section id="arena" aria-labelledby="arena-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-no">08·7</span>
+      <h2 id="arena-h">The Arena</h2>
+      <span class="side">EIGHT ROOMS. ONE FALLS.<br/>EVERY 180 SECONDS.<br/>5% BURNS, FOREVER.</span>
+    </div>
+    <div class="reveal">
+      <p style="color:var(--bone-dim);line-height:1.7;font-size:16px;max-width:760px;margin:18px 0 0">DOTFIELD ARENA is live on-chain: a $DOT battle royale in eight rooms — CORE, VAULT, FORGE, ARCHIVE, SIGNAL, REACTOR, ORBIT, DOCK. Stake DOT in a room for 180 seconds; when the round closes, Chainlink VRF draws one room to fall, and its stakes are split pro rata among every surviving room. 5% of the fallen room burns to the dead address in the same settlement — no house cut, no owner hand on player funds, and the contract source is verified. Play it from the arena page, or let your agent play: the full agent rules ship in llms-arena.txt.</p>
+      <div class="coin-panel">
+        <div class="coin-head"><span>DOTFIELD ARENA — LIVE STATE</span><span id="arenaState">READS LIVE FROM BNB CHAIN</span></div>
+        <div class="coin-stats">
+          <div class="coin-cell"><div class="coin-lab">ROUND</div><div class="coin-num" id="arenaRound">—</div><div class="coin-sub">BACK-TO-BACK · 180 SECONDS EACH</div></div>
+          <div class="coin-cell"><div class="coin-lab">STATE</div><div class="coin-num" id="arenaPhase">—</div><div class="coin-sub">SETTLED BY CHAINLINK VRF</div></div>
+          <div class="coin-cell"><div class="coin-lab">STAKED THIS ROUND</div><div class="coin-num" id="arenaStaked">—</div><div class="coin-sub">DOT ACROSS ALL 8 ROOMS</div></div>
+          <div class="coin-cell"><div class="coin-lab">BURNED ALL-TIME</div><div class="coin-num" id="arenaBurned">—</div><div class="coin-sub">DOT SENT TO THE DEAD ADDRESS</div></div>
+        </div>
+        <div class="coin-actions">
+          <a class="btn btn-solid" href="arena.html">ENTER THE ARENA →</a>
+          <span class="coin-note">DotArena — 0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104 · Source verified (Sourcify exact match). Staking is a game of chance against other players; the expected return is negative — the 5% burn sees to that. Stake only DOT you can afford to lose.</span>
+        </div>
+      </div>
+      <script>
+      (function(){
+        var ARENA="0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104";
+        var RPCS=["https://bsc-dataseed.binance.org","https://bsc-dataseed1.defibit.io","https://bsc-dataseed2.defibit.io","https://bsc.publicnode.com"];
+        function $(id){return document.getElementById(id)}
+        function fmt(n){return Math.round(n).toLocaleString("en-US")}
+        function rpc(data){
+          var body=JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to:ARENA,data:data},"latest"]});
+          var chain=Promise.reject();
+          RPCS.forEach(function(u){
+            chain=chain.catch(function(){
+              return fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:body})
+                .then(function(r){return r.json()})
+                .then(function(j){if(!j.result)throw new Error("rpc");return j.result});
+            });
+          });
+          return chain;
+        }
+        function word(hex,i){return BigInt("0x"+hex.slice(2+i*64,2+(i+1)*64))}
+        function reads(){
+          rpc("0xa32bf597").then(function(h){
+            var id=word(h,0), state=Number(word(h,3)), staked=word(h,5);
+            $("arenaRound").textContent = id===0n ? "—" : "#"+id.toString();
+            $("arenaPhase").textContent = id===0n ? "OPENING" : (state===0?"OPEN — STAKING":state===1?"DRAW REQUESTED":"SETTLING");
+            $("arenaStaked").textContent = fmt(Number(staked)/1e18)+" DOT";
+          }).catch(function(){});
+          rpc("0xd89135cd").then(function(h){ $("arenaBurned").textContent = fmt(Number(BigInt(h))/1e18)+" DOT"; }).catch(function(){});
+        }
+        reads(); setInterval(reads,20000);
+      })();
+      </script>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 09 UNIT CHECKER ================= -->
 <section id="checker" aria-labelledby="checker-h">
   <div class="wrap">
@@ -1478,6 +1538,7 @@ $DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge be
         <a href="#pass">Dot Pass</a>
         <a href="#discharge">Discharge · $DOT</a>
         <a href="#listing">Listing</a>
+        <a href="arena.html">Arena — Battle Royale</a>
         <a href="#checker">Unit Checker</a>
         <a href="#machine">Agent Surface</a>
         <a href="/llms.txt">Docs · llms.txt</a>
@@ -1487,6 +1548,7 @@ $DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge be
         <div class="foot-col-h"><span class="fd-dot">●</span> CONTRACTS</div>
         <a href="https://bscscan.com/token/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">$DOT Token · BscScan ↗</a>
         <a href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">TalvioGenerate NFT · BscScan ↗</a>
+        <a href="https://bscscan.com/address/0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104" target="_blank" rel="noopener">DotArena · BscScan ↗</a>
         <a href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">DPASS (inside the NFT contract) · BscScan ↗</a>
         <a href="https://bscscan.com/address/0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" target="_blank" rel="noopener">Agent ID Registry · BscScan ↗</a>
       </div>

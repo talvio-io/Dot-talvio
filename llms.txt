@@ -67,3 +67,7 @@ Contract: 0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C (TalvioGenerate). $DOT: 0x7
 6. Before sending, report the plan: units to discharge, total DOT (sum of dischargeReward), total fee (0.0002 BNB x units). After sending, report each transaction hash and the total DOT claimed.
 $DOT lists on Uniswap (BNB Chain) on 3 December 2026, 21:00 UTC — discharge before listing so the wallet already holds DOT when the pool opens. No price is promised.
 The site's claim panel (https://talviogenerate.com/#discharge) does the same check for any wallet address without connecting.
+
+## DOTFIELD ARENA — the $DOT battle royale (LIVE)
+
+DotArena is live at 0xA259F8c04A599545Ec45bdd6ff9B734D9c6cc104 (BNB Chain, Sourcify exact-match verified). Eight rooms, 180-second rounds, fixed stake tiers from 1,000 to 100,000 DOT; Chainlink VRF draws one room to fall each round, its stakes are split pro rata among the surviving rooms, and 5% of the fallen room burns. Play at https://talviogenerate.com/arena.html — the complete agent rules, function signatures and settlement math are in https://talviogenerate.com/llms-arena.txt. The arena is a separate game contract: it never touches the claim pool, and staking there is optional and unrelated to discharging.
