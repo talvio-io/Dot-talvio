@@ -3,283 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Withdraw BNB — Talvio Generate DOTFIELD</title>
-<meta name="description" content="Owner-only page to withdraw all BNB held by the TalvioGenerate contract (0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C) to the owner wallet. Balance read live from BNB Chain.">
-<meta property="og:title" content="Withdraw BNB — Talvio Generate DOTFIELD">
-<meta property="og:description" content="Owner-only: withdraw all BNB from the TalvioGenerate contract to the owner wallet.">
-<meta property="og:image" content="https://talviogenerate.com/og-card.webp">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>DOTFIELD — Owner Withdraw</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <style>
-:root{--ink:#060606;--ink2:#0c0c0b;--panel:#131311;--bone:#eceade;--dim:#a9a79b;--faint:#6d6b61;--line:#26261f;--gold:#ffce00;--red:#ff2d1e;--green:#3ddc84;--sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
-*{box-sizing:border-box}
-body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--sans);padding:34px 18px 70px}
-.wrap{max-width:860px;margin:0 auto}
-.kick{font-family:var(--mono);color:var(--gold);letter-spacing:.18em;font-size:13px;text-transform:uppercase}
-h1{font-weight:900;font-size:clamp(34px,6vw,60px);line:.98;margin:10px 0 12px;text-transform:uppercase}
-.lede{color:var(--dim);font-size:18px;line-height:1.55;max-width:720px;margin:0 0 8px}
-.lede b{color:var(--bone)}
-.status{font-family:var(--mono);font-size:13px;color:var(--faint);margin:14px 0 26px}
-.status .live{color:var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
-.card .lab{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
-.card .num{font-weight:900;font-size:36px;margin:8px 0 4px;word-break:break-all}
-.card .num.gold{color:var(--gold)}
-.card .sub{color:var(--faint);font-size:13.5px;line-height:1.45;word-break:break-all}
-.card .sub.mono{font-family:var(--mono);font-size:13px}
-a{color:var(--gold);text-decoration:none;word-break:break-all}
-a:hover{text-decoration:underline}
-.btn{display:inline-block;border:1px solid var(--gold);color:var(--ink);background:var(--gold);font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:14px 22px;border-radius:10px;cursor:pointer;min-height:48px}
-.btn:hover{filter:brightness(1.1)}
-.btn.ghost{background:transparent;color:var(--bone);border-color:var(--line)}
-.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
-.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
-.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0 8px}
-.warn{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;color:var(--dim);line-height:1.6;font-size:15px;margin:18px 0}
-.warn b{color:var(--bone)}
-.msg{font-family:var(--mono);font-size:13.5px;line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;display:none;word-break:break-word}
-.msg.show{display:block}
-.msg.err{border-color:var(--red);color:#ffb3ad}
-.msg.ok{border-color:var(--green);color:#b8f5d1}
-.msg.info{color:var(--dim)}
-h2{font-weight:900;text-transform:uppercase;font-size:22px;margin:34px 0 12px}
-.steps{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 22px}
-.steps li{margin:14px 0;line-height:1.55;color:var(--dim)}
-.steps li b{color:var(--bone)}
-.steps li code,.mono{font-family:var(--mono)}
-.back{font-family:var(--mono);font-size:13px;color:var(--faint)}
+  :root{ --bg:#0a0a0b; --panel:#131315; --line:#26262a; --txt:#f2f2f0; --dim:#9a9aa0; --acc:#ffd21f; --ok:#3ddc84; --err:#ff5c5c; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--txt); font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; max-width:520px; width:100%; padding:28px 26px; }
+  .tag{ font-size:11px; letter-spacing:.18em; color:var(--dim); text-transform:uppercase; }
+  h1{ font-size:22px; margin:6px 0 4px; letter-spacing:.02em; }
+  h1 span{ color:var(--acc); }
+  .sub{ color:var(--dim); font-size:12.5px; line-height:1.55; margin-bottom:20px; }
+  .row{ display:flex; justify-content:space-between; gap:14px; padding:11px 0; border-top:1px solid var(--line); font-size:13px; }
+  .row .k{ color:var(--dim); }
+  .row .v{ text-align:right; word-break:break-all; }
+  .bal{ font-size:30px; font-weight:700; color:var(--acc); padding:16px 0 4px; }
+  .bal small{ font-size:14px; color:var(--dim); font-weight:400; }
+  button{ width:100%; padding:14px; margin-top:14px; border-radius:10px; border:1px solid var(--line); background:#1c1c1f; color:var(--txt); font:inherit; font-size:14px; letter-spacing:.06em; cursor:pointer; }
+  button.primary{ background:var(--acc); color:#111; border-color:var(--acc); font-weight:700; }
+  button:disabled{ opacity:.38; cursor:not-allowed; }
+  button:not(:disabled):hover{ filter:brightness(1.12); }
+  #log{ margin-top:16px; font-size:12.5px; line-height:1.6; color:var(--dim); white-space:pre-wrap; word-break:break-all; }
+  #log .ok{ color:var(--ok); } #log .err{ color:var(--err); }
+  a{ color:var(--acc); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <p class="back"><a href="/">← talviogenerate.com</a></p>
-  <div class="kick">DOTFIELD · Owner only</div>
-  <h1>Withdraw BNB</h1>
-  <p class="lede">Withdraw <b>all BNB</b> held by the <b>TalvioGenerate</b> contract to the <b>owner wallet</b>. This page calls the contract's own <b>withdraw()</b> — nothing else. Only the owner wallet can call it.</p>
-  <p class="status">CONTRACT <span class="live">LIVE ON BNB CHAIN</span> · BALANCE READ LIVE · REFRESHES EVERY 15 SECONDS</p>
+<div class="card">
+  <div class="tag">DOTFIELD · Owner only · Unlinked page</div>
+  <h1>WITHDRAW <span>BNB</span></h1>
+  <p class="sub">Pulls the full BNB balance of the DOTFIELD NFT contract — accumulated discharge fees and paid-mint revenue — to the contract owner wallet. The $DOT claim pool is a token balance and is <b>not</b> touched by this.</p>
 
-  <div class="grid">
-    <div class="card">
-      <div class="lab">BNB in contract</div>
-      <div class="num gold" id="balNum">…</div>
-      <div class="sub" id="balSub">Reading balance from BNB Chain…</div>
-    </div>
-    <div class="card">
-      <div class="lab">Owner wallet</div>
-      <div class="num" style="font-size:20px" id="ownerNum">…</div>
-      <div class="sub mono" id="ownerSub">Reading owner() from the contract…</div>
-    </div>
-    <div class="card">
-      <div class="lab">Units resolved</div>
-      <div class="num" id="mintedNum">…</div>
-      <div class="sub">totalMinted() — live from the contract.</div>
-    </div>
-  </div>
+  <div class="bal"><span id="bal">—</span> <small>BNB in contract</small></div>
+  <div class="row"><span class="k">Contract</span><span class="v" id="caddr"></span></div>
+  <div class="row"><span class="k">Owner</span><span class="v" id="cowner"></span></div>
+  <div class="row"><span class="k">Your wallet</span><span class="v" id="cwallet">not connected</span></div>
 
-  <div class="card" style="margin-bottom:14px">
-    <div class="lab">Connected wallet</div>
-    <div class="num" style="font-size:20px" id="acctNum">NOT CONNECTED</div>
-    <div class="sub mono" id="acctSub">Connect the owner wallet to withdraw. Any other wallet is blocked by the contract itself (onlyOwner).</div>
-  </div>
-
-  <div class="btnrow">
-    <button class="btn ghost" type="button" id="connectBtn">Connect wallet</button>
-    <button class="btn" type="button" id="withdrawBtn" disabled>Withdraw all BNB</button>
-  </div>
-  <div class="msg info" id="msg" aria-live="polite"></div>
-
-  <div class="warn">
-    <b>Exactly what withdraw() does</b> (<a href="https://github.com/talvio-io/Dot-talvio/blob/main/contract/TalvioGenerate.sol" target="_blank" rel="noopener">TalvioGenerate.sol</a>, owner functions): it sends the <b>entire</b> contract balance to <b>owner()</b> in one call and emits <span class="mono">Withdrawn(owner, amount)</span>. There is <b>no amount and no destination to choose</b> — no partial withdraw, no withdraw to another address. If the balance is 0 the call reverts with <span class="mono">"nothing to withdraw"</span>. The BNB comes from paid resolves (0.00026 / 0.001 BNB), discharge fees (0.0002 BNB) and DPASS sales (0.0012 BNB). The 600,000,000 DOT claim pool is a token balance, not BNB — withdraw() never touches it.
-  </div>
-
-  <h2>How to withdraw</h2>
-  <ol class="steps">
-    <li><b>Connect the owner wallet</b> (<span class="mono" id="ownerStep">…</span>) on BNB Smart Chain (chain ID 56). The button stays disabled for any other wallet.</li>
-    <li><b>Press WITHDRAW ALL BNB</b> and confirm in your wallet. The page first simulates the call — if the contract would revert, nothing is sent.</li>
-    <li><b>Wait for the receipt.</b> The transaction hash appears below with a BscScan link. The balance on this page refreshes to 0 after it confirms.</li>
-    <li><b>No wallet here?</b> Use BscScan directly instead: open the contract on BscScan, connect the owner wallet, go to <b>Write Contract → withdraw</b> and send it: <a href="https://bscscan.com/address/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C#writeContract" target="_blank" rel="noopener">bscscan.com/address/0xFfC521…dB2C#writeContract ↗</a></li>
-  </ol>
-
-  <h2>Contracts</h2>
-  <div class="steps">
-    <p style="color:var(--dim);line-height:1.8;margin:14px 0">TalvioGenerate NFT — <a href="https://bscscan.com/token/0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C" target="_blank" rel="noopener">0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C ↗</a><br>
-    $DOT token — <a href="https://bscscan.com/token/0x779ee8B473c09d39BBeFA78636c56C85BfF4456a" target="_blank" rel="noopener">0x779ee8B473c09d39BBeFA78636c56C85BfF4456a ↗</a><br>
-    Function — <span class="mono">withdraw()</span> · selector <span class="mono">0x3ccfd60b</span> · <span class="mono">onlyOwner</span> · value 0 BNB</p>
-  </div>
+  <button id="btnConnect">CONNECT WALLET</button>
+  <button id="btnWithdraw" class="primary" disabled>WITHDRAW ALL BNB</button>
+  <div id="log"></div>
 </div>
 
 <script>
-(function(){
-  "use strict";
-  var NFT = "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C";
-  var OWNER_EXPECTED = "0x85d04d08301a9e9e0efac0b5fa9c874e8f546bd2";
-  var WITHDRAW_DATA = "0x3ccfd60b"; // keccak256("withdraw()")[:4 bytes] — verified
-  var OWNER_DATA = "0x8da5cb5b";     // keccak256("owner()")[:4 bytes]
-  var TOTAL_DATA = "0xa2309ff8";     // keccak256("totalMinted()")[:4 bytes]
-  var RPCS = [
-    "https://bsc-dataseed.binance.org",
-    "https://bsc-dataseed1.defibit.io",
-    "https://bsc-rpc.publicnode.com"
-  ];
-  var account = null, balanceWei = null, ownerLive = null, busy = false;
+const CONTRACT = "0xFfC521D504F20bd7bCd0871B9B39BA9501F5dB2C";
+const RPCS = ["https://bsc-dataseed.binance.org", "https://bsc.publicnode.com", "https://binance.llamarpc.com"];
+const ABI = [
+  "function withdraw()",
+  "function owner() view returns (address)"
+];
+const $ = id => document.getElementById(id);
+const log = (msg, cls) => { const d = document.createElement("div"); if (cls) d.className = cls; d.textContent = msg; $("log").appendChild(d); };
 
-  function $(id){ return document.getElementById(id); }
-  function short(a){ return a ? a.slice(0, 6) + "…" + a.slice(-4) : "—"; }
-  function fmtBnb(w){
-    if (w === null) return "…";
-    var s = w.toString(), pad = s.padStart(19, "0");
-    var whole = pad.slice(0, -18).replace(/^0+(?=\d)/, ""), frac = pad.slice(-18).replace(/0+$/, "");
-    return whole + (frac ? "." + frac : "");
-  }
-  function showMsg(kind, html){
-    var el = $("msg"); el.className = "msg show " + kind; el.innerHTML = html;
-  }
-  function rpc(method, params){
-    var body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params });
-    var tries = RPCS.map(function(u){
-      return fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: body })
-        .then(function(r){ return r.json(); })
-        .then(function(j){ if (typeof j.result !== "string") throw new Error("bad rpc"); return j.result; });
-    });
-    return Promise.any ? Promise.any(tries) : Promise.race(tries);
-  }
-  function decUint(hex){ return hex ? BigInt(hex) : 0n; }
-  function decAddr(hex){ return hex ? ("0x" + hex.slice(-40)) : ""; }
+let ownerAddr = null, signer = null;
 
-  function readState(){
-    return Promise.allSettled([
-      rpc("eth_getBalance", [NFT, "latest"]),
-      rpc("eth_call", [{ to: NFT, data: OWNER_DATA }, "latest"]),
-      rpc("eth_call", [{ to: NFT, data: TOTAL_DATA }, "latest"])
-    ]).then(function(rs){
-      if (rs[0].status === "fulfilled"){
-        balanceWei = decUint(rs[0].value);
-        $("balNum").textContent = fmtBnb(balanceWei) + " BNB";
-        $("balSub").textContent = balanceWei === 0n
-          ? "Balance is 0 — withdraw() would revert with \"nothing to withdraw\"."
-          : "This is the full amount withdraw() sends to the owner.";
-      } else {
-        $("balNum").textContent = "UNREADABLE";
-        $("balSub").textContent = "Could not reach an RPC — retry in a moment.";
-      }
-      if (rs[1].status === "fulfilled"){
-        ownerLive = decAddr(rs[1].value);
-        $("ownerNum").textContent = short(ownerLive);
-        $("ownerSub").textContent = ownerLive;
-        $("ownerStep").textContent = ownerLive;
-        var match = ownerLive.toLowerCase() === OWNER_EXPECTED.toLowerCase();
-        if (!match) $("ownerSub").textContent += " — NOTE: differs from the address recorded at deploy time.";
-      }
-      if (rs[2].status === "fulfilled") $("mintedNum").textContent = decUint(rs[2].value).toString() + " / 10,000";
-      render();
-    });
-  }
+$("caddr").innerHTML = '<a href="https://bscscan.com/address/' + CONTRACT + '" target="_blank" rel="noopener">' + CONTRACT.slice(0,10) + "…" + CONTRACT.slice(-8) + "</a>";
 
-  function render(){
-    var isOwner = !!(account && ownerLive && account.toLowerCase() === ownerLive.toLowerCase());
-    $("acctNum").textContent = account ? short(account) : "NOT CONNECTED";
-    $("acctSub").textContent = account
-      ? (isOwner ? "This is the owner wallet — withdraw is unlocked." : "This wallet is NOT the owner — the contract will reject withdraw(). Connect the owner wallet.")
-      : "Connect the owner wallet to withdraw. Any other wallet is blocked by the contract itself (onlyOwner).";
-    $("withdrawBtn").disabled = busy || !isOwner || balanceWei === null || balanceWei === 0n;
+async function readProvider() {
+  for (const u of RPCS) {
+    try { const p = new ethers.JsonRpcProvider(u); await p.getBlockNumber(); return p; } catch (e) { /* next */ }
   }
+  throw new Error("all RPCs unreachable");
+}
 
-  function ensureChain(){
-    if (!window.ethereum) return Promise.resolve(false);
-    return window.ethereum.request({ method: "eth_chainId" }).then(function(cid){
-      if (cid === "0x38") return true;
-      return window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] })
-        .then(function(){ return true; })
-        .catch(function(e){
-          if (e && e.code === 4902){
-            return window.ethereum.request({ method: "wallet_addEthereumChain", params: [{
-              chainId: "0x38", chainName: "BNB Smart Chain",
-              nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
-              rpcUrls: ["https://bsc-dataseed.binance.org"], blockExplorerUrls: ["https://bscscan.com"]
-            }] }).then(function(){ return true; });
-          }
-          throw e;
-        });
-    });
-  }
+async function refresh() {
+  try {
+    const p = await readProvider();
+    const [bal, c] = await Promise.all([p.getBalance(CONTRACT), new ethers.Contract(CONTRACT, ABI, p)]);
+    ownerAddr = await c.owner();
+    $("bal").textContent = Number(ethers.formatEther(bal)).toFixed(6);
+    $("cowner").textContent = ownerAddr.slice(0,10) + "…" + ownerAddr.slice(-8);
+    $("btnWithdraw").disabled = !(signer && ownerAddr && (await signer.getAddress()).toLowerCase() === ownerAddr.toLowerCase()) || bal === 0n;
+    return bal;
+  } catch (e) { log("Could not read the contract: " + e.message, "err"); }
+}
 
-  function connect(){
-    if (!window.ethereum){ showMsg("err", "NO WALLET FOUND — this browser has no web3 wallet. Install MetaMask (or another BNB Chain wallet) and reload."); return; }
-    ensureChain()
-      .then(function(){ return window.ethereum.request({ method: "eth_requestAccounts" }); })
-      .then(function(accs){ if (accs && accs[0]){ account = accs[0]; render(); } })
-      .catch(function(e){
-        if (e && e.code === 4001) showMsg("err", "CONNECTION REJECTED IN WALLET — nothing was connected.");
-        else showMsg("err", "CONNECTION FAILED — " + ((e && e.message) || e));
-      });
-  }
-
-  function waitReceipt(hash){
-    var tries = 0;
-    return new Promise(function(resolve){
-      (function poll(){
-        tries++;
-        window.ethereum.request({ method: "eth_getTransactionReceipt", params: [hash] })
-          .then(function(rcpt){
-            if (rcpt) resolve(rcpt);
-            else if (tries < 40) setTimeout(poll, 3000);
-            else resolve(null);
-          })
-          .catch(function(){ if (tries < 40) setTimeout(poll, 3000); else resolve(null); });
-      })();
-    });
-  }
-
-  function withdraw(){
-    if (busy || !account || !ownerLive) return;
-    if (account.toLowerCase() !== ownerLive.toLowerCase()){
-      showMsg("err", "BLOCKED — the connected wallet is not the owner. Only " + ownerLive + " can call withdraw().");
-      return;
+$("btnConnect").onclick = async () => {
+  try {
+    if (!window.ethereum) { log("No wallet found in this browser. Open this page in your wallet's browser or with MetaMask.", "err"); return; }
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }); } catch (e) { /* already on BSC or user handled */ }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    const addr = await signer.getAddress();
+    $("cwallet").textContent = addr.slice(0,10) + "…" + addr.slice(-8);
+    if (ownerAddr && addr.toLowerCase() !== ownerAddr.toLowerCase()) {
+      log("This wallet is not the contract owner. withdraw() will revert — connect " + ownerAddr + " instead.", "err");
+    } else {
+      log("Owner wallet connected.", "ok");
     }
-    if (balanceWei === 0n){ showMsg("err", "NOTHING TO WITHDRAW — the contract balance is 0 BNB."); return; }
-    busy = true; render();
-    var amount = fmtBnb(balanceWei);
-    showMsg("info", "SIMULATING withdraw() FOR " + amount + " BNB — nothing is sent if the contract would revert…");
-    var tx = { from: account, to: NFT, data: WITHDRAW_DATA, value: "0x0" };
-    window.ethereum.request({ method: "eth_call", params: [tx, "latest"] })
-      .then(function(){
-        showMsg("info", "SIMULATION PASSED — confirm the transaction in your wallet to withdraw " + amount + " BNB to the owner.");
-        return window.ethereum.request({ method: "eth_sendTransaction", params: [tx] });
-      })
-      .then(function(hash){
-        showMsg("info", "SENT — tx <a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">" + hash.slice(0, 18) + "… ↗</a>. Waiting for confirmation…");
-        return waitReceipt(hash).then(function(rcpt){
-          if (rcpt && rcpt.status === "0x1"){
-            showMsg("ok", "WITHDRAWN — " + amount + " BNB sent to the owner. Tx <a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">" + hash.slice(0, 18) + "… ↗</a>");
-          } else if (rcpt){
-            showMsg("err", "TRANSACTION FAILED ON-CHAIN — check <a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">BscScan ↗</a> for the revert reason.");
-          } else {
-            showMsg("info", "STILL PENDING — tx <a href=\"https://bscscan.com/tx/" + hash + "\" target=\"_blank\" rel=\"noopener\">" + hash.slice(0, 18) + "… ↗</a>. Check it on BscScan.");
-          }
-          return readState();
-        });
-      })
-      .catch(function(e){
-        if (e && e.code === 4001) showMsg("err", "YOU REJECTED THE REQUEST IN YOUR WALLET — nothing was sent.");
-        else showMsg("err", "WITHDRAW FAILED — " + ((e && e.message) || e));
-      })
-      .finally(function(){ busy = false; render(); });
-  }
+    await refresh();
+  } catch (e) { log("Connect failed: " + (e.message || e), "err"); }
+};
 
-  $("connectBtn").addEventListener("click", connect);
-  $("withdrawBtn").addEventListener("click", withdraw);
-  if (window.ethereum && window.ethereum.on){
-    window.ethereum.on("accountsChanged", function(accs){ account = (accs && accs[0]) || null; render(); });
-    window.ethereum.on("chainChanged", function(){ readState(); });
-    window.ethereum.request({ method: "eth_accounts" }).then(function(accs){
-      if (accs && accs[0]) account = accs[0];
-      render();
-    }).catch(function(){});
+$("btnWithdraw").onclick = async () => {
+  try {
+    $("btnWithdraw").disabled = true;
+    const c = new ethers.Contract(CONTRACT, ABI, signer);
+    log("Sending withdraw() — confirm it in your wallet…");
+    const tx = await c.withdraw();
+    log("Transaction sent: " + tx.hash);
+    const rc = await tx.wait();
+    if (rc.status !== 1) { log("Transaction reverted on-chain.", "err"); return; }
+    log("Withdrawn. The BNB is now in the owner wallet.", "ok");
+    const a = document.createElement("a");
+    a.href = "https://bscscan.com/tx/" + tx.hash; a.target = "_blank"; a.rel = "noopener"; a.textContent = "View on BscScan →";
+    $("log").appendChild(a);
+    await refresh();
+  } catch (e) {
+    log("Withdraw failed: " + (e.shortMessage || e.message || e), "err");
+    await refresh();
   }
-  readState();
-  setInterval(readState, 15000);
-})();
+};
+
+refresh();
 </script>
 </body>
 </html>
